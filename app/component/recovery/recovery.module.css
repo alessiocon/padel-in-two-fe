@@ -1,0 +1,30 @@
+.table{
+  text-align: center;
+  margin: 1em 0.5em;
+  background-color: aliceblue;
+  color: black;
+}
+
+.table td {
+  padding: 0.3em 1em;
+}
+
+.table th:first-child,
+.table td:first-child {
+  text-align: left;
+  width: 100%;
+}
+
+.table th {
+  padding: 0.5em 0.5em;
+  background-color: aquamarine;
+  border: 2px solid #ccc;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #dcdcdc;
+}
+
+.table tbody tr:global(.perso) {
+  background-color: #ea0000;
+}
