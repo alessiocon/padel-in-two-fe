@@ -1,16 +1,16 @@
 import { DoorClosed, DoorOpen } from "lucide-react";
 import type { FC } from "react";
+import type { ClubCourtDto } from "~/Client/Model/Common/ClubCourtDto";
 import { Badge } from "~/components/ui/badge";
 import type { CourtDto } from "~/models/club.dto";
+import type { CourtWithStatusDto } from "~/routes/club";
 
 // Estendiamo il DTO per supportare la proprietà booleana opzionale 'occuped'
-export type CourtWithStatusDto = CourtDto & {
-  occuped?: boolean;
-};
+
 
 export const ButtonCourtSelection: FC<{
   court: CourtWithStatusDto;
-  onSelect: (court: CourtDto) => void;
+  onSelect: (court: ClubCourtDto) => void;
   onClose: () => void;
 }> = ({ court, onSelect, onClose }) => {
   

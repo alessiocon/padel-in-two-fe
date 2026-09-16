@@ -15,8 +15,7 @@ export default [
 
     // Rotte PROTETTE: richiedono autenticazione (auth === true)
     route("/", "routes/layout/protectedLayout.tsx", [
-      route("/test", "routes/test.tsx"),
-      route("/padel/:_id", "routes/padel.tsx"),
+      // route("/padel/:_id", "routes/padel.tsx"),
     ]),
 
   ]),

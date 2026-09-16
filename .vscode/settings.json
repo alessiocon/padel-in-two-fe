@@ -1,3 +1,11 @@
 {
-    "folder-color.pathColors": []
+    "folder-color.pathColors": [
+        {
+            "filePath": "padel-fe\\app\\Client\\ApiClient.ts",
+            "color": "foldercolorizer.color_afaf00"
+        }
+    ],
+    "folder-color.favoriteColors": [
+        "foldercolorizer.color_af0000"
+    ]
 }

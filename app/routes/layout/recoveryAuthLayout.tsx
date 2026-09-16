@@ -1,7 +1,8 @@
 import { Navigate, Outlet, useLoaderData } from "react-router";
 import { useContext, useEffect, useState} from "react";
 import { AuthContext } from "../../store/context";
-import { fetchApi } from "../../services/api.service";
+import { FullPageLoader } from "~/component/FullPageLoader";
+import { ApiClient } from "~/Client/ApiClient";
 
 
 
@@ -18,17 +19,19 @@ export default function RecoveryAuthLayout() {
 
     async function checkAuth() {
       let isUserAuthenticated = false;
-
       try {
-        const res = await fetchApi<{ res: boolean }>("/users/me", { method: "GET" });
-        // Sostituisci res.res con il controllo idoneo se la tua API restituisce direttamente l'utente
-        isUserAuthenticated = Boolean(res?.res ?? res);
+        const res = await ApiClient.GetUser();
+        isUserAuthenticated = Boolean(res.IsSuccess);
+
+        if(res.Data === null) throw new Error("errore in fase di ricerca della sessione");
+
+        setAuth({ auth: res.IsSuccess, email: res.Data.email, firstName: res.Data.firstName, lastName: res.Data.lastName, username:res.Data.username});
       } catch (err) {
         isUserAuthenticated = false;
       } finally {
         if (isMounted) {
           // 1. Aggiorniamo il Context globale
-          setAuth({ auth: isUserAuthenticated });
+         
 
           // 2. Aggiorniamo lo stato locale in un unico dispatch atomico
           setAuthState({
@@ -48,7 +51,7 @@ export default function RecoveryAuthLayout() {
 
   // Mostra lo splash screen SOLO durante il primissimo controllo all'avvio dell'app
   if (authState.isChecking) {
-    return <div className="loading">Caricamento in corso...</div>;
+    return <FullPageLoader label="Verifica sessione in corso..." />;
   }
 
   // Passiamo il valore 'isAuth' aggiornato e sincrono al 100%

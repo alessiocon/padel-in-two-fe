@@ -8,7 +8,7 @@ export default function GuestOnlyLayout() {
 
 
   if (auth.auth) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/user" replace />;
   }
   return <Outlet />;
 }

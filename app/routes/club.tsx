@@ -2,7 +2,6 @@ import type { Route } from "./+types/home";
 import React, { useContext, useEffect, useState } from "react";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 
-import { fetchApi } from "../services/api.service";
 import { 
   Building2, 
   Clock, 
@@ -16,11 +15,14 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
-import { Badge } from "~/components/ui/badge";
-import type { ClubDetailDto, CourtDto } from "./../models/club.dto";
 import { PopUpContext } from "~/store/context";
 import { ButtonCourtSelection } from "~/component/ButtonCourtSelection";
-import { BookingStatus, type BookingDto, type CreateBookingDto } from "~/models/booking.dto";
+import { BookingStatus } from "~/models/booking.dto";
+import { ApiClient } from "~/Client/ApiClient";
+import type { ClubResDto } from "~/Client/Model/Response/ClubResDto";
+import type { ClubCourtDto } from "~/Client/Model/Common/ClubCourtDto";
+import type { BookingResDto } from "~/Client/Model/Response/BookingsResDto";
+import type { CreateBookingDto } from "~/Client/Model/Request/CreateBookingDto";
 
 
 
@@ -32,11 +34,15 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
-  const response = await fetchApi<ClubDetailDto>(`/clubs/${params.id}`);
-  if (!response) {
+  if(params.id === undefined){
+    throw new Error("Club non specificato");
+  }
+  const response = await ApiClient.GetClub(params.id);
+
+  if (!response.IsSuccess) {
     throw new Error("Impossibile recuperare i dettagli del club");
   }
-  return response;
+  return response.Data;
 }
 
 function generateTimeSlots(
@@ -76,17 +82,17 @@ function generateTimeSlots(
 }
 
 export default function ClubDetailPage() {
-  const club = useLoaderData<ClubDetailDto>();
+  const club = useLoaderData<ClubResDto>();
   const [, setPopup] = useContext(PopUpContext);
   
   const [selectedDate, setSelectedDate] = useState<string>( new Date().toISOString().split("T")[0] );
   
   // Stato per le prenotazioni lette dall'API e relativo caricamento
-  const [bookings, setBookings] = useState<BookingDto[]>([]);
+  const [bookings, setBookings] = useState<BookingResDto[]>([]);
   const [isLoadingBookings, setIsLoadingBookings] = useState<boolean>(false);
 
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
-  const [selectedCourt, setSelectedCourt] = useState<CourtDto | null>(null);
+  const [selectedCourt, setSelectedCourt] = useState<ClubCourtDto | null>(null);
   
 
   const timeSlots = generateTimeSlots(
@@ -100,19 +106,14 @@ export default function ClubDetailPage() {
   maxDate.setMonth(maxDate.getMonth() + 1);
   const maxDateStr = maxDate.toISOString().split("T")[0];
 
-  const totalSum = club.courts.reduce((acc, court) => acc + court.price, 0);
-  const averagePrice = (club.courts.length > 0 ? totalSum / club.courts.length : 0).toFixed(2);
-
   // Fetch per caricare le prenotazioni ogni volta che cambia il club o la data selezionata
   useEffect(() => {
     async function fetchBookings() {
       setIsLoadingBookings(true);
       try {
-        const response = await fetchApi<BookingDto[]>(
-          `/clubs/${club.id}/bookings?date=${selectedDate}`
-        );
+        const res = await ApiClient.GetBookings(club.id, selectedDate);
+        setBookings(res.Data || []);
 
-        setBookings(response || []);
       } catch (error) {
         console.error("Errore nel recupero delle prenotazioni:", error);
         setBookings([]);
@@ -139,18 +140,19 @@ export default function ClubDetailPage() {
     setIsLoadingBookings(true);
 
     try {
-      const response = await fetchApi<BookingDto>(
-        `/clubs/${club.id}/bookings`,{
-          method: "POST",
-          body: newBooking
-        }
-      );
-      setBookings((prev) => [...prev, response]);
-      window.alert("campo prenotato correttamente!")
+      const res = await ApiClient.CreateBooking(club.id, newBooking);
+
+      if (!res.Data) {
+        throw new Error("Errore nella creazione di una prenotazione");
+      }
+      const createdBooking = res.Data;
+
+      setBookings((prev) => [...prev, createdBooking]);
+      window.alert("Campo prenotato correttamente!");
 
     } catch (error) {
       console.error("Errore nel recupero delle prenotazioni:", error);
-      window.alert("Errore riporva più tardi")
+      window.alert("Errore, riprova più tardi");
     } finally {
       setIsLoadingBookings(false);
       setSelectedSlot(null);
@@ -161,12 +163,17 @@ export default function ClubDetailPage() {
     setSelectedSlot(slot);
     setSelectedCourt(null);
 
+    const courtModels: CourtWithStatusDto[] = club.courts.map((court) => ({
+      ...court,
+      isOccupied: false,
+    }));
+
     setPopup({
       massage: (
         <CourtSelectionModal
           slot={slot}
           selectedDate={selectedDate}
-          courts={club.courts || []}
+          courts={courtModels}
           bookings={bookings}
           onSelectCourt={(court) => {
             setSelectedCourt(court);
@@ -223,14 +230,14 @@ export default function ClubDetailPage() {
                 <span className="text-muted-foreground flex items-center gap-1.5">
                   <CircleDollarSign className="h-4 w-4" /> Prezzo Medio
                 </span>
-                <span className="font-bold text-primary">€ {averagePrice}</span>
+                <span className="font-bold text-primary">€ {club.averagePrice}</span>
               </div>
 
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground flex items-center gap-1.5">
                   <CircleDollarSign className="h-4 w-4" /> Noleggio Pala
                 </span>
-                <span className="font-bold">€ {club.racketPrice?.toFixed(2)}</span>
+                <span className="font-bold">€ {club.racketPrice.toFixed(2)}</span>
               </div>
             </CardContent>
           </Card>
@@ -326,13 +333,18 @@ export default function ClubDetailPage() {
   );
 }
 
+
+export type CourtWithStatusDto = ClubCourtDto & {
+  isOccupied: boolean;
+};
+
 // Popup aggiornato: completamente responsive per qualsiasi schermo (Invariato)
 interface CourtSelectionModalProps {
   slot: string;
   selectedDate: string;
-  courts: CourtDto[];
-  bookings: BookingDto[];
-  onSelectCourt: (court: CourtDto) => void;
+  courts: CourtWithStatusDto[];
+  bookings: BookingResDto[];
+  onSelectCourt: (court: ClubCourtDto) => void;
   onClose: () => void;
 }
 
@@ -352,7 +364,7 @@ function CourtSelectionModal({
     .filter((b) => (b.startsAt.slice(0, 16) === slotTime.slice(0, 16) && b.status !== BookingStatus.CANCELLED ))
     .map((b) => b.courtId);
 
-  var courtsCheck: CourtDto[] = courts.map((court, index) => {
+  var courtsCheck: CourtWithStatusDto[] = courts.map((court, index) => {
     court.isOccupied = bookedCourtIdsForSlot.includes(court.id);
     return court
   });

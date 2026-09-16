@@ -1,5 +1,10 @@
 import React, { useState, type ButtonHTMLAttributes, type FC, type InputHTMLAttributes } from 'react';
 import style from './form.module.css';
+import { Label } from '~/components/ui/label';
+import { Input } from '~/components/ui/input';
+import { CardContent } from '~/components/ui/card';
+import { Button } from "~/components/ui/button";
+import { Dumbbell, Loader2, LogIn } from "lucide-react";
 
 // Tipo per la configurazione di un campo
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement>{
@@ -14,7 +19,7 @@ export interface formButton {
     label: string;
     addClass?:string;
     type?: ButtonHTMLAttributes<HTMLButtonElement>['type'];
-
+    disabled: boolean
 }
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement>{
@@ -35,13 +40,10 @@ const DynamicInput: FC<InputProps> = ({
 }) => {
     return (
         <div className={`${style['form-field']} ${addClass || ""}`}>
-            {<label htmlFor={id ?? name} className="form-label">{labelText ?? name}</label>}
-            <input
+            <Label htmlFor={id ?? name}>{labelText ?? name}</Label>
+            <Input
                 id={id ?? name}
                 name={name}
-                // value={inputValue}
-                // onChange={(e) => setInputValue(e.target.value)}
-                className="form-input"
                 {...rest}
             />
         </div>
@@ -227,22 +229,23 @@ const DynamicForm : FC<FormProps> = ({
 //   };
 
     return (
-    <form onSubmit={onCustomSubmit} className={`${style.form} ${addClass || ""}`}>
-        {children}
-        <div className='containerBtn'>
-            {buttons.map(({ action, label, type, addClass }, index) => (
-                <button 
-                    key={index}
-                    type={type || "button"}
-                    className={`btn ${addClass || ""}`}
-                    onClick={(e) => action(e)}
-                >
-                    {label}
-                </button>
-            ))}
-        </div>
-
-    </form>
+        <form onSubmit={onCustomSubmit} className={`space-y-4 ${addClass || ""}`}>
+            {children}
+            <div className="pt-2 flex flex-col gap-2">
+                {buttons.map(({ action, label, type, addClass, disabled }, index) => (
+                    <Button 
+                        key={index}
+                        type={type || "button"}
+                        className={`w-full gap-2 ${addClass || ""}`}
+                        onClick={(e) => action(e)}
+                        disabled={disabled}
+                    >
+                        {label}
+                    </Button>
+                ))}
+            </div>
+        </form>
+        
     );
 }
 

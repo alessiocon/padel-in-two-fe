@@ -10,6 +10,10 @@ export interface I_PopupContext {
 
 export interface I_AuthContext {
     auth: boolean;
+    username: string;
+    firstName: string;
+    lastName: string;
+    email: string;
 }
 
 type I_PopupContextUseState = [I_PopupContext, React.Dispatch<React.SetStateAction<I_PopupContext>>];
