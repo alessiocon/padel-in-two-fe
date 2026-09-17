@@ -111,7 +111,7 @@ export default function ClubDetailPage() {
     async function fetchBookings() {
       setIsLoadingBookings(true);
       try {
-        const res = await ApiClient.GetBookings(club.id, selectedDate);
+        const res = await ApiClient.GetBookingsOfClub(club.id, selectedDate);
         setBookings(res.Data || []);
 
       } catch (error) {
@@ -143,7 +143,12 @@ export default function ClubDetailPage() {
       const res = await ApiClient.CreateBooking(club.id, newBooking);
 
       if (!res.Data) {
-        throw new Error("Errore nella creazione di una prenotazione");
+        if(res.Error){ 
+          window.alert(res.Error?.message);
+        }else{
+          throw new Error("errore")
+        }
+        return;
       }
       const createdBooking = res.Data;
 
@@ -151,8 +156,7 @@ export default function ClubDetailPage() {
       window.alert("Campo prenotato correttamente!");
 
     } catch (error) {
-      console.error("Errore nel recupero delle prenotazioni:", error);
-      window.alert("Errore, riprova più tardi");
+      throw new Error("si è verificato un errore, riprova più tardi")
     } finally {
       setIsLoadingBookings(false);
       setSelectedSlot(null);

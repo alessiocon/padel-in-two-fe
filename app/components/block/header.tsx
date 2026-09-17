@@ -52,7 +52,7 @@ export function Header() {
 
             {/* AZIONI DESTRA (DESKTOP) */}
             <div className="flex items-center gap-4">
-                <Link to={auth.auth ? "/profile" : "/auth"}>
+                <Link to={auth.auth ? "/user" : "/auth"}>
                         <Button variant="default" className="gap-2">
                             {auth.auth 
                             ?   <><User className="h-4 w-4" />  <>Profilo</></>

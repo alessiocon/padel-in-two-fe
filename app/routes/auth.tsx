@@ -1,121 +1,16 @@
 import type { Route } from "./+types/auth";
 import { useRevalidator } from "react-router";
-import React, { useContext, useState, type FC } from "react";
-import {DynamicForm, DynamicInput} from "./../component/form/form";
-import { AuthContext } from "./../store/context";
-import { ApiClient } from "~/Client/ApiClient";
-import type { AuthReqDto } from "~/Client/Model/Request/AuthReqDto";
-
-
-export function meta({ data }: Route.MetaArgs) {
-  return [
-    { title: "Login" },
-    { name: "description", content: `login` },
-  ];
-}
-
-export default function Auth() {
-  const revalidator = useRevalidator();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [auth, setAuth] = useContext(AuthContext);
-
-    async function login(e: React.SubmitEvent){
-      e.preventDefault();
-
-      const formData = new FormData(e.target as HTMLFormElement);
-      const email = formData.get("email")?.toString();
-      const password = formData.get("password")?.toString();
-      
-      if(isSubmitting) return;
-      setIsSubmitting(true);
-      
-      if(!email || !password){
-        throw new Error("email o password non presente");
-      }
-
-      try {
-        var input: AuthReqDto = {email:email, password: password } 
-        const res =  await ApiClient.Login(input)
-
-        if(!res.IsSuccess || res.Data === null){
-          throw new Error("errore in fase di autenticazione");
-        } 
-
-        setAuth({auth:true, 
-          email: res.Data.email ,
-          firstName:res.Data.firstName , 
-          lastName:res.Data.lastName, 
-
-          username: res.Data.username
-        });
-
-      } catch (error) {
-        alert("Errore in fase di login");
-      } finally {
-        setIsSubmitting(false);
-      }
-    }
-
-  return (<>
-  <h1 className="t-center">Login</h1>
-   <DynamicForm 
-        onSubmit={(e) => login(e)}
-        addClass="center"
-        buttons={[
-              {action: () => {}, label: "Accedi", type: "submit", addClass: "submit", disabled: isSubmitting},
-            ]}
-    >
-        <DynamicInput 
-            name="email" 
-            labelText={`email`} 
-            type="email" 
-            required 
-            addClass=""
-            defaultValue={"john.doe@example.com"} 
-            value={["", () => {}]}
-            placeholder={`email`}
-        />
-
-        <DynamicInput 
-            name="password" 
-            labelText={`password`} 
-            type="password" 
-            required 
-            addClass="" 
-            defaultValue={"password123!"}
-            value={["", () => {}]}
-            placeholder={`password`}
-        />
-    </DynamicForm>
-  </>
-  );
-}
-
-
-
-
-/*
-import type { Route } from "./+types/padel";
-import { useRevalidator } from "react-router";
-import { fetchApi } from "./../services/api.service";
 import React, { useContext, useState } from "react";
+import { DynamicForm, DynamicInput } from "./../component/form/form";
 import { AuthContext } from "./../store/context";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Dumbbell, Loader2, LogIn } from "lucide-react";
+import { ApiClient } from "./../Client/ApiClient";
+import type { AuthReqDto } from "./../Client/Model/Request/AuthReqDto";
+import type { CreateUserDto } from "./../Client/Model/Request/CreateUserDto";
 
 export function meta({ data }: Route.MetaArgs) {
   return [
-    { title: "Accedi - PadelInTwo" },
-    { name: "description", content: "Effettua il login per accedere alle tue prenotazioni." },
+    { title: "Autenticazione" },
+    { name: "description", content: "Login e Registrazione" },
   ];
 }
 
@@ -123,95 +18,264 @@ export default function Auth() {
   const revalidator = useRevalidator();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [auth, setAuth] = useContext(AuthContext);
+  const [isRegisterMode, setIsRegisterMode] = useState(false);
 
-  async function login(e: React.FormEvent<HTMLFormElement>) {
+  // ==========================================
+  // HANDLER LOGIN
+  // ==========================================
+  async function handleLogin(e: React.SubmitEvent) {
     e.preventDefault();
     if (isSubmitting) return;
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(e.target as HTMLFormElement);
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
+
+    if (!email || !password) {
+      alert("Inserisci email e password");
+      return;
+    }
 
     setIsSubmitting(true);
 
     try {
-      await fetchApi(`/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
+      const input: AuthReqDto = { email: email.toLocaleLowerCase(), password };
+      const res = await ApiClient.Login(input);
+
+      if (!res.IsSuccess || !res.Data) {
+        throw new Error("Errore in fase di autenticazione");
+      }
+
+      setAuth({
+        auth: true,
+        email: res.Data.email.toLocaleLowerCase(),
+        firstName: res.Data.firstName,
+        lastName: res.Data.lastName,
+        username: res.Data.username,
       });
 
-      setAuth({ auth: true });
     } catch (error) {
-      console.error("Errore durante il login:", error);
-      alert("Credenziali non valide o errore di connessione.");
+      alert("Errore in fase di login. Verificare le credenziali.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  // ==========================================
+  // HANDLER REGISTRAZIONE
+  // ==========================================
+  async function handleRegister(e: React.SubmitEvent) {
+    e.preventDefault();
+    if (isSubmitting) return;
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get("email")?.toString();
+    const password = formData.get("password")?.toString();
+    const firstName = formData.get("firstName")?.toString();
+    const lastName = formData.get("lastName")?.toString();
+    const username = formData.get("username")?.toString();
+
+    if (!email || !password || !firstName || !lastName || !username) {
+      alert("Tutti i campi sono obbligatori");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const input: CreateUserDto = {
+        email,
+        password,
+        firstName,
+        lastName,
+        username,
+      };
+
+      const res = await ApiClient.Register(input);
+
+      if (!res.IsSuccess) {
+        throw new Error("Errore durante la registrazione");
+      }
+
+      alert("Account creato con successo! Ora puoi effettuare il login.");
+      setIsRegisterMode(false);
+    } catch (error) {
+      alert("Errore in fase di registrazione. Riprova più tardi.");
     } finally {
       setIsSubmitting(false);
     }
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 bg-background">
-      <Card className="w-full max-w-md border-primary/20 shadow-lg">
-        <CardHeader className="space-y-2 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground mb-2">
-            <Dumbbell className="h-6 w-6" />
-          </div>
-          <CardTitle className="text-2xl font-bold tracking-tight">
-            Accedi a Padel<span className="text-primary">In</span>Two
-          </CardTitle>
-          <CardDescription>
-            Inserisci le tue credenziali per gestire i campi e le prenotazioni
-          </CardDescription>
-        </CardHeader>
+    <div className="min-h-screen bg-background text-foreground w-full flex flex-col justify-center items-center p-4">
+      <div className="w-full max-w-sm flex flex-col items-center">
+        
+        {/* Selector Switch Tra Login e Registrazione */}
+        <div className="flex w-full mb-6 bg-muted p-1 rounded-lg border border-border">
+          <button
+            type="button"
+            onClick={() => setIsRegisterMode(false)}
+            className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${
+              !isRegisterMode
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Accedi
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsRegisterMode(true)}
+            className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${
+              isRegisterMode
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Registrati
+          </button>
+        </div>
 
-        <CardContent>
-          <form onSubmit={login} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
+        <h1 className="text-2xl font-bold mb-6 text-center">
+          {isRegisterMode ? "Crea il tuo Account" : "Bentornato"}
+        </h1>
+
+        {/* FORM LOGIN */}
+        {!isRegisterMode ? (
+          <DynamicForm
+            onSubmit={(e) => handleLogin(e)}
+            addClass="w-full flex flex-col gap-4"
+            buttons={[
+              {
+                action: () => {},
+                label: "Accedi",
+                type: "submit",
+                addClass: "submit w-full py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md font-semibold text-sm transition-colors mt-2 shadow-sm",
+                disabled: isSubmitting,
+              },
+            ]}
+          >
+            <DynamicInput
+              name="email"
+              labelText="Email"
+              type="email"
+              required
+              addClass="w-full"
+              defaultValue="alessioConforto@gmail.com"//"john.doe@example.com"
+              value={["", () => {}]}
+              placeholder="email@esempio.com"
+            />
+
+            <DynamicInput
+              name="password"
+              labelText="Password"
+              type="password"
+              required
+              addClass="w-full"
+              defaultValue="password123!"
+              value={["", () => {}]}
+              placeholder="••••••••"
+            />
+          </DynamicForm>
+        ) : (
+          /* FORM REGISTRAZIONE */
+          <div className="w-full max-h-[75vh] overflow-y-auto pr-1">
+            <DynamicForm
+              onSubmit={(e) => handleRegister(e)}
+              addClass="w-full flex flex-col gap-3"
+              buttons={[
+                {
+                  action: () => {},
+                  label: "Crea Account",
+                  type: "submit",
+                  addClass: "submit w-full py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md font-semibold text-sm transition-colors mt-2 shadow-sm",
+                  disabled: isSubmitting,
+                },
+              ]}
+            >
+              <DynamicInput
+                name="firstName"
+                labelText="Nome"
+                type="text"
+                required
+                addClass="w-full"
+                placeholder="Nome"
+                value={["", () => {}]}
+              />
+
+              <DynamicInput
+                name="lastName"
+                labelText="Cognome"
+                type="text"
+                required
+                addClass="w-full"
+                placeholder="Cognome"
+                value={["", () => {}]}
+              />
+
+              <DynamicInput
+                name="username"
+                labelText="Username"
+                type="text"
+                required
+                addClass="w-full"
+                placeholder="Username"
+                value={["", () => {}]}
+              />
+
+              <DynamicInput
                 name="email"
+                labelText="Email"
                 type="email"
-                placeholder="nome@esempio.it"
-                defaultValue="john.doe@example.com"
                 required
+                addClass="w-full"
+                defaultValue="alessioConforto@gmail.com"
+                placeholder="email@esempio.com"
+                value={["", () => {}]}
               />
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
+              <DynamicInput
                 name="password"
+                labelText="Password"
                 type="password"
-                placeholder="••••••••"
-                defaultValue="password123!"
                 required
+                addClass="w-full"
+                defaultValue="password123!"
+                placeholder="Min. 8 caratteri"
+                value={["", () => {}]}
               />
-            </div>
+            </DynamicForm>
+          </div>
+        )}
 
-            <div className="pt-2 flex flex-col gap-2">
-              <Button type="submit" className="w-full gap-2" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Accesso in corso...
-                  </>
-                ) : (
-                  <>
-                    <LogIn className="h-4 w-4" />
-                    Accedi
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+        {/* Footer switch */}
+        <div className="mt-6 text-xs text-muted-foreground text-center">
+          {isRegisterMode ? (
+            <p>
+              Hai già un account?{" "}
+              <button
+                type="button"
+                onClick={() => setIsRegisterMode(false)}
+                className="text-primary font-medium hover:underline"
+              >
+                Accedi qui
+              </button>
+            </p>
+          ) : (
+            <p>
+              Non hai un account?{" "}
+              <button
+                type="button"
+                onClick={() => setIsRegisterMode(true)}
+                className="text-primary font-medium hover:underline"
+              >
+                Registrati qui
+              </button>
+            </p>
+          )}
+        </div>
+
+      </div>
     </div>
   );
 }
-*/

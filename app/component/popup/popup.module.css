@@ -4,7 +4,6 @@
     margin-bottom: 1em;
     font-weight: bold;
     text-align: center;
-    color: black;
 }
 
 .backdrop{
@@ -27,14 +26,12 @@
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    color: black;
 }
 
 .wrap_popup p {
     margin: 1em 0 1.5em;
     min-width: 230px;
     text-align: center;
-    color: black;
 }
 
 @media (width < 500px) {
