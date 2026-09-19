@@ -24,6 +24,7 @@ import {
   CardTitle 
 } from "./components/ui/card";
 import { AlertCircle, RefreshCw , Home } from "lucide-react";
+import { Footer } from "./components/block/footer";
 
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -59,6 +60,7 @@ export default function App() {
     <Popup />
     <Header/>
     <Outlet />
+    <Footer />
   </>;
 }
 
