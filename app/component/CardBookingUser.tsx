@@ -1,10 +1,10 @@
 import React from "react";
 import { Link } from "react-router";
 import { DoorOpen, DoorClosed, MapPin, Timer } from "lucide-react";
-import type { BookingUserResDto } from "./../Client/Model/Response/BookingUserResDto";
-import { DataHelper } from "./../Helper/DateHelper";
+import type { BookingUserResDto } from "../client/model/response/BookingUserResDto";
+import { dataHelper } from "../helper/dateHelper";
 import { Button } from "./../components/ui/button";
-import { BookingStatus } from "~/Client/Model/Common/Enum/BookingStatusDto";
+import { bookingStatus } from "~/client/model/common/Enum/bookingStatusDto";
 
 interface BookingCardProps {
   booking: BookingUserResDto;
@@ -58,7 +58,7 @@ export const CardBookingUser: React.FC<BookingCardProps> = ({ booking, onDelete 
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
-            {DataHelper.FormatDate(booking.startsAt)}
+            {dataHelper.formatDate(booking.startsAt)}
           </span>
           <span className="text-xs text-muted-foreground font-medium">
             {booking.isIndoor ? (
@@ -79,8 +79,8 @@ export const CardBookingUser: React.FC<BookingCardProps> = ({ booking, onDelete 
 
         <div className="flex items-center gap-2 text-sm font-semibold text-foreground mt-1">
           <Timer className="h-4 w-4 text-primary" />{" "}
-          {DataHelper.FormatTime(booking.startsAt)} -{" "}
-          {DataHelper.FormatTime(booking.endsAt)}
+          {dataHelper.formatTime(booking.startsAt)} -{" "}
+          {dataHelper.formatTime(booking.endsAt)}
         </div>
       </div>
 
@@ -97,7 +97,7 @@ export const CardBookingUser: React.FC<BookingCardProps> = ({ booking, onDelete 
           </Link>
 
           <Button
-            disabled={booking.status === BookingStatus.CANCELLED}
+            disabled={booking.status === bookingStatus.CANCELLED}
             type="button"
             onClick={(e) => {e.preventDefault(); onDelete(booking)}}
             className="inline-flex items-center justify-center text-xs font-semibold px-3 py-2 rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20 transition-colors"

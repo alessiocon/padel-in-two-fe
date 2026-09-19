@@ -3,16 +3,45 @@ import { useRevalidator } from "react-router";
 import React, { useContext, useState } from "react";
 import { DynamicForm, DynamicInput } from "./../component/form/form";
 import { AuthContext } from "./../store/context";
-import { ApiClient } from "./../Client/ApiClient";
-import type { AuthReqDto } from "./../Client/Model/Request/AuthReqDto";
-import type { CreateUserDto } from "./../Client/Model/Request/CreateUserDto";
+import { apiClient } from "./../client/apiClient";
+import type { AuthReqDto } from "./../client/model/request/AuthReqDto";
+import type { CreateUserDto } from "./../client/model/request/CreateUserDto";
 
-export function meta({ data }: Route.MetaArgs) {
+export function meta({ }: Route.MetaArgs) {
   return [
     { title: "Autenticazione" },
     { name: "description", content: "Login e Registrazione" },
   ];
 }
+
+
+const isValidAllowedEmail = (email: string): boolean => {
+
+  const ALLOWED_EMAIL_DOMAINS = [
+    "gmail.com",
+    "gmail.it",
+    "icloud.com",
+    "me.com",
+    "outlook.com",
+    "outlook.it",
+    "hotmail.com",
+    "hotmail.it",
+    "yahoo.com",
+    "yahoo.it",
+    "libero.it"
+  ];
+
+  // 1. Regex standard per validare la struttura formale dell'email
+  const emailFormatRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailFormatRegex.test(email)) {
+    return false;
+  }
+
+  const domain = email.split("@")[1]?.toLowerCase();
+  if (!domain) return false;
+
+  return ALLOWED_EMAIL_DOMAINS.includes(domain);
+};
 
 export default function Auth() {
   const revalidator = useRevalidator();
@@ -40,7 +69,7 @@ export default function Auth() {
 
     try {
       const input: AuthReqDto = { email: email.toLocaleLowerCase(), password };
-      const res = await ApiClient.Login(input);
+      const res = await apiClient.login(input);
 
       if (!res.IsSuccess || !res.Data) {
         throw new Error("Errore in fase di autenticazione");
@@ -52,6 +81,7 @@ export default function Auth() {
         firstName: res.Data.firstName,
         lastName: res.Data.lastName,
         username: res.Data.username,
+        id: res.Data.id
       });
 
     } catch (error) {
@@ -80,25 +110,35 @@ export default function Auth() {
       return;
     }
 
+
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!isValidAllowedEmail(trimmedEmail)) {
+      window.alert(
+        "Inserisci un'indirizzo email valido. Sono accettati solo i provider principali (es. Gmail, iCloud, Outlook, Yahoo, Libero)."
+      );
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const input: CreateUserDto = {
-        email,
+        email: trimmedEmail,
         password,
         firstName,
         lastName,
         username,
       };
 
-      const res = await ApiClient.Register(input);
+      const res = await apiClient.register(input);
 
-      if (!res.IsSuccess) {
-        throw new Error("Errore durante la registrazione");
+      if (!res.IsSuccess && res.Error) {
+          alert(res.Error?.message);
+          return;
       }
 
       alert("Account creato con successo! Ora puoi effettuare il login.");
-      setIsRegisterMode(false);
+      
     } catch (error) {
       alert("Errore in fase di registrazione. Riprova più tardi.");
     } finally {
@@ -161,7 +201,7 @@ export default function Auth() {
               type="email"
               required
               addClass="w-full"
-              defaultValue="alessioConforto@gmail.com"//"john.doe@example.com"
+              defaultValue="john.doe@example.com"//alessioConforto@gmail.com
               value={["", () => {}]}
               placeholder="email@esempio.com"
             />

@@ -1,8 +1,9 @@
-import type { ClubCourtDto } from "./../Common/ClubCourtDto";
-import type { ClubStatusDto } from "./../Common/Enum/ClubStatusDto";
+import type { ClubCourtDto } from "./../common/ClubCourtDto";
+import type { ClubStatusDto } from "./../common/Enum/ClubStatusDto";
 
 export class ClubResDto {
   id: string;
+  ownerId: string;
   name: string;
   email: string;
   status: ClubStatusDto;

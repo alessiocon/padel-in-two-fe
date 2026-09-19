@@ -8,6 +8,9 @@ export default [
 
     route("/clubs/:id", "routes/club.tsx"),
 
+    
+
+
     // Rotte riservate SOLTANTO ai visitatori (se loggato ti reindirizza altrove)
     route("/", "routes/layout/guestOnlyLayout.tsx", [
       route("/auth", "routes/auth.tsx"),
@@ -16,6 +19,7 @@ export default [
     // Rotte PROTETTE: richiedono autenticazione (auth === true)
     route("/", "routes/layout/protectedLayout.tsx", [
       route("/user", "routes/user.tsx"),
+      route("/clubs/:id/manager", "routes/clubManager.tsx"),
     ]),
 
   ]),

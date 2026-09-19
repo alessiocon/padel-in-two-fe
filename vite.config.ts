@@ -8,6 +8,9 @@ export default defineConfig(({ mode }) => {
     plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
     server: {
       port: 3001,
+      future: {
+        v3_singleFetch: false, // <-- Disabilita la funzionalità Single Fetch (.data)
+      },
       host: true,
       // proxy: {
       //   'http://': {

@@ -1,9 +1,9 @@
-import type { BookingStatus } from "./../Common/Enum/BookingStatusDto";
+import type { bookingStatus } from "./../common/Enum/bookingStatusDto";
 
 export class BookingResDto {
     id: string;
     courtId: string;
-    status: BookingStatus;
+    status: bookingStatus;
     clubId: string;
     description: string;
     startsAt: string;

@@ -1,4 +1,4 @@
-export enum BookingStatus { 
+export enum bookingStatus { 
     RESERVED = "reserved" ,
     PENDING = "pending" ,
     CONFIRMED = "confirmed" ,

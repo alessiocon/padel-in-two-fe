@@ -9,6 +9,7 @@ export interface I_PopupContext {
 }
 
 export interface I_AuthContext {
+    id: string;
     auth: boolean;
     username: string;
     firstName: string;

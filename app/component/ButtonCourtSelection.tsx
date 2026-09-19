@@ -1,6 +1,6 @@
 import { DoorClosed, DoorOpen } from "lucide-react";
 import type { FC } from "react";
-import type { ClubCourtDto } from "~/Client/Model/Common/ClubCourtDto";
+import type { ClubCourtDto } from "~/client/model/common/ClubCourtDto";
 import { Badge } from "~/components/ui/badge";
 import type { CourtDto } from "~/models/club.dto";
 import type { CourtWithStatusDto } from "~/routes/club";

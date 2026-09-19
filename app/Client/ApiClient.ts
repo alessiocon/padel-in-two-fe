@@ -1,218 +1,165 @@
-import type { CreateBookingDto } from "~/models/booking.dto";
-import type {IApiResponse, IBaseApiResponse } from "./Interfaces/IApiResponse";
-import type { AuthReqDto } from "./Model/Request/AuthReqDto";
-import type { AuthUserResDto } from "./Model/Response/AuthResDto";
-import type { BookingResDto } from "./Model/Response/BookingsResDto";
-import type { ClubResDto } from "./Model/Response/ClubResDto";
-import type { ClubsResDto } from "./Model/Response/ClubsResDto";
-import type { UserResDto } from "./Model/Response/UserResDto";
-import type { CreateUserDto } from "./Model/Request/CreateUserDto";
-import type { BookingUserResDto } from "./Model/Response/BookingUserResDto";
+import type { IApiResponse, IBaseApiResponse } from "./interfaces/IApiResponse";
+import type { AuthReqDto } from "./model/request/AuthReqDto";
+import type { AuthUserResDto } from "./model/response/AuthResDto";
+import type { BookingResDto } from "./model/response/BookingsResDto";
+import type { ClubResDto } from "./model/response/ClubResDto";
+import type { ClubsResDto } from "./model/response/ClubsResDto";
+import type { UserResDto } from "./model/response/UserResDto";
+import type { CreateUserDto } from "./model/request/CreateUserDto";
+import type { BookingUserResDto } from "./model/response/BookingUserResDto";
+import type { updateBookingDto } from "./model/request/updateBookingDto";
+import type { CreateBookingDto } from "./model/request/CreateBookingDto";
 
-
-
-export class ApiClient {
-    
-    private static getApiBaseUrl(): string {
-    // Nel browser, usa la variabile d'ambiente Vite
-        if (typeof window !== 'undefined') {
-            return import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/';
-        }
-        // Nel server, usa la variabile d'ambiente o default backend
-        return (process.env.API_BASE_URL || 'http://127.0.0.1:3000/api/') ;
+export class apiClient {
+  private static getApiBaseUrl(): string {
+    if (typeof window !== "undefined") {
+      return import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/";
     }
+    return process.env.API_BASE_URL || "http://127.0.0.1:3000/api/";
+  }
 
-    private static config: RequestInit = {
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: "include",
+  private static readonly defaultConfig: RequestInit = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  };
+
+  /**
+   * Metodo helper centrale per eseguire tutte le chiamate HTTP.
+   * Elimina le duplicazioni di GetFetchAsync, PostFetchIOAsync, ecc.
+   */
+  private static async request<T = void>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<IApiResponse<T>> {
+    const baseUrl = this.getApiBaseUrl();
+    const cleanEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
+    const fullUrl = `${baseUrl}${cleanEndpoint}`;
+
+    const config: RequestInit = {
+      ...this.defaultConfig,
+      ...options,
+      headers: {
+        ...this.defaultConfig.headers,
+        ...options.headers,
+      },
     };
-    
 
-    private static async GetFetchAsync(url: string) : Promise<IBaseApiResponse> {
-
-        var baseUrl = this.getApiBaseUrl();
-        var fullUrl = baseUrl+url;
-
-        var output : IBaseApiResponse = { Error: null, IsSuccess: false}
-        var config: RequestInit = {...this.config, method: "GET"}
-        var response = await fetch(fullUrl, config);
-
-        if(!response.ok){
-            var error : Error = await response.json()
-            output.Error = {
-                status: response.status,
-                statusText: response.statusText,
-                message: error.message
-            }
-        }else{
-            output.IsSuccess = true;
+    try {
+      const response = await fetch(fullUrl, config);
+      if (!response.ok) {
+        let errorMessage = response.statusText;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // Nel caso in cui il body di errore non sia un JSON valido
         }
 
-        return output
+        return {
+          IsSuccess: false,
+          Data: null as unknown as T,
+          Error: {
+            status: response.status,
+            statusText: response.statusText,
+            message: errorMessage,
+          },
+        };
+      }
+
+      // Gestione dei casi 204 No Content o risposte senza body
+      if (response.status === 204) {
+        return { IsSuccess: true, Data: null as unknown as T, Error: null };
+      }
+
+      const data = await response.json();
+
+      return { IsSuccess: true, Data: data as T, Error: null };
+    } catch (err: any) {
+      // Gestione di errori di rete (offline, CORS, abort)
+      return {
+        IsSuccess: false,
+        Data: null as unknown as T,
+        Error: {
+          status: 0,
+          statusText: "Network Error",
+          message: err?.message || "Impossibile contattare il server",
+        },
+      };
     }
+  }
 
-    private static async GetFetchOAsync<TOutput>(url: string) : Promise<IApiResponse<TOutput>> {
+  // ==========================================
+  // API Endpoints - Club
+  // ==========================================
+  static async getClubs(): Promise<IApiResponse<ClubsResDto[]>> {
+    return this.request<ClubsResDto[]>("clubs", { method: "GET" });
+  }
 
-        var baseUrl = this.getApiBaseUrl();
-        var fullUrl = baseUrl+url;
+  static async getClub(idClub: string): Promise<IApiResponse<ClubResDto>> {
+    return this.request<ClubResDto>(`clubs/${idClub}`, { method: "GET" });
+  }
 
-        var output : IApiResponse<TOutput> = { Error: null, IsSuccess: false, Data: null}
-        var config: RequestInit = {...this.config, method: "GET"}
-        var response = await fetch(fullUrl, config);
+  static async getClubManager(idClub: string): Promise<IApiResponse<ClubResDto>> {
+    return this.request<ClubResDto>(`clubs/${idClub}/manager`, { method: "GET" });
+  }
 
-        if(!response.ok){
-            var error : Error = await response.json()
-            output.Error = {
-                status: response.status,
-                statusText: response.statusText,
-                message: error.message
-            }
-        }else{
-            output.IsSuccess = true;
-            output.Data = await response.json()
-        }
+  // ==========================================
+  // API Endpoints - Booking
+  // ==========================================
+  static async getBookingsOfClub(clubId: string, date: string): Promise<IApiResponse<BookingResDto[]>> {
+    return this.request<BookingResDto[]>(`bookings/clubs/${clubId}?date=${date}`, { method: "GET" });
+  }
 
-        return output
-    }
+  static async getBookingsOfUser(): Promise<IApiResponse<BookingUserResDto[]>> {
+    return this.request<BookingUserResDto[]>("bookings/user", { method: "GET" });
+  }
 
+  static async createBooking(clubId: string, input: CreateBookingDto): Promise<IApiResponse<BookingResDto>> {
+    return this.request<BookingResDto>(`bookings/clubs/${clubId}`, {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  }
 
-    private static async PostFetchIOAsync<TInput, TOutput>(url: string, input: TInput) : Promise<IApiResponse<TOutput>> {
+  static async updateBooking(bookingId: string, input: updateBookingDto): Promise<IApiResponse<BookingResDto>> {
+    return this.request<BookingResDto>(`bookings/${bookingId}`, { 
+      method: "PATCH", 
+      body: JSON.stringify(input)
+    });
+  }
 
-        var baseUrl = this.getApiBaseUrl();
-        var fullUrl = baseUrl+url;
-
-        var output : IApiResponse<TOutput> = { Error: null, IsSuccess: false, Data: null}
-        var config: RequestInit = {...this.config, method: "POST", body: JSON.stringify(input)}
-
-        var response = await fetch(fullUrl, config);
-        if(!response.ok){
-            var error : Error = await response.json()
-            output.Error = {
-                status: response.status,
-                statusText: response.statusText,
-                message: error.message
-            }
-        }else{
-            output.IsSuccess = true;
-            output.Data = await response.json()
-        }
-
-        return output
-    }
-
-    private static async PostFetchAsync(url: string) : Promise<IBaseApiResponse> {
-
-        var baseUrl = this.getApiBaseUrl();
-        var fullUrl = baseUrl+url;
-
-        var output : IBaseApiResponse = { Error: null, IsSuccess: false}
-        var config: RequestInit = {...this.config, method: "POST"}
-
-        var response = await fetch(fullUrl, config);
-
-        if(!response.ok){
-            output.Error = {
-                status: response.status,
-                statusText: response.statusText,
-                message: ""
-            }
-        }else{
-            output.IsSuccess = true;
-        }
-
-        return output
-    }
-
-    private static async DeleteFetchOAsync<TOutput>(url: string ) : Promise<IApiResponse<TOutput>> {
-
-        var baseUrl = this.getApiBaseUrl();
-        var fullUrl = baseUrl+url;
-
-        var output : IApiResponse<TOutput> = { Error: null, IsSuccess: false, Data: null}
-        var config: RequestInit = {...this.config, method: "DELETE"}
-
-        var response = await fetch(fullUrl, config);
-
-        if(!response.ok){
-            var error : Error = await response.json()
-            output.Error = {
-                status: response.status,
-                statusText: response.statusText,
-                message: error.message
-            }
-        }else{
-            output.IsSuccess = true;
-            output.Data = await response.json()
-        }
-
-        return output
-    }
+  static async deleteBooking(bookingId: string): Promise<IApiResponse<BookingResDto>> {
+    return this.request<BookingResDto>(`bookings/${bookingId}`, { method: "DELETE" });
+  }
 
 
+  // ==========================================
+  // API Endpoints - User
+  // ==========================================
+  static async getUser(): Promise<IApiResponse<UserResDto>> {
+    return this.request<UserResDto>("users/me", { method: "GET" });
+  }
 
+  static async register(input: CreateUserDto): Promise<IApiResponse<UserResDto>> {
+    return this.request<UserResDto>("users", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  }
 
-//#region Club
-    static async GetClubs() : Promise<IApiResponse<ClubsResDto[]>> {
+  // ==========================================
+  // API Endpoints - Auth
+  // ==========================================
+  static async login(input: AuthReqDto): Promise<IApiResponse<AuthUserResDto>> {
+    return this.request<AuthUserResDto>("auth/login", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  }
 
-        return await this.GetFetchOAsync("clubs");
-    }
-
-    static async GetClub(idClub: string) : Promise<IApiResponse<ClubResDto>> {
-
-        return await this.GetFetchOAsync(`clubs/${idClub}`);
-    }
-//#endregion
-
-
-//#region Booking
-    static async GetBookingsOfClub(clubId: string, date: string) : Promise<IApiResponse<BookingResDto[]>> {
-
-        return await this.GetFetchOAsync(`bookings/clubs/${clubId}?date=${date}`);
-    }
-
-    static async GetBookingsOfUser() : Promise<IApiResponse<BookingUserResDto[]>> {
-
-        return await this.GetFetchOAsync(`bookings/user`);
-    }
-
-    static async CreateBooking(clubId: string ,input: CreateBookingDto) : Promise<IApiResponse<BookingResDto>> {
-
-        return await this.PostFetchIOAsync<CreateBookingDto, BookingResDto>(`bookings/clubs/${clubId}`, input);
-    }
-
-    static async DeleteBooking(bookingId: string) : Promise<IApiResponse<BookingResDto>> {
-
-        return await this.DeleteFetchOAsync(`bookings/${bookingId}`);
-    }
-//#endregion
-
-
-//#region User
-    static async GetUser() : Promise<IApiResponse<UserResDto>> {
-
-        return await this.GetFetchOAsync("users/me");
-    }
-
-    static async Register(input: CreateUserDto) : Promise<IApiResponse<UserResDto>> {
-
-        return await this.PostFetchIOAsync<CreateUserDto, UserResDto>("users", input);
-    }
-//#endregion
-
-
-
-//#region Auth
-    static async Login(input: AuthReqDto) : Promise<IApiResponse<AuthUserResDto>> {
-
-        return await this.PostFetchIOAsync<AuthReqDto, AuthUserResDto>("auth/login", input);
-    }
-
-    static async LogOut() : Promise<IBaseApiResponse> {
-
-        return await this.PostFetchAsync("auth/logout");
-    }
-//#endregion 
-
+  static async logOut(): Promise<IBaseApiResponse> {
+    return this.request<void>("auth/logout", { method: "POST" });
+  }
 }

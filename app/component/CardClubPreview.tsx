@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import type { ClubsResDto } from "~/Client/Model/Response/ClubsResDto";
+import type { ClubsResDto } from "~/client/model/response/ClubsResDto";
 
 interface CardClubPreviewProps {
   club: ClubsResDto;

@@ -1,6 +1,6 @@
 import type { Route } from "./+types/home";
-import React, { useContext, useEffect, useState } from "react";
-import { useLoaderData, type LoaderFunctionArgs } from "react-router";
+import { useContext, useEffect, useState } from "react";
+import { Link, useLoaderData, type LoaderFunctionArgs } from "react-router";
 
 import { 
   Building2, 
@@ -10,19 +10,21 @@ import {
   Info,
   CircleDollarSign,
   Loader2,
-  X
+  X,
+  ShieldCheck
 } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card";
-import { Button } from "~/components/ui/button";
-import { PopUpContext } from "~/store/context";
-import { ButtonCourtSelection } from "~/component/ButtonCourtSelection";
-import { BookingStatus } from "~/models/booking.dto";
-import { ApiClient } from "~/Client/ApiClient";
-import type { ClubResDto } from "~/Client/Model/Response/ClubResDto";
-import type { ClubCourtDto } from "~/Client/Model/Common/ClubCourtDto";
-import type { BookingResDto } from "~/Client/Model/Response/BookingsResDto";
-import type { CreateBookingDto } from "~/Client/Model/Request/CreateBookingDto";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./../components/ui/card";
+import { Button } from "./../components/ui/button";
+import { AuthContext, PopUpContext } from "./../store/context";
+import { ButtonCourtSelection } from "./../component/ButtonCourtSelection";
+import { apiClient } from "./../client/apiClient";
+import type { ClubResDto } from "./../client/model/response/ClubResDto";
+import type { ClubCourtDto } from "./../client/model/common/ClubCourtDto";
+import type { BookingResDto } from "./../client/model/response/BookingsResDto";
+import type { CreateBookingDto } from "./../client/model/request/CreateBookingDto";
+import { dataHelper } from "./../helper/dateHelper";
+import { bookingStatus } from "./../client/model/common/Enum/bookingStatusDto";
 
 
 
@@ -37,7 +39,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if(params.id === undefined){
     throw new Error("Club non specificato");
   }
-  const response = await ApiClient.GetClub(params.id);
+
+  const response = await apiClient.getClub(params.id);
 
   if (!response.IsSuccess) {
     throw new Error("Impossibile recuperare i dettagli del club");
@@ -45,45 +48,11 @@ export async function loader({ params }: LoaderFunctionArgs) {
   return response.Data;
 }
 
-function generateTimeSlots(
-    opening: string,
-    closing: string,
-    durationMinutes: number,
-    selectedDateStr: string
-): string[] {
-    const slots: string[] = [];
-    const [openHour, openMin] = opening.split(":").map(Number);
-    const [closeHour, closeMin] = closing.split(":").map(Number);
-
-    // Data e ora attuale
-    const now = new Date();
-
-    // Parsing della data selezionata dall'utente in ora locale
-    const [year, month, day] = selectedDateStr.split("-").map(Number);
-    const isToday =now.toISOString().slice(0,10) === selectedDateStr
-      
-    // Impostiamo l'orario di inizio e fine per il giorno selezionato
-    const current = new Date(year, month - 1, day, openHour, openMin, 0, 0);
-    const end = new Date(year, month - 1, day, closeHour, closeMin, 0, 0);
-
-    while (current < end) {
-      // Se la prenotazione è per OGGI, escludiamo gli slot con orario di inizio già passato
-      if (!isToday || current > now) {
-        const hours = String(current.getHours()).padStart(2, "0");
-        const minutes = String(current.getMinutes()).padStart(2, "0");
-        slots.push(`${hours}:${minutes}`);
-      }
-
-      // Avanza allo slot successivo
-      current.setMinutes(current.getMinutes() + durationMinutes);
-    }
-
-    return slots;
-}
 
 export default function ClubDetailPage() {
   const club = useLoaderData<ClubResDto>();
   const [, setPopup] = useContext(PopUpContext);
+  const [auth,] = useContext(AuthContext);
   
   const [selectedDate, setSelectedDate] = useState<string>( new Date().toISOString().split("T")[0] );
   
@@ -95,7 +64,7 @@ export default function ClubDetailPage() {
   const [selectedCourt, setSelectedCourt] = useState<ClubCourtDto | null>(null);
   
 
-  const timeSlots = generateTimeSlots(
+  const timeSlots = dataHelper.generateTimeSlots(
     club.openingTime,
     club.closingTime,
     club.slotDurationMinutes,
@@ -111,7 +80,7 @@ export default function ClubDetailPage() {
     async function fetchBookings() {
       setIsLoadingBookings(true);
       try {
-        const res = await ApiClient.GetBookingsOfClub(club.id, selectedDate);
+        const res = await apiClient.getBookingsOfClub(club.id, selectedDate);
         setBookings(res.Data || []);
 
       } catch (error) {
@@ -129,10 +98,13 @@ export default function ClubDetailPage() {
 
   async function sendBooking(){
     if (!selectedCourt?.id || !selectedSlot) return;
+    if(!auth.auth){
+      window.alert("devi accedere per poter prenotare")
+    }
     
     var newBooking : CreateBookingDto = {
       courtId: selectedCourt.id,
-      description: "",
+      description: "Prenotazione da: "+auth.username,
       startsAt: new Date(`${selectedDate}T${selectedSlot}`).toISOString(),
       slots: 1 
     }  
@@ -140,7 +112,7 @@ export default function ClubDetailPage() {
     setIsLoadingBookings(true);
 
     try {
-      const res = await ApiClient.CreateBooking(club.id, newBooking);
+      const res = await apiClient.createBooking(club.id, newBooking);
 
       if (!res.Data) {
         if(res.Error){ 
@@ -203,6 +175,15 @@ export default function ClubDetailPage() {
             <MapPin className="h-4 w-4" /> {club.position ?? "Via Alcide De Gasperi, 200"}
           </p>
         </div>
+        {auth.id === club.ownerId && (
+          <Link
+            to="./manager"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shrink-0"
+          >
+            <ShieldCheck className="h-4 w-4" />
+            <span>Area Manager</span>
+          </Link>
+        )}
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -263,6 +244,7 @@ export default function ClubDetailPage() {
 
               <input
                 type="date"
+                id="date"
                 value={selectedDate}
                 min={todayStr}
                 max={maxDateStr}
@@ -271,7 +253,7 @@ export default function ClubDetailPage() {
                   setSelectedSlot(null);
                   setSelectedCourt(null);
                 }}
-                className="bg-background border border-input rounded-md px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary"
+                className="bg-background border-input dark:scheme-dark rounded-md border px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </CardHeader>
 
@@ -365,7 +347,7 @@ function CourtSelectionModal({
 
   var slotTime = new Date(selectedDate+"T"+slot).toISOString();
   const bookedCourtIdsForSlot = bookings
-    .filter((b) => (b.startsAt.slice(0, 16) === slotTime.slice(0, 16) && b.status !== BookingStatus.CANCELLED ))
+    .filter((b) => (b.startsAt.slice(0, 16) === slotTime.slice(0, 16) && b.status !== bookingStatus.CANCELLED ))
     .map((b) => b.courtId);
 
   var courtsCheck: CourtWithStatusDto[] = courts.map((court, index) => {

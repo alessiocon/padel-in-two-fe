@@ -1,13 +1,13 @@
 import type { Route } from "./+types/user";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext, PopUpContext } from "./../store/context";
-import { ApiClient } from "./../Client/ApiClient";
-import type { BookingUserResDto } from "~/Client/Model/Response/BookingUserResDto";
-import { DataHelper } from "~/Helper/DateHelper";
-import { AlertTriangle, DoorClosed, DoorOpen, MapPin, Timer, X } from "lucide-react";
-import { CardBookingUser } from "~/component/CardBookingUser";
-import { Button } from "~/components/ui/button";
-import { BookingStatus } from "~/models/booking.dto";
+import { apiClient } from "./../client/apiClient";
+import type { BookingUserResDto } from "./../client/model/response/BookingUserResDto";
+import { dataHelper } from "./../helper/dateHelper";
+import { AlertTriangle, X } from "lucide-react";
+import { CardBookingUser } from "./../component/CardBookingUser";
+import { Button } from "./../components/ui/button";
+import { bookingStatus } from "./../client/model/common/Enum/bookingStatusDto";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -32,7 +32,7 @@ export default function UserProfile() {
         try {
             setIsLoadingBookings(true);
 
-            const res = await ApiClient.GetBookingsOfUser();
+            const res = await apiClient.getBookingsOfUser();
             if (!res.IsSuccess || res.Data === null) {
             throw new Error("Bookings non caricati");
             }
@@ -52,14 +52,14 @@ export default function UserProfile() {
 
     const handleDeleteBooking = async (bookingId: string) => {
         try {
-            const res = await ApiClient.DeleteBooking(bookingId);
+            const res = await apiClient.deleteBooking(bookingId);
 
             if (!res.IsSuccess || !res.Data) {
                 throw new Error("Impossibile cancellare la prenotazione");
             }
             const updatedBooking = res.Data;
 
-            if (updatedBooking.status === BookingStatus.PENDING) {
+            if (updatedBooking.status === bookingStatus.PENDING) {
                 setBookings((prev) => prev.filter((b) => b.id !== bookingId));
                 window.alert("Prenotazione rimossa con successo.");
                 return;
@@ -69,7 +69,7 @@ export default function UserProfile() {
                 prev.map((b) => {
                     if (b.id === bookingId) {
                         return {...b,
-                            status: BookingStatus.CANCELLED,
+                            status: bookingStatus.CANCELLED,
                             description: updatedBooking.description ?? "",
                         };
                     }
@@ -191,7 +191,7 @@ export function DeleteBookingModal({
         <div className="space-y-2 text-sm text-muted-foreground">
            
             <div className="p-3 bg-muted rounded-lg text-foreground font-medium space-y-1 text-xs border border-border/50">
-                 <p>Sei sicuro di voler eliminare la prenotazione del {DataHelper.FormatDate(booking.startsAt)} alle {DataHelper.FormatTime(booking.startsAt)}?</p>
+                 <p>Sei sicuro di voler eliminare la prenotazione del {dataHelper.formatDate(booking.startsAt)} alle {dataHelper.formatTime(booking.startsAt)}?</p>
             </div>
             <p className="text-xs text-destructive font-medium">L'azione non potrà essere annullata.</p>
         </div>

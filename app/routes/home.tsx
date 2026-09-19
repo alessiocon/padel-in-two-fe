@@ -1,16 +1,10 @@
 import type { Route } from "./+types/home";
-import { useContext, useState } from "react";
 import { useLoaderData } from "react-router";
 
-import { AuthContext, PopUpContext } from "./../store/context";
 
-
-import { CardClubPreview } from "~/component/CardClubPreview";
-import { ApiClient } from "~/Client/ApiClient";
-import type { ClubsResDto } from "~/Client/Model/Response/ClubsResDto";
-
-
-
+import { CardClubPreview } from "./../component/CardClubPreview";
+import { apiClient } from "./../client/apiClient";
+import type { ClubsResDto } from "./../client/model/response/ClubsResDto";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -20,7 +14,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export async function loader() {
-  const res = await ApiClient.GetClubs();
+  const res = await apiClient.getClubs();
 
   if (!res.IsSuccess) { throw new Error("Failed to fetch padel data");}
 
@@ -32,11 +26,6 @@ export async function loader() {
 export default function Home() {
   const clubs = useLoaderData<typeof loader>() as ClubsResDto[];
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const [popup, setPopup] = useContext(PopUpContext);
-  const [auth, setAuth] = useContext(AuthContext);
-  
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="flex flex-row flex-wrap items-center justify-center md:justify-start gap-3 p-4">

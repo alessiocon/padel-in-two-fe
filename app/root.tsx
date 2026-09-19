@@ -8,8 +8,6 @@ import {
   ScrollRestoration,
 } from "react-router";
 
-
-
 import type { Route } from "./+types/root";
 import "./app.css";
 import { useState } from "react";
@@ -17,33 +15,20 @@ import { AuthContext, PopUpContext, type I_AuthContext, type I_PopupContext } fr
 import Popup from "./component/popup/popup";
 import { Header } from "./components/block/header";
 
-import { Button } from "~/components/ui/button";
+import { Button } from "./components/ui/button";
 import { 
   Card, 
   CardContent, 
   CardFooter, 
   CardHeader, 
   CardTitle 
-} from "~/components/ui/card";
+} from "./components/ui/card";
 import { AlertCircle, RefreshCw , Home } from "lucide-react";
 
 
-export const links: Route.LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-  },
-];
-
 export function Layout({ children }: { children: React.ReactNode }) {
   const [popup, setPopup] = useState<I_PopupContext>({massage: null});
-  const [auth, setAuth] = useState<I_AuthContext>({auth: false, firstName: "" , lastName: "", email:"", username:""});
+  const [auth, setAuth] = useState<I_AuthContext>({auth: false, firstName: "" , lastName: "", email:"", username:"", id:""});
 
 
   return (
