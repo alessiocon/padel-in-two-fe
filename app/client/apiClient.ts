@@ -21,23 +21,23 @@ export class apiClient {
   return url.endsWith("/") ? url.slice(0, -1) : url;
 }
 
-  private static readonly defaultConfig: RequestInit = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  };
+private static readonly defaultConfig: RequestInit = {
+  headers: {
+    "Content-Type": "application/json",
+  },
+  credentials: "include",
+};
 
   /**
    * Metodo helper centrale per eseguire tutte le chiamate HTTP.
    * Elimina le duplicazioni di GetFetchAsync, PostFetchIOAsync, ecc.
    */
-  private static async request<T = void>(
+private static async request<T = void>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<IApiResponse<T>> {
     const baseUrl = this.getApiBaseUrl();
-    const cleanEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
+    const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
     const fullUrl = `${baseUrl}${cleanEndpoint}`;
 
     const config: RequestInit = {
@@ -97,44 +97,44 @@ export class apiClient {
   // API Endpoints - Club
   // ==========================================
   static async getClubs(): Promise<IApiResponse<ClubsResDto[]>> {
-    return this.request<ClubsResDto[]>("clubs", { method: "GET" });
+    return this.request<ClubsResDto[]>("/clubs", { method: "GET" });
   }
 
   static async getClub(idClub: string): Promise<IApiResponse<ClubResDto>> {
-    return this.request<ClubResDto>(`clubs/${idClub}`, { method: "GET" });
+    return this.request<ClubResDto>(`/clubs/${idClub}`, { method: "GET" });
   }
 
   static async getClubManager(idClub: string): Promise<IApiResponse<ClubResDto>> {
-    return this.request<ClubResDto>(`clubs/${idClub}/manager`, { method: "GET" });
+    return this.request<ClubResDto>(`/clubs/${idClub}/manager`, { method: "GET" });
   }
 
   // ==========================================
   // API Endpoints - Booking
   // ==========================================
   static async getBookingsOfClub(clubId: string, date: string): Promise<IApiResponse<BookingResDto[]>> {
-    return this.request<BookingResDto[]>(`bookings/clubs/${clubId}?date=${date}`, { method: "GET" });
+    return this.request<BookingResDto[]>(`/bookings/clubs/${clubId}?date=${date}`, { method: "GET" });
   }
 
   static async getBookingsOfUser(): Promise<IApiResponse<BookingUserResDto[]>> {
-    return this.request<BookingUserResDto[]>("bookings/user", { method: "GET" });
+    return this.request<BookingUserResDto[]>("/bookings/user", { method: "GET" });
   }
 
   static async createBooking(clubId: string, input: CreateBookingDto): Promise<IApiResponse<BookingResDto>> {
-    return this.request<BookingResDto>(`bookings/clubs/${clubId}`, {
+    return this.request<BookingResDto>(`/bookings/clubs/${clubId}`, {
       method: "POST",
       body: JSON.stringify(input),
     });
   }
 
   static async updateBooking(bookingId: string, input: updateBookingDto): Promise<IApiResponse<BookingResDto>> {
-    return this.request<BookingResDto>(`bookings/${bookingId}`, { 
+    return this.request<BookingResDto>(`/bookings/${bookingId}`, { 
       method: "PATCH", 
       body: JSON.stringify(input)
     });
   }
 
   static async deleteBooking(bookingId: string): Promise<IApiResponse<BookingResDto>> {
-    return this.request<BookingResDto>(`bookings/${bookingId}`, { method: "DELETE" });
+    return this.request<BookingResDto>(`/bookings/${bookingId}`, { method: "DELETE" });
   }
 
 
@@ -142,11 +142,11 @@ export class apiClient {
   // API Endpoints - User
   // ==========================================
   static async getUser(): Promise<IApiResponse<UserResDto>> {
-    return this.request<UserResDto>("users/me", { method: "GET" });
+    return this.request<UserResDto>("/users/me", { method: "GET" });
   }
 
   static async register(input: CreateUserDto): Promise<IApiResponse<UserResDto>> {
-    return this.request<UserResDto>("users", {
+    return this.request<UserResDto>("/users", {
       method: "POST",
       body: JSON.stringify(input),
     });
@@ -156,13 +156,13 @@ export class apiClient {
   // API Endpoints - Auth
   // ==========================================
   static async login(input: AuthReqDto): Promise<IApiResponse<AuthUserResDto>> {
-    return this.request<AuthUserResDto>("auth/login", {
+    return this.request<AuthUserResDto>("/auth/login", {
       method: "POST",
       body: JSON.stringify(input),
     });
   }
 
   static async logOut(): Promise<IBaseApiResponse> {
-    return this.request<void>("auth/logout", { method: "POST" });
+    return this.request<void>("/auth/logout", { method: "POST" });
   }
 }
