@@ -11,7 +11,8 @@ import {
   CircleDollarSign,
   Loader2,
   X,
-  ShieldCheck
+  ShieldCheck,
+  Gift
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./../components/ui/card";
@@ -225,6 +226,14 @@ export default function ClubDetailPage() {
                 <span className="font-bold">€ {club.racketPrice.toFixed(2)}</span>
               </div>
             </CardContent>
+
+            {/* BANNER PROMO NELLA SIDEBAR */}
+            <div className="bg-primary/10 p-3.5 flex items-start gap-2.5 rounded-b-xl border-t border-primary/20">
+              <Gift className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+              <p className="text-xs text-muted-foreground leading-snug">
+                Prenotando da qui, <strong className="text-primary font-semibold">in omaggio</strong> il noleggio delle <strong className="text-primary font-semibold">pale</strong> per tutti i partecipanti.
+              </p>
+            </div>
           </Card>
         </aside>
 
@@ -257,7 +266,17 @@ export default function ClubDetailPage() {
               />
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="space-y-6">
+              {/* BANNER PROMO PRINCIPALE */}
+              <div className="p-3.5 rounded-lg bg-primary/10 border border-primary/30 flex items-center gap-3">
+                <div className="p-2 bg-primary text-primary-foreground rounded-md shrink-0">
+                  <Gift className="h-5 w-5" />
+                </div>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  Prenotando su <strong className="text-foreground">PadelInTwo</strong>,per ricevere il noleggio delle pale <strong className="text-primary font-semibold">in omaggio</strong> per tutti i partecipanti!
+                </p>
+              </div>
+
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-semibold text-muted-foreground">

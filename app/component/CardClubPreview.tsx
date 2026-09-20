@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { MapPin, CalendarClock, Timer, DoorClosed, DoorOpen } from "lucide-react";
+import { MapPin, CalendarClock, Timer, DoorClosed, DoorOpen, Gift } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -18,7 +18,7 @@ interface CardClubPreviewProps {
 export function CardClubPreview({ club }: CardClubPreviewProps) {
 
   return (
-    <Card className="w-[350px] bg-card border-primary/20">
+    <Card className="w-[350px] bg-card border-primary/20 py-5 gap-4">
       <CardHeader>
         <CardTitle className="text-primary">{club.name}</CardTitle>
         <CardDescription className="flex items-center gap-2 text-xs pt-1">
@@ -73,6 +73,14 @@ export function CardClubPreview({ club }: CardClubPreviewProps) {
           <Button variant="default">Prenota Ora</Button>
         </Link>
       </CardFooter>
+
+      <CardDescription className="bg-primary/10  p-2.5 flex items-start gap-2 px-1">
+          <Gift className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+          <p className="text-xs text-muted-foreground leading-tight">
+            Prenotando da qui, <strong className="text-primary">in omaggio</strong> il noleggio delle <strong className="text-primary">pale</strong> per tutti i giocatori.
+          </p>
+      </CardDescription>
     </Card>
+    
   );
 }
