@@ -201,7 +201,7 @@ export default function Auth() {
               type="email"
               required
               addClass="w-full"
-              defaultValue="john.doe@example.com"//alessioConforto@gmail.com
+              //defaultValue="john.doe@example.com"//alessioConforto@gmail.com
               value={["", () => {}]}
               placeholder="email@esempio.com"
             />
@@ -212,7 +212,7 @@ export default function Auth() {
               type="password"
               required
               addClass="w-full"
-              defaultValue="password123!"
+              //defaultValue="password123!"
               value={["", () => {}]}
               placeholder="••••••••"
             />
@@ -269,7 +269,7 @@ export default function Auth() {
                 type="email"
                 required
                 addClass="w-full"
-                defaultValue="alessioConforto@gmail.com"
+                //defaultValue="alessioConforto@gmail.com"
                 placeholder="email@esempio.com"
                 value={["", () => {}]}
               />
@@ -280,7 +280,7 @@ export default function Auth() {
                 type="password"
                 required
                 addClass="w-full"
-                defaultValue="password123!"
+                //defaultValue="password123!"
                 placeholder="Min. 8 caratteri"
                 value={["", () => {}]}
               />

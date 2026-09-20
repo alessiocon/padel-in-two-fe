@@ -12,11 +12,14 @@ import type { CreateBookingDto } from "./model/request/CreateBookingDto";
 
 export class apiClient {
   private static getApiBaseUrl(): string {
-    if (typeof window !== "undefined") {
-      return import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/";
-    }
-    return process.env.API_BASE_URL || "http://127.0.0.1:3000/api/";
+  let url = "http://localhost:3000/api";
+  if (typeof window !== "undefined") {
+    url = import.meta.env.VITE_API_BASE_URL || url;
+  } else {
+    url = process.env.API_BASE_URL || url;
   }
+  return url.endsWith("/") ? url.slice(0, -1) : url;
+}
 
   private static readonly defaultConfig: RequestInit = {
     headers: {
