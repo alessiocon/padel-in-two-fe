@@ -8,7 +8,6 @@ import {
   ScrollRestoration,
 } from "react-router";
 
-import type { Route } from "./+types/root";
 import "./app.css";
 import { useState } from "react";
 import { AuthContext, PopUpContext, type I_AuthContext, type I_PopupContext } from "./store/context";
