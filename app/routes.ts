@@ -14,6 +14,8 @@ export default [
     // Rotte riservate SOLTANTO ai visitatori (se loggato ti reindirizza altrove)
     route("/", "routes/layout/guestOnlyLayout.tsx", [
       route("/auth", "routes/auth.tsx"),
+      route("/auth/emailconfirmation", "routes/confirmationEmail.tsx"),
+      route("/auth/resetpassword", "routes/resetPassword.tsx"),
     ]),
 
     // Rotte PROTETTE: richiedono autenticazione (auth === true)

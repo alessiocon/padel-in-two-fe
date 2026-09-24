@@ -9,6 +9,7 @@ import type { CreateUserDto } from "./model/request/CreateUserDto";
 import type { BookingUserResDto } from "./model/response/BookingUserResDto";
 import type { updateBookingDto } from "./model/request/updateBookingDto";
 import type { CreateBookingDto } from "./model/request/CreateBookingDto";
+import type { resetPasswordReqDto } from "./model/request/resetPasswordReqDto";
 
 export class apiClient {
   private static getApiBaseUrl(): string {
@@ -161,6 +162,32 @@ private static async request<T = void>(
       body: JSON.stringify(input),
     });
   }
+
+  static async sendEmailConfirmation(idUser: string): Promise<IBaseApiResponse> {
+    return this.request(`/auth/sendemailconfirmation?tokenId=${idUser}`, {
+      method: "GET",
+    });
+  }
+
+  static async emailConfirmation(idUser: string): Promise<IBaseApiResponse> {
+    return this.request(`/auth/emailconfirmation?tokenId=${idUser}`, {
+      method: "POST",
+    });
+  }
+
+  static async sendEmailForgotPassword(email: string): Promise<IBaseApiResponse> {
+    return this.request(`/auth/sendemailForgotPassword?email=${email}`, {
+      method: "GET",
+    });
+  }
+
+  static async resetPassword(input: resetPasswordReqDto): Promise<IBaseApiResponse> {
+    return this.request(`/auth/resetpassword`, {
+      method: "POST",
+      body: JSON.stringify(input)
+    });
+  }
+
 
   static async logOut(): Promise<IBaseApiResponse> {
     return this.request<void>("/auth/logout", { method: "POST" });
