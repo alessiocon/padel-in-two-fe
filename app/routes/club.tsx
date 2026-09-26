@@ -1,9 +1,8 @@
 import type { Route } from "./+types/home";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect,useRef, useState } from "react";
 import { Link, useLoaderData, type LoaderFunctionArgs } from "react-router";
 
 import { 
-  Building2, 
   Clock, 
   Calendar as CalendarIcon, 
   MapPin, 
@@ -24,9 +23,8 @@ import type { ClubResDto } from "./../client/model/response/ClubResDto";
 import type { ClubCourtDto } from "./../client/model/common/ClubCourtDto";
 import type { BookingResDto } from "./../client/model/response/BookingsResDto";
 import type { CreateBookingDto } from "./../client/model/request/CreateBookingDto";
-import { dataHelper } from "./../helper/dateHelper";
 import { bookingStatus } from "./../client/model/common/Enum/bookingStatusDto";
-
+import { GroupedTimeSlot } from "../components/GroupedTimeSlot";
 
 
 export function meta({}: Route.MetaArgs) {
@@ -63,18 +61,13 @@ export default function ClubDetailPage() {
 
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [selectedCourt, setSelectedCourt] = useState<ClubCourtDto | null>(null);
-  
 
-  const timeSlots = dataHelper.generateTimeSlots(
-    club.openingTime,
-    club.closingTime,
-    club.slotDurationMinutes,
-    selectedDate
-  );
   const todayStr = new Date().toISOString().split("T")[0];
   const maxDate = new Date();
   maxDate.setMonth(maxDate.getMonth() + 1);
   const maxDateStr = maxDate.toISOString().split("T")[0];
+
+  const detailsRef = useRef<HTMLDivElement>(null);
 
   // Fetch per caricare le prenotazioni ogni volta che cambia il club o la data selezionata
   useEffect(() => {
@@ -97,10 +90,21 @@ export default function ClubDetailPage() {
     }
   }, [club.id, selectedDate]);
 
+
+  useEffect(() => {
+  if (selectedCourt && detailsRef.current) {
+    detailsRef.current.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'nearest'
+    });
+  }
+}, [selectedCourt]);
+
   async function sendBooking(){
     if (!selectedCourt?.id || !selectedSlot) return;
     if(!auth.auth){
       window.alert("devi accedere per poter prenotare")
+      return;
     }
     
     var newBooking : CreateBookingDto = {
@@ -136,11 +140,11 @@ export default function ClubDetailPage() {
     }
   }
 
-  const handleOpenCourtSelectionModal = (slot: string) => {
+  const handleOpenCourtSelectionModal = (slot: string, courts: ClubCourtDto[]) => {
     setSelectedSlot(slot);
     setSelectedCourt(null);
 
-    const courtModels: CourtWithStatusDto[] = club.courts.map((court) => ({
+    const courtModels: CourtWithStatusDto[] = courts.map((court) => ({
       ...court,
       isOccupied: false,
     }));
@@ -164,17 +168,15 @@ export default function ClubDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 lg:p-8">
+    <div className="min-h-screen bg-background text-foreground p-2 md:p-4 lg:p-8">
       {/* Header del Club */}
-      <header className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between border-b border-border pb-4 gap-4">
+      <header className="mb-2 mt-2 flex flex-col md:flex-row md:items-center md:justify-between border-b border-border pb-4 gap-4">
         <div>
-          <div className="flex items-center gap-3">
-            <Building2 className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-extrabold tracking-tight">{club.name}</h1>
+          <h1 className="text-xl text-center md:text-3xl md:text-start font-extrabold tracking-tight">{club.name}</h1>
+          <div className="flex justify-center md:justify-start items-center gap-3">
+            <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground text-center md:text-left">{club.position}</p>
           </div>
-          <p className="text-sm text-muted-foreground mt-1 flex items-center gap-2">
-            <MapPin className="h-4 w-4" /> {club.position ?? "Via Alcide De Gasperi, 200"}
-          </p>
         </div>
         {auth.id === club.ownerId && (
           <Link
@@ -251,19 +253,21 @@ export default function ClubDetailPage() {
                 </CardDescription>
               </div>
 
-              <input
-                type="date"
-                id="date"
-                value={selectedDate}
-                min={todayStr}
-                max={maxDateStr}
-                onChange={(e) => {
-                  setSelectedDate(e.target.value);
-                  setSelectedSlot(null);
-                  setSelectedCourt(null);
-                }}
-                className="bg-background border-input dark:scheme-dark rounded-md border px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary"
-              />
+              <div className="relative flex items-center">
+                <input
+                  type="date"
+                  id="date"
+                  value={selectedDate}
+                  min={todayStr}
+                  max={maxDateStr}
+                  onChange={(e) => {
+                    setSelectedDate(e.target.value);
+                    setSelectedSlot(null);
+                    setSelectedCourt(null);
+                  }}
+                  className="w-full sm:w-auto bg-background border-input text-foreground dark:scheme-dark rounded-lg border-2 px-4 py-2.5 text-base font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:border-primary/50 cursor-pointer"
+                />
+              </div>
             </CardHeader>
 
             <CardContent className="space-y-6">
@@ -289,33 +293,21 @@ export default function ClubDetailPage() {
                     </span>
                   )}
                 </div>
-                
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                  {timeSlots.map((slot) => {
-                    const isSelected = selectedSlot === slot;
-                    return (
-                      <Button
-                        key={slot}
-                        disabled={isLoadingBookings}
-                        variant={isSelected ? "default" : "outline"}
-                        className={`py-6 flex flex-col items-center justify-center gap-1 transition-all ${
-                          isSelected ? "ring-2 ring-primary" : "hover:border-primary"
-                        }`}
-                        onClick={() => handleOpenCourtSelectionModal(slot)}
-                      >
-                        <span className="text-base font-bold">{slot}</span>
-                        <span className="text-[10px] text-muted-foreground">
-                          {club.slotDurationMinutes} min
-                        </span>
-                      </Button>
-                    );
-                  })}
+                  <GroupedTimeSlot
+                      opening={club.openingTime}
+                      closing={club.closingTime}
+                      durationMinutes={club.slotDurationMinutes}
+                      selectedDateStr={selectedDate}
+                      selectedSlotStr={selectedSlot}
+                      courts={club.courts}
+                      isLoadingBookings={isLoadingBookings}
+                      onSelect={handleOpenCourtSelectionModal}
+                  />
                 </div>
-              </div>
 
               {/* Box di Conferma Finale */}
               {selectedSlot && selectedCourt && (
-                <div className="mt-8 p-4 rounded-lg bg-primary/10 border border-primary/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div ref={detailsRef} className="mt-8 p-4 rounded-lg bg-primary/10 border border-primary/30 flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div>
                     <p className="text-sm font-semibold text-primary">Campo Selezionato:</p>
                     <p className="text-base font-medium">
@@ -389,7 +381,6 @@ function CourtSelectionModal({
         </button>
       </div>
 
-      {/* Griglia responsive: 2 colonne flessibili senza overflow */}
       <div className="grid grid-cols-2 gap-2 sm:gap-3">
         {courtsCheck.map((court) => {
           return (

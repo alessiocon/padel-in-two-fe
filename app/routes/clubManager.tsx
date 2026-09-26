@@ -3,7 +3,6 @@ import { useContext, useEffect, useState } from "react";
 import { useLoaderData, type LoaderFunctionArgs} from "react-router";
 
 import { 
-  Building2, 
   Calendar as CalendarIcon, 
   MapPin, 
   Loader2,
@@ -12,14 +11,14 @@ import {
   CheckCircle2,
   XCircle,
   User,
-  ShieldCheck,
   ListFilter,
   Clock,
   CircleDot,
-  RotateCcw
+  RotateCcw,
+  RefreshCw
 } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "./../components/ui/card";
 import { Button } from "./../components/ui/button";
 import { PopUpContext } from "./../store/context";
 import { ButtonCourtSelection } from "./../component/ButtonCourtSelection";
@@ -28,8 +27,8 @@ import type { ClubResDto } from "./../client/model/response/ClubResDto";
 import type { ClubCourtDto } from "./../client/model/common/ClubCourtDto";
 import type { BookingResDto } from "./../client/model/response/BookingsResDto";
 import type { CreateBookingDto } from "./../client/model/request/CreateBookingDto";
-import { dataHelper } from "./../helper/dateHelper";
 import { bookingStatus } from "./../client/model/common/Enum/bookingStatusDto";
+import { GroupedTimeSlot } from "../components/GroupedTimeSlot";
 
 export type CourtWithStatusDto = ClubCourtDto & {
   isOccupied: boolean;
@@ -70,12 +69,6 @@ export default function ClubManagerPage() {
   const [selectedCourt, setSelectedCourt] = useState<ClubCourtDto | null>(null);
   const [playerName, setPlayerName] = useState<string>("");
 
-  const timeSlots = dataHelper.generateTimeSlots(
-    club.openingTime,
-    club.closingTime,
-    club.slotDurationMinutes,
-    selectedDate
-  );
 
   const fetchBookings = async () => {
     setIsLoadingBookings(true);
@@ -95,6 +88,7 @@ export default function ClubManagerPage() {
       fetchBookings();
     }
   }, [club.id, selectedDate]);
+
 
   // Map per recuperare il nome del campo dato l'ID
   const courtNameMap = new Map<string, string>(
@@ -162,31 +156,32 @@ export default function ClubManagerPage() {
     }
   };
 
-  const handleOpenCourtSelectionModal = (slot: string) => {
-    setSelectedSlot(slot);
-    setSelectedCourt(null);
-
-    const courtModels: CourtWithStatusDto[] = club.courts.map((court) => ({
-      ...court,
-      isOccupied: false,
-    }));
-
-    setPopup({
-      massage: (
-        <CourtSelectionModal
-          slot={slot}
-          selectedDate={selectedDate}
-          courts={courtModels}
-          bookings={bookings}
-          onSelectCourt={(court) => {
-            setSelectedCourt(court);
-          }}
-          onClose={() => setPopup({ massage: null })}
-        />
-      ),
-      buttons: null
-    });
-  };
+  const handleOpenCourtSelectionModal = (slot: string, courts: ClubCourtDto[]) => {
+      setSelectedSlot(slot);
+      setSelectedCourt(null);
+  
+      const courtModels: CourtWithStatusDto[] = courts.map((court) => ({
+        ...court,
+        isOccupied: false,
+      }));
+  
+      setPopup({
+        massage: (
+          <CourtSelectionModal
+            slot={slot}
+            selectedDate={selectedDate}
+            courts={courtModels}
+            bookings={bookings}
+            onSelectCourt={(court) => {
+              setSelectedCourt(court);
+            }}
+  
+            onClose={() => setPopup({ massage: null })}
+          />
+        ),
+        buttons: null
+      });
+    };
 
   const pendingBookings = bookings.filter((b) => b.status === bookingStatus.PENDING);
 
@@ -228,21 +223,23 @@ export default function ClubManagerPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 space-y-6">
-      {/* Header Manager */}
-      <header className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-border pb-4 gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3">
-            <Building2 className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-extrabold tracking-tight">{club.name}</h1>
-            <span className="bg-primary/10 text-primary text-xs font-bold px-2.5 py-1 rounded-full border border-primary/20 flex items-center gap-1">
-              <ShieldCheck className="h-3.5 w-3.5" /> Owner / Manager
-            </span>
+          <h1 className="text-xl text-center md:text-3xl md:text-start font-extrabold tracking-tight">{club.name}</h1>
+          <div className="flex justify-center md:justify-start items-center gap-3">
+            <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground text-center md:text-left">{club.position}</p>
           </div>
-          <p className="text-sm text-muted-foreground mt-1 flex items-center gap-2">
-            <MapPin className="h-4 w-4" /> {club.position ?? "Via Alcide De Gasperi, 200"}
-          </p>
         </div>
-      </header>
+        {isLoadingBookings}
+        <Button className="bg-background mx-2" variant="outline" onClick={fetchBookings} disabled={isLoadingBookings}>
+          {isLoadingBookings ? (
+            <><Loader2 className="h-4 w-4 animate-spin text-primary mr-2" /> Aggiornamento...</>
+          ) : (
+            <><RefreshCw className="h-4 w-4 mr-2" /> Aggiorna</>
+          )}
+        </Button>
+      </div>
 
       {/* Richieste in Attesa */}
       {pendingBookings.length > 0 && (
@@ -315,7 +312,7 @@ export default function ClubManagerPage() {
               setSelectedCourt(null);
             }}
             className="bg-background border-input dark:scheme-dark rounded-md border px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary"
-          />
+          />          
         </CardHeader>
 
         <CardContent className="space-y-4">
@@ -330,27 +327,16 @@ export default function ClubManagerPage() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-            {timeSlots.map((slot) => {
-              const isSelected = selectedSlot === slot;
-              return (
-                <Button
-                  key={slot}
-                  disabled={isLoadingBookings}
-                  variant={isSelected ? "default" : "outline"}
-                  className={`py-6 flex flex-col items-center justify-center gap-1 transition-all ${
-                    isSelected ? "ring-2 ring-primary" : "hover:border-primary"
-                  }`}
-                  onClick={() => handleOpenCourtSelectionModal(slot)}
-                >
-                  <span className="text-base font-bold">{slot}</span>
-                  <span className="text-[10px] text-muted-foreground">
-                    {club.slotDurationMinutes} min
-                  </span>
-                </Button>
-              );
-            })}
-          </div>
+          <GroupedTimeSlot
+              opening={club.openingTime}
+              closing={club.closingTime}
+              durationMinutes={club.slotDurationMinutes}
+              selectedDateStr={selectedDate}
+              selectedSlotStr={selectedSlot}
+              courts={club.courts}
+              isLoadingBookings={isLoadingBookings}
+              onSelect={handleOpenCourtSelectionModal}
+          />
 
           {/* Box di Conferma Inserimento Manager */}
           {selectedSlot && selectedCourt && (

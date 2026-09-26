@@ -7,4 +7,5 @@ export type ClubCourtDto = {
   isIndoor: boolean;
   price: number;
   status: CourtStatusDto;
+  offsetMinutes: number;
 };

@@ -2,7 +2,6 @@ import { DoorClosed, DoorOpen } from "lucide-react";
 import type { FC } from "react";
 import type { ClubCourtDto } from "~/client/model/common/ClubCourtDto";
 import { Badge } from "~/components/ui/badge";
-import type { CourtDto } from "~/models/club.dto";
 import type { CourtWithStatusDto } from "~/routes/club";
 
 // Estendiamo il DTO per supportare la proprietà booleana opzionale 'occuped'
@@ -42,7 +41,7 @@ export const ButtonCourtSelection: FC<{
       </div>
 
       {/* Sezione inferiore: Prezzo e Badge */}
-      <div className="flex items-center justify-between pt-1.5 border-t border-border text-[11px] sm:text-[12px] w-full gap-1">
+      <div className="flex flex-col md:flex-row items-center justify-between pt-1.5 border-t border-border text-[11px] md:text-[12px] w-full gap-1">
         <span className="font-extrabold truncate">
           € {court.price?.toFixed(2)}
         </span>

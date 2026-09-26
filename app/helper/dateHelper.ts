@@ -1,3 +1,4 @@
+
 export class dataHelper {
 
     
@@ -13,39 +14,65 @@ export class dataHelper {
         return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     };
 
-    static generateTimeSlots(
-        opening: string,
-        closing: string,
-        durationMinutes: number,
-        selectedDateStr: string
-    ): string[] {
-        const slots: string[] = [];
-        const [openHour, openMin] = opening.split(":").map(Number);
-        const [closeHour, closeMin] = closing.split(":").map(Number);
 
-        // Data e ora attuale
-        const now = new Date();
-
-        // Parsing della data selezionata dall'utente in ora locale
-        const [year, month, day] = selectedDateStr.split("-").map(Number);
-        const isToday =now.toISOString().slice(0,10) === selectedDateStr
+    // static getSlotsGroupedByTime(
+    //     opening: string,
+    //     closing: string,
+    //     durationMinutes: number,
+    //     selectedDateStr: string,
+    //     courts: ClubCourtDto[]
+    // ): Array<{ time: string; availableCourts: ClubCourtDto[] }> {
+    //     const [openHour, openMin] = opening.split(":").map(Number);
+    //     const [closeHour, closeMin] = closing.split(":").map(Number);
         
-        // Impostiamo l'orario di inizio e fine per il giorno selezionato
-        const current = new Date(year, month - 1, day, openHour, openMin, 0, 0);
-        const end = new Date(year, month - 1, day, closeHour, closeMin, 0, 0);
+    //     const now = new Date();
+    //     const [year, month, day] = selectedDateStr.split("-").map(Number);
+    //     const isToday = now.toISOString().slice(0, 10) === selectedDateStr;
 
-        while (current < end) {
-        // Se la prenotazione è per OGGI, escludiamo gli slot con orario di inizio già passato
-        if (!isToday || current > now) {
-            const hours = String(current.getHours()).padStart(2, "0");
-            const minutes = String(current.getMinutes()).padStart(2, "0");
-            slots.push(`${hours}:${minutes}`);
-        }
+    //     const baseOpen = new Date(year, month - 1, day, openHour, openMin, 0, 0);
+    //     const baseEnd = new Date(year, month - 1, day, closeHour, closeMin, 0, 0);
 
-        // Avanza allo slot successivo
-        current.setMinutes(current.getMinutes() + durationMinutes);
-        }
+    //     const timeSlotsMap = new Map<string, Array<typeof courts[0]>>();
 
-        return slots;
-    }
+    //     for (const court of courts) {
+    //         const current = new Date(baseOpen.getTime());
+    //         // Applichiamo l'offset del singolo campo
+    //         current.setMinutes(current.getMinutes() + (court.offsetMinutes ?? 0));
+
+    //         // Finché l'orario di inizio è precedente alla chiusura
+    //         while (current < baseEnd) {
+    //             // Calcoliamo quando finirebbe questo slot
+    //             const slotEnd = new Date(current.getTime());
+    //             slotEnd.setMinutes(slotEnd.getMinutes() + durationMinutes);
+
+    //             // IL CONTROLLO CHIAVE: Lo slot è valido SOLO SE la sua fine 
+    //             // non supera l'orario di chiusura del circolo
+    //             if (slotEnd <= baseEnd) {
+    //                 // Se la data è oggi, scartiamo gli orari già passati
+    //                 if (!isToday || current > now) {
+    //                     const hours = String(current.getHours()).padStart(2, "0");
+    //                     const minutes = String(current.getMinutes()).padStart(2, "0");
+    //                     const timeString = `${hours}:${minutes}`;
+
+    //                     if (!timeSlotsMap.has(timeString)) {
+    //                         timeSlotsMap.set(timeString, []);
+    //                     }
+    //                     timeSlotsMap.get(timeString)!.push(court);
+    //                 }
+    //             }
+
+    //             // Avanza dello slot duration standard del circolo
+    //             current.setMinutes(current.getMinutes() + durationMinutes);
+    //         }
+    //     }
+
+    //     // Convertiamo la Map in un array ordinato per orario
+    //     const sortedTimes = Array.from(timeSlotsMap.keys()).sort();
+
+    //     return sortedTimes.map(time => ({
+    //         time,
+    //         availableCourts: timeSlotsMap.get(time)!
+    //     }));
+    // }
 }
+
