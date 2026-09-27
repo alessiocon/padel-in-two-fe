@@ -29,6 +29,7 @@ import type { BookingResDto } from "./../client/model/response/BookingsResDto";
 import type { CreateBookingDto } from "./../client/model/request/CreateBookingDto";
 import { bookingStatus } from "./../client/model/common/Enum/bookingStatusDto";
 import { GroupedTimeSlot } from "../components/GroupedTimeSlot";
+import type { IApiResponse } from "../client/interfaces/IApiResponse";
 
 export type CourtWithStatusDto = ClubCourtDto & {
   isOccupied: boolean;
@@ -132,14 +133,16 @@ export default function ClubManagerPage() {
     }
   }
 
-  // Cambio stato con aggiornamento ottimistico
   const handleUpdateStatus = async (bookingId: string, newStatus: bookingStatus) => {
     setIsSubmitting(true);
     try {
-      const res = await apiClient.updateBooking(bookingId, {
-        clubId: club.id,
-        status: newStatus
-      });
+      let res : IApiResponse<BookingResDto> = {Data: null, Error: null, IsSuccess: false};
+
+      if(newStatus === bookingStatus.CANCELLED){
+        res = await apiClient.deleteBooking(bookingId, { isStaff: true });
+      }else{
+        res = await apiClient.restoreBookigStatus(bookingId, { isStaff: true });
+      }
 
       if (res && !res.IsSuccess) {
         alert(res.Error?.message || "Errore durante l'aggiornamento");
@@ -155,6 +158,28 @@ export default function ClubManagerPage() {
       setIsSubmitting(false);
     }
   };
+
+    const handleAcceptBooking = async (bookingId: string) => {
+    setIsSubmitting(true);
+    try {
+      let res : IApiResponse<BookingResDto> = {Data: null, Error: null, IsSuccess: false};
+      res = await apiClient.acceptBooking(bookingId);
+
+      if (res && !res.IsSuccess) {
+        alert(res.Error?.message || "Errore durante l'aggiornamento");
+        return;
+      }
+
+      setBookings((prev) =>
+        prev.map((b) => (b.id === bookingId ? { ...b, status: bookingStatus.CONFIRMED } : b))
+      );
+    } catch (error) {
+      alert("Errore durante l'operazione.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
 
   const handleOpenCourtSelectionModal = (slot: string, courts: ClubCourtDto[]) => {
       setSelectedSlot(slot);
@@ -270,7 +295,7 @@ export default function ClubManagerPage() {
                     variant="outline"
                     className="border-green-600 text-green-600 hover:bg-green-600/10 flex-1 sm:flex-initial font-semibold"
                     disabled={isSubmitting}
-                    onClick={() => handleUpdateStatus(b.id, bookingStatus.CONFIRMED)}
+                    onClick={() => handleAcceptBooking(b.id)}
                   >
                     <CheckCircle2 className="h-4 w-4 mr-1" /> Accetta
                   </Button>
@@ -441,7 +466,7 @@ export default function ClubManagerPage() {
                             variant="ghost"
                             className="h-8 text-xs text-emerald-600 hover:bg-emerald-500/10 font-semibold"
                             disabled={isSubmitting}
-                            onClick={() => handleUpdateStatus(booking.id, bookingStatus.CONFIRMED)}
+                            onClick={() => handleAcceptBooking(booking.id)}
                           >
                             <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Accetta
                           </Button>

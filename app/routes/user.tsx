@@ -52,7 +52,7 @@ export default function UserProfile() {
 
     const handleDeleteBooking = async (bookingId: string) => {
         try {
-            const res = await apiClient.deleteBooking(bookingId);
+            const res = await apiClient.deleteBooking(bookingId, {isStaff: false});
 
             if (!res.IsSuccess || !res.Data) {
                 throw new Error("Impossibile cancellare la prenotazione");

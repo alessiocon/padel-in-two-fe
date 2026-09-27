@@ -10,6 +10,8 @@ import type { BookingUserResDto } from "./model/response/BookingUserResDto";
 import type { updateBookingDto } from "./model/request/updateBookingDto";
 import type { CreateBookingDto } from "./model/request/CreateBookingDto";
 import type { resetPasswordReqDto } from "./model/request/resetPasswordReqDto";
+import type { DeleteBookingReqDto } from "./model/request/deleteBooking.req.dto";
+import type { RestoreBookingStatusReqDto } from "./model/request/restoreBookingStatus.req.dto";
 
 export class apiClient {
   private static getApiBaseUrl(): string {
@@ -134,8 +136,24 @@ private static async request<T = void>(
     });
   }
 
-  static async deleteBooking(bookingId: string): Promise<IApiResponse<BookingResDto>> {
-    return this.request<BookingResDto>(`/bookings/${bookingId}`, { method: "DELETE" });
+  static async acceptBooking(bookingId: string): Promise<IApiResponse<BookingResDto>> {
+    return this.request<BookingResDto>(`/bookings/${bookingId}/accept`, { 
+      method: "PATCH", 
+    });
+  }
+
+  static async deleteBooking(bookingId: string, input: DeleteBookingReqDto): Promise<IApiResponse<BookingResDto>> {
+    return this.request<BookingResDto>(`/bookings/${bookingId}`, { 
+      method: "DELETE", 
+      body: JSON.stringify(input)
+    });
+  }
+
+  static async restoreBookigStatus(bookingId: string, input: RestoreBookingStatusReqDto ): Promise<IApiResponse<BookingResDto>> {
+    return this.request<BookingResDto>(`/bookings/${bookingId}/restore`, { 
+      method: "PATCH", 
+      body: JSON.stringify(input)
+    });
   }
 
 
