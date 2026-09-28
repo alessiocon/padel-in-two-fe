@@ -124,8 +124,9 @@ export default function Auth() {
     const firstName = formData.get("firstName")?.toString();
     const lastName = formData.get("lastName")?.toString();
     const username = formData.get("username")?.toString();
+    const phone = formData.get("phone")?.toString();
 
-    if (!email || !password || !firstName || !lastName || !username) {
+    if (!email || !password || !firstName || !lastName || !username || !phone) {
       alert("Tutti i campi sono obbligatori");
       return;
     }
@@ -141,6 +142,7 @@ export default function Auth() {
         firstName,
         lastName,
         username,
+        phone
       };
 
       const res = await apiClient.register(input);
@@ -341,6 +343,16 @@ export default function Auth() {
                 required
                 addClass="w-full"
                 placeholder="Min. 8 caratteri"
+                value={["", () => {}]}
+              />
+              
+              <DynamicInput
+                name="phone"
+                labelText="Telefono"
+                type="tel"
+                required
+                addClass="w-full"
+                placeholder="3278477845"
                 value={["", () => {}]}
               />
             </DynamicForm>
