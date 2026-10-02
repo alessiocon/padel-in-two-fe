@@ -2,8 +2,8 @@ import type { Route } from "./+types/user";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext, PopUpContext } from "./../store/context";
 import { apiClient } from "./../client/apiClient";
-import type { BookingUserResDto } from "./../client/model/response/BookingUserResDto";
-import { dataHelper } from "./../helper/dateHelper";
+import type { BookingUserResDto } from "../client/model/response/BookingUserResDto";
+import { dateHelper } from "./../helper/dateHelper";
 import { AlertTriangle, X } from "lucide-react";
 import { CardBookingUser } from "./../component/CardBookingUser";
 import { Button } from "./../components/ui/button";
@@ -191,7 +191,7 @@ export function DeleteBookingModal({
         <div className="space-y-2 text-sm text-muted-foreground">
            
             <div className="p-3 bg-muted rounded-lg text-foreground font-medium space-y-1 text-xs border border-border/50">
-                 <p>Sei sicuro di voler eliminare la prenotazione del {dataHelper.formatDate(booking.startsAt)} alle {dataHelper.formatTime(booking.startsAt)}?</p>
+                 <p>Sei sicuro di voler eliminare la prenotazione del {dateHelper.formatDate(booking.startsAt)} alle {dateHelper.formatTime(booking.startsAt)}?</p>
             </div>
             <p className="text-xs text-destructive font-medium">L'azione non potrà essere annullata.</p>
         </div>

@@ -12,6 +12,10 @@ import type { CreateBookingDto } from "./model/request/CreateBookingDto";
 import type { resetPasswordReqDto } from "./model/request/resetPasswordReqDto";
 import type { DeleteBookingReqDto } from "./model/request/deleteBooking.req.dto";
 import type { RestoreBookingStatusReqDto } from "./model/request/restoreBookingStatus.req.dto";
+import type { TournamentsResDto } from "./model/response/tournaments.res.dto";
+import type { TournamentResDto } from "./model/response/tournament.res.dto";
+import type { UpdateMatchReqDto } from "./model/request/update.match.req.dto";
+import type { EndMatchReqDto } from "./model/request/end.match.res.dto";
 
 export class apiClient {
   private static getApiBaseUrl(): string {
@@ -203,6 +207,41 @@ private static async request<T = void>(
     return this.request(`/auth/resetpassword`, {
       method: "POST",
       body: JSON.stringify(input)
+    });
+  }
+
+  // ==========================================
+  // API Endpoints - TOURNAMENT
+  // ==========================================
+  static async getTournaments(): Promise<IApiResponse<TournamentsResDto[]>> {
+    return this.request(`/tournament`, {
+      method: "GET",
+    });
+  }
+
+  static async getTournament(idTournament: string): Promise<IApiResponse<TournamentResDto>> {
+    return this.request(`/tournament/${idTournament}`, {
+      method: "GET",
+    });
+  }
+
+  static async updateMatch(idTournament: string, idMatch:string, input: UpdateMatchReqDto){
+    return this.request(`/tournament/${idTournament}/match/${idMatch}`, {
+      method: "PATCH",
+      body: JSON.stringify(input)
+    });
+  }
+
+  static async endMatch(idTournament: string, idMatch:string, input: EndMatchReqDto  ){
+    return this.request(`/tournament/${idTournament}/match/${idMatch}/end`, {
+      method: "PATCH",
+      body: JSON.stringify(input)
+    });
+  }
+
+  static async nextMatch(idTournament: string, idMatch:string){
+    return this.request(`/tournament/${idTournament}/match/${idMatch}/next`, {
+      method: "PATCH",
     });
   }
 

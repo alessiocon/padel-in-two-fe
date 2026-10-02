@@ -1,4 +1,4 @@
-import type { bookingStatus } from "./../common/Enum/bookingStatusDto";
+import type { bookingStatus } from "../common/Enum/bookingStatusDto";
 
 export class BookingUserResDto{
     id: string;

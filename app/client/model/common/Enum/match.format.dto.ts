@@ -1,0 +1,1 @@
+export enum MatchFormat { SINGLE_SET = 'SINGLE_SET', BEST_OF_3 = 'BEST_OF_3'}

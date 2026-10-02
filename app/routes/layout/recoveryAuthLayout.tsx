@@ -42,7 +42,12 @@ export default function RecoveryAuthLayout() {
       }
     }
 
-    checkAuth();
+    //TODO: DA LEVARE
+    setAuthState({
+            isChecking: false,
+            isAuth: false,
+          });
+    // checkAuth();
 
     return () => {
       isMounted = false;

@@ -7,6 +7,8 @@ export default [
     index("routes/home.tsx"),
 
     route("/clubs/:id", "routes/club.tsx"),
+    route("/tournaments/:id", "routes/tournament.tsx"),
+    route("/tournaments/:id/adminalessio", "routes/adminTournamentManagement.tsx"),
 
     
 

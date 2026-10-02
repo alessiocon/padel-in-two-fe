@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router";
 import { DoorOpen, DoorClosed, MapPin, Timer } from "lucide-react";
 import type { BookingUserResDto } from "../client/model/response/BookingUserResDto";
-import { dataHelper } from "../helper/dateHelper";
+import { dateHelper } from "../helper/dateHelper";
 import { Button } from "./../components/ui/button";
 import { bookingStatus } from "~/client/model/common/Enum/bookingStatusDto";
 
@@ -58,7 +58,7 @@ export const CardBookingUser: React.FC<BookingCardProps> = ({ booking, onDelete 
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
-            {dataHelper.formatDate(booking.startsAt)}
+            {dateHelper.formatDate(booking.startsAt)}
           </span>
           <span className="text-xs text-muted-foreground font-medium">
             {booking.isIndoor ? (
@@ -79,8 +79,8 @@ export const CardBookingUser: React.FC<BookingCardProps> = ({ booking, onDelete 
 
         <div className="flex items-center gap-2 text-sm font-semibold text-foreground mt-1">
           <Timer className="h-4 w-4 text-primary" />{" "}
-          {dataHelper.formatTime(booking.startsAt)} -{" "}
-          {dataHelper.formatTime(booking.endsAt)}
+          {dateHelper.formatTime(booking.startsAt)} -{" "}
+          {dateHelper.formatTime(booking.endsAt)}
         </div>
       </div>
 

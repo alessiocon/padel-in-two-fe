@@ -1,4 +1,4 @@
-import type { ClubStatusDto } from "./../common/Enum/ClubStatusDto";
+import type { ClubStatusDto } from "../common/Enum/ClubStatusDto";
 
 export class ClubsResDto {
   id: string;
