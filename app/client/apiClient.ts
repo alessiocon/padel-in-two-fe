@@ -15,7 +15,8 @@ import type { RestoreBookingStatusReqDto } from "./model/request/restoreBookingS
 import type { TournamentsResDto } from "./model/response/tournaments.res.dto";
 import type { TournamentResDto } from "./model/response/tournament.res.dto";
 import type { UpdateMatchReqDto } from "./model/request/update.match.req.dto";
-import type { EndMatchReqDto } from "./model/request/end.match.res.dto";
+import type { SetPointsMatchReqDto } from "./model/request/set.points.match.res.dto";
+import type { TournamentMatchResDto } from "./model/response/tournament.match.res.dto";
 
 export class apiClient {
   private static getApiBaseUrl(): string {
@@ -225,21 +226,28 @@ private static async request<T = void>(
     });
   }
 
-  static async updateMatch(idTournament: string, idMatch:string, input: UpdateMatchReqDto){
+  static async getMatches(idTournament: string): Promise<IApiResponse<TournamentMatchResDto[]>> {
+    return this.request(`/tournament/${idTournament}/match`, {
+      method: "GET",
+    });
+  }
+
+
+  static async updateMatch(idTournament: string, idMatch:string, input: UpdateMatchReqDto): Promise<IApiResponse<TournamentMatchResDto>>{
     return this.request(`/tournament/${idTournament}/match/${idMatch}`, {
       method: "PATCH",
       body: JSON.stringify(input)
     });
   }
 
-  static async endMatch(idTournament: string, idMatch:string, input: EndMatchReqDto  ){
-    return this.request(`/tournament/${idTournament}/match/${idMatch}/end`, {
+  static async assignPointsMatch(idTournament: string, idMatch:string, input: SetPointsMatchReqDto  ) : Promise<IApiResponse<TournamentMatchResDto>> {
+    return this.request(`/tournament/${idTournament}/match/${idMatch}/points`, {
       method: "PATCH",
       body: JSON.stringify(input)
     });
   }
 
-  static async nextMatch(idTournament: string, idMatch:string){
+  static async nextMatch(idTournament: string, idMatch:string) : Promise<IApiResponse<TournamentMatchResDto>> {
     return this.request(`/tournament/${idTournament}/match/${idMatch}/next`, {
       method: "PATCH",
     });

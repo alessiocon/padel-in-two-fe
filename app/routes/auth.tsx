@@ -1,5 +1,4 @@
 import type { Route } from "./+types/auth";
-import { useRevalidator } from "react-router";
 import React, { useContext, useState } from "react";
 import { DynamicForm, DynamicInput } from "./../component/form/form";
 import { AuthContext } from "./../store/context";

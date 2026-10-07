@@ -11,7 +11,6 @@ import {
 import "./app.css";
 import { useState } from "react";
 import { AuthContext, PopUpContext, type I_AuthContext, type I_PopupContext } from "./store/context";
-import Popup from "./component/popup/popup";
 import { Header } from "./components/block/header";
 
 import { Button } from "./components/ui/button";
@@ -24,7 +23,6 @@ import {
 } from "./components/ui/card";
 import { AlertCircle, RefreshCw , Home } from "lucide-react";
 import { Footer } from "./components/block/footer";
-
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [popup, setPopup] = useState<I_PopupContext>({massage: null});
@@ -56,7 +54,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return <>
-    <Popup />
     <Header/>
     <Outlet />
     <Footer />

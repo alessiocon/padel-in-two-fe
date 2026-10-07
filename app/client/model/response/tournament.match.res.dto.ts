@@ -17,5 +17,5 @@ export class TournamentMatchResDto{
     matchOrder: number;
     status: MatchStatus;
     scheduledAt: Date | null;
-    score?: MatchScoreResDto[] | null;
+    sets?: MatchScoreResDto[] | null;
 }

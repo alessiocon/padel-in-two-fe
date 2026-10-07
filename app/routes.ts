@@ -5,10 +5,11 @@ export default [
   // Layout principale per il recupero della sessione (/users/me)
   route("/", "routes/layout/recoveryAuthLayout.tsx", [
     index("routes/home.tsx"),
-
+    route("/test", "routes/test.tsx"),
     route("/clubs/:id", "routes/club.tsx"),
     route("/tournaments/:id", "routes/tournament.tsx"),
-    route("/tournaments/:id/adminalessio", "routes/adminTournamentManagement.tsx"),
+    
+    
 
     
 
@@ -18,12 +19,14 @@ export default [
       route("/auth", "routes/auth.tsx"),
       route("/auth/emailconfirmation", "routes/confirmationEmail.tsx"),
       route("/auth/resetpassword", "routes/resetPassword.tsx"),
+    
     ]),
 
     // Rotte PROTETTE: richiedono autenticazione (auth === true)
     route("/", "routes/layout/protectedLayout.tsx", [
       route("/user", "routes/user.tsx"),
       route("/clubs/:id/manager", "routes/clubManager.tsx"),
+      route("/tournaments/:id/adminalessio", "routes/adminTournamentManagement.tsx"),
     ]),
 
   ]),

@@ -129,3 +129,28 @@
     @apply font-sans;
   }
 }
+
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent; /* Grigio semi-trasparente visibile */
+}
+
+/* Stile globale per le scrollbar (Webkit: Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px; /* Importante per le scrollbar orizzontali come quella del tabellone */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--foreground) / 0.25); /* 25% di opacità del colore del testo principale */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--foreground) / 0.5);
+}

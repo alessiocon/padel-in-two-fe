@@ -182,10 +182,9 @@ export function TournamentSchedule({ tournamentId, matches = [] }: TournamentSch
 
                             {/* Punteggio Set Squadra 1 */}
                             <div className="flex items-center gap-1">
-                              {match.score && match.score.length > 0 ? (
-                                match.score.map((set) => (
+                              {match.sets && match.sets.length > 0 ? (
+                                match.sets.map((set) => (
                                   <Badge
-                                    key={set.id}
                                     variant={match.winnerTeamId === match.team1Id ? "default" : "outline"}
                                     className={`h-4 min-w-[20px] px-1 justify-center text-[11px] font-bold ${
                                       match.winnerTeamId === match.team1Id 
@@ -218,10 +217,9 @@ export function TournamentSchedule({ tournamentId, matches = [] }: TournamentSch
 
                             {/* Punteggio Set Squadra 2 */}
                             <div className="flex items-center gap-1">
-                              {match.score && match.score.length > 0 ? (
-                                match.score.map((set) => (
+                              {match.sets && match.sets.length > 0 ? (
+                                match.sets.map((set) => (
                                   <Badge
-                                    key={set.id}
                                     variant={match.winnerTeamId === match.team2Id ? "default" : "outline"}
                                     className={`h-4 min-w-[20px] px-1 justify-center text-[11px] font-bold ${
                                       match.winnerTeamId === match.team2Id 

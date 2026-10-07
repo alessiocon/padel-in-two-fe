@@ -1,5 +1,3 @@
-import type { TournamentsTeamResDto } from "./tournamentsTeam.res.dto";
-
 export class TournamentsResDto {
       id: string;
       title: string;
@@ -15,5 +13,4 @@ export class TournamentsResDto {
       isClosed: boolean;
       isVisible: boolean;
       showTeams: boolean;
-      teams: TournamentsTeamResDto[];
 }
