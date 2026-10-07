@@ -5,7 +5,6 @@ export default [
   // Layout principale per il recupero della sessione (/users/me)
   route("/", "routes/layout/recoveryAuthLayout.tsx", [
     index("routes/home.tsx"),
-    route("/test", "routes/test.tsx"),
     route("/clubs/:id", "routes/club.tsx"),
     route("/tournaments/:id", "routes/tournament.tsx"),
     
