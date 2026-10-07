@@ -1,13 +1,11 @@
 import type { Route } from "./+types/user";
 import { useContext, useEffect, useState } from "react";
-import { AuthContext, PopUpContext } from "./../store/context";
+import { AuthContext} from "./../store/context";
 import { apiClient } from "./../client/apiClient";
 import type { BookingUserResDto } from "../client/model/response/BookingUserResDto";
-import { dateHelper } from "./../helper/dateHelper";
-import { AlertTriangle, X } from "lucide-react";
 import { CardBookingUser } from "./../component/CardBookingUser";
-import { Button } from "./../components/ui/button";
-import { bookingStatus } from "./../client/model/common/Enum/bookingStatusDto";
+import type { IDeleteBookingDialogProps } from "../components/dialog/delete.booking.dialog";
+import DeleteBookingDialog from "../components/dialog/delete.booking.dialog";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -18,13 +16,12 @@ export function meta({ }: Route.MetaArgs) {
 
 export default function UserProfile() {
     const [auth] = useContext(AuthContext);
-    const [popUp, setPopup] = useContext(PopUpContext);
     const [bookings, setBookings] = useState<BookingUserResDto[]>([]);
     const [isLoadingBookings, setIsLoadingBookings] = useState<boolean>(true);
 
     // Stato per gestire il popup custom di conferma eliminazione
-    const [bookingToDelete, setBookingToDelete] = useState<BookingUserResDto | null>(null);
-    const [isDeleting, setIsDeleting] = useState<boolean>(false);
+    const [deleteBookingDialog, setdeleteBookingDialog] = useState<IDeleteBookingDialogProps | null>(null);
+    const [openBookingDialog, setOpenBookingDialog] = useState<boolean>(false);
 
     // Fetch delle prenotazioni dell'utente
     useEffect(() => {
@@ -50,55 +47,8 @@ export default function UserProfile() {
         }
     }, [auth.auth]);
 
-    const handleDeleteBooking = async (bookingId: string) => {
-        try {
-            const res = await apiClient.deleteBooking(bookingId, {isStaff: false});
 
-            if (!res.IsSuccess || !res.Data) {
-                throw new Error("Impossibile cancellare la prenotazione");
-            }
-            const updatedBooking = res.Data;
-
-            if (updatedBooking.status === bookingStatus.PENDING) {
-                setBookings((prev) => prev.filter((b) => b.id !== bookingId));
-                window.alert("Prenotazione rimossa con successo.");
-                return;
-            }
-
-            setBookings((prev) =>
-                prev.map((b) => {
-                    if (b.id === bookingId) {
-                        return {...b,
-                            status: bookingStatus.CANCELLED,
-                            description: updatedBooking.description ?? "",
-                        };
-                    }
-                    return b;
-                })
-            );
-
-            window.alert("Prenotazione cancellata con successo.");
-        } catch (error) {
-            console.error("Errore durante l'eliminazione:", error);
-            window.alert("Si è verificato un errore durante la cancellazione.");
-        }
-    };
-
-    const handleOpenDeleteModal = (booking: BookingUserResDto) => {
-        setPopup({
-            massage: (
-                <DeleteBookingModal
-                    booking={booking}
-                    onConfirm={handleDeleteBooking}
-                    onClose={() => setPopup({ massage: null })}
-                />
-            ),
-            buttons: null,
-        });
-    };
-
-
-  return (
+  return (<>
     <div className="min-h-screen bg-background text-foreground w-full p-4 md:p-8 flex flex-col items-center relative">
       <div className="w-full max-w-2xl flex flex-col gap-6">
         
@@ -148,7 +98,10 @@ export default function UserProfile() {
                 {bookings.map((booking) => (
                     <CardBookingUser key={booking.id}
                         booking={booking}
-                        onDelete={(e) => handleOpenDeleteModal(booking)}
+                        onDelete={(e) => {
+                          setdeleteBookingDialog({booking: booking, setBookings: setBookings })
+                          setOpenBookingDialog(true)
+                        }}
                     />
                 ))}
             </div>
@@ -157,59 +110,17 @@ export default function UserProfile() {
 
       </div>
     </div>
-  );
-}
+    
+    {openBookingDialog && deleteBookingDialog && 
+      <DeleteBookingDialog 
+        booking={deleteBookingDialog.booking} 
+        setBookings={setBookings} 
+        openState={[openBookingDialog, setOpenBookingDialog]}
+      /> 
+    }
+  
+  </>
+   
 
-interface DeleteBookingModalProps {
-  booking: BookingUserResDto,
-  onConfirm: (bookingId: string) => Promise<void> | void;
-  onClose: () => void;
-}
-
-//TODO: DAIALOG
-export function DeleteBookingModal({
-  booking,
-  onConfirm,
-  onClose,
-}: DeleteBookingModalProps) {
-  return (
-    <div className="w-full max-w-md mx-auto bg-card border border-border text-card-foreground rounded-xl p-4 shadow-2xl space-y-4">
-    {/* Header */}
-        <div className="flex items-center justify-between border-b border-border pb-3">
-            <div className="flex items-center gap-2 text-destructive font-bold text-base">
-            <AlertTriangle className="h-5 w-5 shrink-0" />
-            <span>Conferma Eliminazione</span>
-            </div>
-            <button
-            onClick={onClose}
-            className="text-muted-foreground hover:text-foreground transition-colors p-1 shrink-0"
-            >
-            <X className="h-5 w-5" />
-            </button>
-        </div>
-
-    {/* Contenuto */}
-        <div className="space-y-2 text-sm text-muted-foreground">
-           
-            <div className="p-3 bg-muted rounded-lg text-foreground font-medium space-y-1 text-xs border border-border/50">
-                 <p>Sei sicuro di voler eliminare la prenotazione del {dateHelper.formatDate(booking.startsAt)} alle {dateHelper.formatTime(booking.startsAt)}?</p>
-            </div>
-            <p className="text-xs text-destructive font-medium">L'azione non potrà essere annullata.</p>
-        </div>
-
-    {/* Azioni */}
-        <div className="flex items-center justify-end gap-3 pt-2">
-            <Button variant="outline" size="sm" onClick={onClose}>
-                Annulla
-            </Button>
-            <Button variant="destructive" size="sm"
-                onClick={async () => {
-                    await onConfirm(booking.id);
-                    onClose();
-                }}>
-                Elimina Prenotazione
-            </Button>
-        </div>
-    </div>
   );
 }

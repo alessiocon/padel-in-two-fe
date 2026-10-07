@@ -16,8 +16,7 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./../components/ui/card";
 import { Button } from "./../components/ui/button";
-import { AuthContext, PopUpContext } from "./../store/context";
-import { ButtonCourtSelection } from "./../component/ButtonCourtSelection";
+import { AuthContext } from "./../store/context";
 import { apiClient } from "./../client/apiClient";
 import type { ClubResDto } from "../client/model/response/ClubResDto";
 import type { ClubCourtDto } from "./../client/model/common/ClubCourtDto";
@@ -25,6 +24,7 @@ import type { BookingResDto } from "../client/model/response/BookingsResDto";
 import type { CreateBookingDto } from "./../client/model/request/CreateBookingDto";
 import { bookingStatus } from "./../client/model/common/Enum/bookingStatusDto";
 import { GroupedTimeSlot } from "../components/GroupedTimeSlot";
+import SelectCourtDialog, { type CourtWithStatusDto, type ICourtSelectionDialogProps } from "../components/dialog/select.court.dialog";
 
 
 export function meta({}: Route.MetaArgs) {
@@ -50,9 +50,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 export default function ClubDetailPage() {
   const club = useLoaderData<ClubResDto>();
-  const [, setPopup] = useContext(PopUpContext);
   const [auth,] = useContext(AuthContext);
-  
   const [selectedDate, setSelectedDate] = useState<string>( new Date().toISOString().split("T")[0] );
   
   // Stato per le prenotazioni lette dall'API e relativo caricamento
@@ -68,6 +66,10 @@ export default function ClubDetailPage() {
   const maxDateStr = maxDate.toISOString().split("T")[0];
 
   const detailsRef = useRef<HTMLDivElement>(null);
+
+  const [openSelectCourtDialog, setOpenSelectCourtDialog] = useState(false);
+  const [selectCourtDialogProps, setSelectCourtDialogProps] = useState<ICourtSelectionDialogProps | null>(null);
+
 
   // Fetch per caricare le prenotazioni ogni volta che cambia il club o la data selezionata
   useEffect(() => {
@@ -140,7 +142,7 @@ export default function ClubDetailPage() {
     }
   }
 
-  const handleOpenCourtSelectionModal = (slot: string, courts: ClubCourtDto[]) => {
+  const handleOpenCourtSelection = (slot: string, courts: ClubCourtDto[]) => {
     setSelectedSlot(slot);
     setSelectedCourt(null);
 
@@ -149,25 +151,18 @@ export default function ClubDetailPage() {
       isOccupied: false,
     }));
 
-    setPopup({
-      massage: (
-        <CourtSelectionModal
-          slot={slot}
-          selectedDate={selectedDate}
-          courts={courtModels}
-          bookings={bookings}
-          onSelectCourt={(court) => {
-            setSelectedCourt(court);
-          }}
-
-          onClose={() => setPopup({ massage: null })}
-        />
-      ),
-      buttons: null
-    });
+    setSelectCourtDialogProps({
+      slot,
+      selectedDate,
+      courts:courtModels,
+      bookings:bookings,
+      onSelectCourt: (court) => {
+        setSelectedCourt(court);
+    }})
+    setOpenSelectCourtDialog(true);
   };
 
-  return (
+  return (<>
     <div className="min-h-screen bg-background text-foreground p-2 md:p-4 lg:p-8">
       {/* Header del Club */}
       <header className="mb-2 mt-2 flex flex-col md:flex-row md:items-center md:justify-between border-b border-border pb-4 gap-4">
@@ -301,7 +296,7 @@ export default function ClubDetailPage() {
                       selectedSlotStr={selectedSlot}
                       courts={club.courts}
                       isLoadingBookings={isLoadingBookings}
-                      onSelect={handleOpenCourtSelectionModal}
+                      onSelect={handleOpenCourtSelection}
                   />
                 </div>
 
@@ -327,67 +322,19 @@ export default function ClubDetailPage() {
         </main>
       </div>
     </div>
-  );
-}
-
-
-export type CourtWithStatusDto = ClubCourtDto & {
-  isOccupied: boolean;
-};
-
-// Popup aggiornato: completamente responsive per qualsiasi schermo (Invariato)
-interface CourtSelectionModalProps {
-  slot: string;
-  selectedDate: string;
-  courts: CourtWithStatusDto[];
-  bookings: BookingResDto[];
-  onSelectCourt: (court: ClubCourtDto) => void;
-  onClose: () => void;
-}
-
-
-//TODO: DIALOG
-function CourtSelectionModal({
-  slot,
-  selectedDate,
-  courts,
-  bookings,
-  onSelectCourt,
-  onClose,
-}: CourtSelectionModalProps) {
-
-  var slotTime = new Date(selectedDate+"T"+slot).toISOString();
-  const bookedCourtIdsForSlot = bookings
-    .filter((b) => (b.startsAt.slice(0, 16) === slotTime.slice(0, 16) && b.status !== bookingStatus.CANCELLED ))
-    .map((b) => b.courtId);
-
-  var courtsCheck: CourtWithStatusDto[] = courts.map((court, index) => {
-    court.isOccupied = bookedCourtIdsForSlot.includes(court.id);
-    return court
-  });
-
-  return (
-    <div className="w-full max-w-md mx-auto bg-card border border-border text-foreground rounded-xl p-3 sm:p-4 shadow-2xl space-y-4">
-      {/* Header centrato con pulsante di chiusura bilanciato */}
-      <div className="flex items-center justify-between border-b border-border pb-3">
-        <h3 className="font-bold text-center w-full text-sm sm:text-base">
-          {selectedDate.replaceAll("-", "/")} - {slot}
-        </h3>
-        <button
-          onClick={onClose}
-          className="text-muted-foreground hover:text-foreground transition-colors p-1 shrink-0"
-        >
-          <X className="h-5 w-5" />
-        </button>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2 sm:gap-3">
-        {courtsCheck.map((court) => {
-          return (
-            <ButtonCourtSelection key={court.name} court={court} onSelect={onSelectCourt} onClose={onClose}/>
-          );
-        })}
-      </div>
-    </div>
+    
+    {openSelectCourtDialog &&  selectCourtDialogProps && 
+      <SelectCourtDialog
+        slot={selectCourtDialogProps.slot}
+        courts={selectCourtDialogProps.courts}
+        bookings={selectCourtDialogProps.bookings}
+        onSelectCourt={selectCourtDialogProps.onSelectCourt}
+        openState={[openSelectCourtDialog, setOpenSelectCourtDialog]}
+        selectedDate={selectCourtDialogProps.selectedDate}
+    />}
+    
+  
+  </>
+    
   );
 }

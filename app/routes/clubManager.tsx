@@ -1,12 +1,11 @@
 import type { Route } from "./+types/clubManager";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLoaderData, type LoaderFunctionArgs} from "react-router";
 
 import { 
   Calendar as CalendarIcon, 
   MapPin, 
   Loader2,
-  X,
   AlertCircle,
   CheckCircle2,
   XCircle,
@@ -20,8 +19,6 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "./../components/ui/card";
 import { Button } from "./../components/ui/button";
-import { PopUpContext } from "./../store/context";
-import { ButtonCourtSelection } from "./../component/ButtonCourtSelection";
 import { apiClient } from "./../client/apiClient";
 import type { ClubResDto } from "../client/model/response/ClubResDto";
 import type { ClubCourtDto } from "./../client/model/common/ClubCourtDto";
@@ -30,10 +27,9 @@ import type { CreateBookingDto } from "./../client/model/request/CreateBookingDt
 import { bookingStatus } from "./../client/model/common/Enum/bookingStatusDto";
 import { GroupedTimeSlot } from "../components/GroupedTimeSlot";
 import type { IApiResponse } from "../client/interfaces/IApiResponse";
+import type { CourtWithStatusDto, ICourtSelectionDialogProps } from "../components/dialog/select.court.dialog";
+import SelectCourtDialog from "../components/dialog/select.court.dialog";
 
-export type CourtWithStatusDto = ClubCourtDto & {
-  isOccupied: boolean;
-};
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -58,7 +54,6 @@ clientLoader.hydrate = true;
 
 export default function ClubManagerPage() {
   const club = useLoaderData<ClubResDto>();
-  const [, setPopup] = useContext(PopUpContext);
 
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split("T")[0]);
   const [bookings, setBookings] = useState<BookingResDto[]>([]);
@@ -69,6 +64,9 @@ export default function ClubManagerPage() {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [selectedCourt, setSelectedCourt] = useState<ClubCourtDto | null>(null);
   const [playerName, setPlayerName] = useState<string>("");
+
+  const [openSelectCourtDialog, setOpenSelectCourtDialog] = useState(false);
+  const [selectCourtDialogProps, setSelectCourtDialogProps] = useState<ICourtSelectionDialogProps | null>(null);
 
 
   const fetchBookings = async () => {
@@ -181,31 +179,24 @@ export default function ClubManagerPage() {
   };
 
 
-  const handleOpenCourtSelectionModal = (slot: string, courts: ClubCourtDto[]) => {
+  const handleOpenCourtSelection = (slot: string, courts: ClubCourtDto[]) => {
       setSelectedSlot(slot);
       setSelectedCourt(null);
-  
+
       const courtModels: CourtWithStatusDto[] = courts.map((court) => ({
         ...court,
         isOccupied: false,
       }));
-  
-      setPopup({
-        massage: (
-          <CourtSelectionModal
-            slot={slot}
-            selectedDate={selectedDate}
-            courts={courtModels}
-            bookings={bookings}
-            onSelectCourt={(court) => {
-              setSelectedCourt(court);
-            }}
-  
-            onClose={() => setPopup({ massage: null })}
-          />
-        ),
-        buttons: null
-      });
+
+      setSelectCourtDialogProps({
+        slot,
+        selectedDate,
+        courts:courtModels,
+        bookings:bookings,
+        onSelectCourt: (court) => {
+          setSelectedCourt(court);
+      }})
+      setOpenSelectCourtDialog(true);
     };
 
   const pendingBookings = bookings.filter((b) => b.status === bookingStatus.PENDING);
@@ -246,319 +237,272 @@ export default function ClubManagerPage() {
     );
   };
 
-  return (
+  return (<>
     <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-xl text-center md:text-3xl md:text-start font-extrabold tracking-tight">{club.name}</h1>
-          <div className="flex justify-center md:justify-start items-center gap-3">
-            <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground text-center md:text-left">{club.position}</p>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-xl text-center md:text-3xl md:text-start font-extrabold tracking-tight">{club.name}</h1>
+            <div className="flex justify-center md:justify-start items-center gap-3">
+              <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground text-center md:text-left">{club.position}</p>
+            </div>
           </div>
+          {isLoadingBookings}
+          <Button className="bg-background mx-2" variant="outline" onClick={fetchBookings} disabled={isLoadingBookings}>
+            {isLoadingBookings ? (
+              <><Loader2 className="h-4 w-4 animate-spin text-primary mr-2" /> Aggiornamento...</>
+            ) : (
+              <><RefreshCw className="h-4 w-4 mr-2" /> Aggiorna</>
+            )}
+          </Button>
         </div>
-        {isLoadingBookings}
-        <Button className="bg-background mx-2" variant="outline" onClick={fetchBookings} disabled={isLoadingBookings}>
-          {isLoadingBookings ? (
-            <><Loader2 className="h-4 w-4 animate-spin text-primary mr-2" /> Aggiornamento...</>
-          ) : (
-            <><RefreshCw className="h-4 w-4 mr-2" /> Aggiorna</>
-          )}
-        </Button>
-      </div>
 
-      {/* Richieste in Attesa */}
-      {pendingBookings.length > 0 && (
-        <Card className="border-amber-500/40 bg-amber-500/5 shadow-md">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-amber-500 text-lg flex items-center gap-2">
-              <AlertCircle className="h-5 w-5" /> Richieste Giocatori in Attesa ({pendingBookings.length})
-            </CardTitle>
+        {/* Richieste in Attesa */}
+        {pendingBookings.length > 0 && (
+          <Card className="border-amber-500/40 bg-amber-500/5 shadow-md">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-amber-500 text-lg flex items-center gap-2">
+                <AlertCircle className="h-5 w-5" /> Richieste Giocatori in Attesa ({pendingBookings.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {pendingBookings.map((b) => (
+                <div
+                  key={b.id}
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-lg border border-border bg-card gap-4"
+                >
+                  <div>
+                    <p className="font-bold text-sm">
+                      {courtNameMap.get(b.courtId) || b.courtId || "Campo"} • {new Date(b.startsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                    {b.description}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-green-600 text-green-600 hover:bg-green-600/10 flex-1 sm:flex-initial font-semibold"
+                      disabled={isSubmitting}
+                      onClick={() => handleAcceptBooking(b.id)}
+                    >
+                      <CheckCircle2 className="h-4 w-4 mr-1" /> Accetta
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-destructive text-destructive hover:bg-destructive/10 flex-1 sm:flex-initial font-semibold"
+                      disabled={isSubmitting}
+                      onClick={() => handleUpdateStatus(b.id, bookingStatus.CANCELLED)}
+                    >
+                      <XCircle className="h-4 w-4 mr-1" /> Rifiuta
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Sezione Griglia Oraria / Prenotazione Manuale */}
+        <Card className="bg-card border-primary/20">
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <CalendarIcon className="h-5 w-5 text-primary" /> Seleziona Orario per Inserimento
+              </CardTitle>
+              <CardDescription>
+                Clicca su uno slot orario libero per assegnare un campo a un giocatore
+              </CardDescription>
+            </div>
+
+            <input
+              type="date"
+              id="date"
+              value={selectedDate}
+              onChange={(e) => {
+                setSelectedDate(e.target.value);
+                setSelectedSlot(null);
+                setSelectedCourt(null);
+              }}
+              className="bg-background border-input dark:scheme-dark rounded-md border px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary"
+            />          
           </CardHeader>
-          <CardContent className="space-y-3">
-            {pendingBookings.map((b) => (
-              <div
-                key={b.id}
-                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-lg border border-border bg-card gap-4"
-              >
-                <div>
-                  <p className="font-bold text-sm">
-                    {courtNameMap.get(b.courtId) || b.courtId || "Campo"} • {new Date(b.startsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                   {b.description}
-                  </p>
+
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-muted-foreground">
+                Orari per il {selectedDate}:
+              </h3>
+              {isLoadingBookings && (
+                <span className="text-xs text-primary flex items-center gap-1.5 font-medium animate-pulse">
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" /> Aggiornamento...
+                </span>
+              )}
+            </div>
+
+            <GroupedTimeSlot
+                opening={club.openingTime}
+                closing={club.closingTime}
+                durationMinutes={club.slotDurationMinutes}
+                selectedDateStr={selectedDate}
+                selectedSlotStr={selectedSlot}
+                courts={club.courts}
+                isLoadingBookings={isLoadingBookings}
+                onSelect={handleOpenCourtSelection}
+            />
+
+            {/* Box di Conferma Inserimento Manager */}
+            {selectedSlot && selectedCourt && (
+              <div className="mt-8 p-4 rounded-lg bg-primary/10 border border-primary/30 space-y-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-primary/20 pb-3">
+                  <div>
+                    <p className="text-xs font-bold text-primary uppercase">Campo Selezionato:</p>
+                    <p className="text-base font-semibold">
+                      {selectedCourt.name} ({selectedCourt.isIndoor ? "Indoor" : "Outdoor"}) • {selectedDate} ore {selectedSlot}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Prezzo: € {selectedCourt.price?.toFixed(2)}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-green-600 text-green-600 hover:bg-green-600/10 flex-1 sm:flex-initial font-semibold"
-                    disabled={isSubmitting}
-                    onClick={() => handleAcceptBooking(b.id)}
-                  >
-                    <CheckCircle2 className="h-4 w-4 mr-1" /> Accetta
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-destructive text-destructive hover:bg-destructive/10 flex-1 sm:flex-initial font-semibold"
-                    disabled={isSubmitting}
-                    onClick={() => handleUpdateStatus(b.id, bookingStatus.CANCELLED)}
-                  >
-                    <XCircle className="h-4 w-4 mr-1" /> Rifiuta
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <div className="relative flex-1">
+                    <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="text"
+                      placeholder="Nome e Cognome Giocatore (opzionale)"
+                      value={playerName}
+                      onChange={(e) => setPlayerName(e.target.value)}
+                      className="w-full bg-background border border-input rounded-md pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+
+                  <Button onClick={sendManagerBooking} size="lg" className="font-bold shrink-0">
+                    Conferma Inserimento Manager
                   </Button>
                 </div>
               </div>
-            ))}
+            )}
           </CardContent>
         </Card>
-      )}
 
-      {/* Sezione Griglia Oraria / Prenotazione Manuale */}
-      <Card className="bg-card border-primary/20">
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
+        {/* Lista / Tabellone Completo delle Prenotazioni del Giorno */}
+        <Card className="bg-card border-border">
+          <CardHeader>
             <CardTitle className="text-xl flex items-center gap-2">
-              <CalendarIcon className="h-5 w-5 text-primary" /> Seleziona Orario per Inserimento
+              <ListFilter className="h-5 w-5 text-primary" /> Gestione Prenotazioni del Giorno ({bookings.length})
             </CardTitle>
             <CardDescription>
-              Clicca su uno slot orario libero per assegnare un campo a un giocatore
+              Visualizza e modifica lo stato di qualsiasi prenotazione in data {selectedDate}
             </CardDescription>
-          </div>
+          </CardHeader>
+          <CardContent>
+            {isLoadingBookings ? (
+              <div className="flex items-center justify-center py-8 text-muted-foreground gap-2">
+                <Loader2 className="h-5 w-5 animate-spin" /> Caricamento prenotazioni...
+              </div>
+            ) : bookings.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">
+                Nessuna prenotazione presente per questa giornata.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {bookings.map((booking) => {
+                  const courtName = courtNameMap.get(booking.courtId) || booking.courtId || "Campo Sconosciuto";
+                  const timeString = new Date(booking.startsAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
 
-          <input
-            type="date"
-            id="date"
-            value={selectedDate}
-            onChange={(e) => {
-              setSelectedDate(e.target.value);
-              setSelectedSlot(null);
-              setSelectedCourt(null);
-            }}
-            className="bg-background border-input dark:scheme-dark rounded-md border px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary"
-          />          
-        </CardHeader>
+                  const isCancelled = booking.status === bookingStatus.CANCELLED;
 
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-muted-foreground">
-              Orari per il {selectedDate}:
-            </h3>
-            {isLoadingBookings && (
-              <span className="text-xs text-primary flex items-center gap-1.5 font-medium animate-pulse">
-                <Loader2 className="h-4 w-4 animate-spin text-primary" /> Aggiornamento...
-              </span>
+                  return (
+                    <div
+                      key={booking.id}
+                      className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border transition-colors gap-3 ${
+                        isCancelled
+                          ? "bg-muted/20 border-border/50 opacity-75"
+                          : "bg-background/50 border-border hover:bg-muted/40"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-md bg-primary/10 text-primary font-mono font-bold text-sm flex items-center gap-1 shrink-0">
+                          <Clock className="h-4 w-4" />
+                          {timeString}
+                        </div>
+
+                        <div>
+                          <p className="font-bold text-sm flex items-center gap-2">
+                            <CircleDot className="h-3.5 w-3.5 text-primary" />
+                            {courtName}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {booking.description || booking.userId || "Nessun dettaglio specificato"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Azioni Manager per il cambio di stato */}
+                      <div className="flex items-center gap-3 justify-between sm:justify-end shrink-0">
+                        {renderStatusBadge(booking.status)}
+
+                        <div className="flex items-center gap-1.5 border-l border-border pl-3">
+                          {booking.status === bookingStatus.PENDING && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 text-xs text-emerald-600 hover:bg-emerald-500/10 font-semibold"
+                              disabled={isSubmitting}
+                              onClick={() => handleAcceptBooking(booking.id)}
+                            >
+                              <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Accetta
+                            </Button>
+                          )}
+
+                          {isCancelled ? (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 text-xs text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-600 font-semibold"
+                              disabled={isSubmitting}
+                              onClick={() => handleUpdateStatus(booking.id, bookingStatus.CONFIRMED)}
+                            >
+                              <RotateCcw className="h-3.5 w-3.5 mr-1" /> Ripristina
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive font-semibold"
+                              disabled={isSubmitting}
+                              onClick={() => handleUpdateStatus(booking.id, bookingStatus.CANCELLED)}
+                            >
+                              <XCircle className="h-3.5 w-3.5 mr-1" /> Annulla
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
-          </div>
-
-          <GroupedTimeSlot
-              opening={club.openingTime}
-              closing={club.closingTime}
-              durationMinutes={club.slotDurationMinutes}
-              selectedDateStr={selectedDate}
-              selectedSlotStr={selectedSlot}
-              courts={club.courts}
-              isLoadingBookings={isLoadingBookings}
-              onSelect={handleOpenCourtSelectionModal}
-          />
-
-          {/* Box di Conferma Inserimento Manager */}
-          {selectedSlot && selectedCourt && (
-            <div className="mt-8 p-4 rounded-lg bg-primary/10 border border-primary/30 space-y-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-primary/20 pb-3">
-                <div>
-                  <p className="text-xs font-bold text-primary uppercase">Campo Selezionato:</p>
-                  <p className="text-base font-semibold">
-                    {selectedCourt.name} ({selectedCourt.isIndoor ? "Indoor" : "Outdoor"}) • {selectedDate} ore {selectedSlot}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Prezzo: € {selectedCourt.price?.toFixed(2)}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <div className="relative flex-1">
-                  <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Nome e Cognome Giocatore (opzionale)"
-                    value={playerName}
-                    onChange={(e) => setPlayerName(e.target.value)}
-                    className="w-full bg-background border border-input rounded-md pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-
-                <Button onClick={sendManagerBooking} size="lg" className="font-bold shrink-0">
-                  Conferma Inserimento Manager
-                </Button>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Lista / Tabellone Completo delle Prenotazioni del Giorno */}
-      <Card className="bg-card border-border">
-        <CardHeader>
-          <CardTitle className="text-xl flex items-center gap-2">
-            <ListFilter className="h-5 w-5 text-primary" /> Gestione Prenotazioni del Giorno ({bookings.length})
-          </CardTitle>
-          <CardDescription>
-            Visualizza e modifica lo stato di qualsiasi prenotazione in data {selectedDate}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoadingBookings ? (
-            <div className="flex items-center justify-center py-8 text-muted-foreground gap-2">
-              <Loader2 className="h-5 w-5 animate-spin" /> Caricamento prenotazioni...
-            </div>
-          ) : bookings.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">
-              Nessuna prenotazione presente per questa giornata.
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {bookings.map((booking) => {
-                const courtName = courtNameMap.get(booking.courtId) || booking.courtId || "Campo Sconosciuto";
-                const timeString = new Date(booking.startsAt).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
-
-                const isCancelled = booking.status === bookingStatus.CANCELLED;
-
-                return (
-                  <div
-                    key={booking.id}
-                    className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border transition-colors gap-3 ${
-                      isCancelled
-                        ? "bg-muted/20 border-border/50 opacity-75"
-                        : "bg-background/50 border-border hover:bg-muted/40"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-md bg-primary/10 text-primary font-mono font-bold text-sm flex items-center gap-1 shrink-0">
-                        <Clock className="h-4 w-4" />
-                        {timeString}
-                      </div>
-
-                      <div>
-                        <p className="font-bold text-sm flex items-center gap-2">
-                          <CircleDot className="h-3.5 w-3.5 text-primary" />
-                          {courtName}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {booking.description || booking.userId || "Nessun dettaglio specificato"}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Azioni Manager per il cambio di stato */}
-                    <div className="flex items-center gap-3 justify-between sm:justify-end shrink-0">
-                      {renderStatusBadge(booking.status)}
-
-                      <div className="flex items-center gap-1.5 border-l border-border pl-3">
-                        {booking.status === bookingStatus.PENDING && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 text-xs text-emerald-600 hover:bg-emerald-500/10 font-semibold"
-                            disabled={isSubmitting}
-                            onClick={() => handleAcceptBooking(booking.id)}
-                          >
-                            <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Accetta
-                          </Button>
-                        )}
-
-                        {isCancelled ? (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 text-xs text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-600 font-semibold"
-                            disabled={isSubmitting}
-                            onClick={() => handleUpdateStatus(booking.id, bookingStatus.CONFIRMED)}
-                          >
-                            <RotateCcw className="h-3.5 w-3.5 mr-1" /> Ripristina
-                          </Button>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive font-semibold"
-                            disabled={isSubmitting}
-                            onClick={() => handleUpdateStatus(booking.id, bookingStatus.CANCELLED)}
-                          >
-                            <XCircle className="h-3.5 w-3.5 mr-1" /> Annulla
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-// Sub-componente Popup per la selezione dei campi
-interface CourtSelectionModalProps {
-  slot: string;
-  selectedDate: string;
-  courts: CourtWithStatusDto[];
-  bookings: BookingResDto[];
-  onSelectCourt: (court: ClubCourtDto) => void;
-  onClose: () => void;
-}
-//TODO: DIALOG
-function CourtSelectionModal({
-  slot,
-  selectedDate,
-  courts,
-  bookings,
-  onSelectCourt,
-  onClose,
-}: CourtSelectionModalProps) {
-  const slotTime = new Date(`${selectedDate}T${slot}`).toISOString();
+          </CardContent>
+        </Card>
+      </div>
   
-  const bookedCourtIdsForSlot = bookings
-    .filter((b) => (b.startsAt.slice(0, 16) === slotTime.slice(0, 16) && b.status !== bookingStatus.CANCELLED))
-    .map((b) => b.courtId);
-
-  const courtsCheck: CourtWithStatusDto[] = courts.map((court) => ({
-    ...court,
-    isOccupied: bookedCourtIdsForSlot.includes(court.id),
-  }));
-
-  return (
-    <div className="w-full max-w-md mx-auto bg-card border border-border text-foreground rounded-xl p-3 sm:p-4 shadow-2xl space-y-4">
-      <div className="flex items-center justify-between border-b border-border pb-3">
-        <h3 className="font-bold text-center w-full text-sm sm:text-base">
-          {selectedDate.replaceAll("-", "/")} - {slot}
-        </h3>
-        <button
-          onClick={onClose}
-          className="text-muted-foreground hover:text-foreground transition-colors p-1 shrink-0"
-        >
-          <X className="h-5 w-5" />
-        </button>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2 sm:gap-3">
-        {courtsCheck.map((court) => (
-          <ButtonCourtSelection 
-            key={court.id} 
-            court={court} 
-            onSelect={onSelectCourt} 
-            onClose={onClose}
-          />
-        ))}
-      </div>
-    </div>
-  );
+    {openSelectCourtDialog &&  selectCourtDialogProps && 
+          <SelectCourtDialog
+            slot={selectCourtDialogProps.slot}
+            courts={selectCourtDialogProps.courts}
+            bookings={selectCourtDialogProps.bookings}
+            onSelectCourt={selectCourtDialogProps.onSelectCourt}
+            openState={[openSelectCourtDialog, setOpenSelectCourtDialog]}
+            selectedDate={selectCourtDialogProps.selectedDate}
+        />}
+  </>);
 }

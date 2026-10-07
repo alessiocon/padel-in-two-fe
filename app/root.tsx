@@ -10,7 +10,7 @@ import {
 
 import "./app.css";
 import { useState } from "react";
-import { AuthContext, PopUpContext, type I_AuthContext, type I_PopupContext } from "./store/context";
+import { AuthContext, type I_AuthContext } from "./store/context";
 import { Header } from "./components/block/header";
 
 import { Button } from "./components/ui/button";
@@ -25,7 +25,6 @@ import { AlertCircle, RefreshCw , Home } from "lucide-react";
 import { Footer } from "./components/block/footer";
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const [popup, setPopup] = useState<I_PopupContext>({massage: null});
   const [auth, setAuth] = useState<I_AuthContext>({auth: false, firstName: "" , lastName: "", email:"", username:"", id:""});
 
 
@@ -41,9 +40,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div id="backdrop-root"></div>
         <div id="overlay-root"></div>
         <AuthContext.Provider value={[auth,setAuth]}>
-          <PopUpContext.Provider value={[popup, setPopup]}>
             {children}
-          </PopUpContext.Provider>
         </AuthContext.Provider>
         <ScrollRestoration />
         <Scripts />

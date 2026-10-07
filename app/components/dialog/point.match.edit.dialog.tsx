@@ -1,10 +1,10 @@
 import { CheckCircle, Loader2, Plus, Trash2, User, UserCheck} from "lucide-react";
-import { apiClient } from "../../../client/apiClient";
-import type { TournamentMatchResDto } from "../../../client/model/response/tournament.match.res.dto";
-import { Input } from "../../ui/input";
 import { Button } from "@base-ui/react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader } from "../../ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader } from "../ui/dialog";
 import { useState } from "react";
+import type { TournamentMatchResDto } from "../../client/model/response/tournament.match.res.dto";
+import { apiClient } from "../../client/apiClient";
+import { Input } from "../ui/input";
 
 
 

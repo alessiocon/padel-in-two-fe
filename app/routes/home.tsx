@@ -39,11 +39,12 @@ export default function Home() {
     <div className="my-10  m-auto">
       <h2 className="mb-2 text-center text-xl font-medium" >CAMPI IN PROMOZIONE</h2>
         <div className="flex flex-row flex-wrap items-center justify-center md:justify-start gap-3">
+          <CardUpcomingClubs/>
           {clubs.map((club) => (
             <CardClubPreview key={`club-${club.id}`} club={club} />
           ))}
           
-          <CardUpcomingClubs/>
+          
         </div>
       </div>
     </div>

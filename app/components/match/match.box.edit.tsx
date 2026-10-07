@@ -5,11 +5,11 @@ import { apiClient } from "../../client/apiClient";
 import { Button } from "../ui/button";
 import { MatchFormat } from "../../client/model/common/Enum/match.format.dto";
 import { FieldMatchEdit } from "./field.match.edit";
-import PointMatchEditDialog from "./dialog/point.match.edit.dialog";
 import { PointMatch } from "./point.match";
 import { FastForward, Loader2 } from "lucide-react";
 import { MatchStatus } from "../../client/model/common/Enum/matchStatus.dto";
 import type { UpdateMatchReqDto } from "../../client/model/request/update.match.req.dto";
+import PointMatchEditDialog from "../dialog/point.match.edit.dialog";
 
 interface MatchBoxEditProps {
   match: TournamentMatchResDto;

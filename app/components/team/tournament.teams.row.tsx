@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { TournamentTeamResDto } from "./../../client/model/response/tournamentTeam.res.dto";
 import { Info, User, UserCheck} from "lucide-react";
 import { TableCell, TableRow } from "./../ui/table";
-import TournamentTeamsRowMessage, { type ISelectedPlayerDialog } from "../../component/popup/message/tournament.teams..row.message";
+import TournamentTeamsRowMessage, { type ISelectedPlayerDialog } from "../dialog/tournament.teams..row.dialog";
 
 
 interface ITournamentTeamProps {

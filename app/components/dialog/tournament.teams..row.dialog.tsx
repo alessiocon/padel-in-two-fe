@@ -1,5 +1,5 @@
 import { User, UserCheck} from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./../../../components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 
 
 export interface ISelectedPlayerDialog{
@@ -8,7 +8,7 @@ export interface ISelectedPlayerDialog{
     isExternal: boolean
 }
 
-export default function TournamentTeamsRowMessage(input : ISelectedPlayerDialog 
+export default function TournamentTeamsRowDialog(input : ISelectedPlayerDialog 
     & {  openReact: [boolean, React.Dispatch<React.SetStateAction<boolean>>];}) {
     const [open, setOpen] = input.openReact;
     const {isExternal, username, fullName } = input;
