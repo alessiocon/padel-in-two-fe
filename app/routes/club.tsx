@@ -1,30 +1,17 @@
 import type { Route } from "./+types/home";
-import { useContext, useEffect,useRef, useState } from "react";
-import { Link, useLoaderData, type LoaderFunctionArgs } from "react-router";
+import {useEffect, useState } from "react";
+import { useParams } from "react-router";
 
-import { 
-  Clock, 
-  Calendar as CalendarIcon, 
-  MapPin, 
-  Info,
-  CircleDollarSign,
-  Loader2,
-  X,
-  ShieldCheck,
-  Gift
-} from "lucide-react";
-
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./../components/ui/card";
-import { Button } from "./../components/ui/button";
-import { AuthContext } from "./../store/context";
 import { apiClient } from "./../client/apiClient";
 import type { ClubResDto } from "../client/model/response/ClubResDto";
 import type { ClubCourtDto } from "./../client/model/common/ClubCourtDto";
 import type { BookingResDto } from "../client/model/response/BookingsResDto";
-import type { CreateBookingDto } from "./../client/model/request/CreateBookingDto";
-import { bookingStatus } from "./../client/model/common/Enum/bookingStatusDto";
-import { GroupedTimeSlot } from "../components/GroupedTimeSlot";
-import SelectCourtDialog, { type CourtWithStatusDto, type ICourtSelectionDialogProps } from "../components/dialog/select.court.dialog";
+import { ClubStatusDto } from "../client/model/common/Enum/ClubStatusDto";
+import { CourtStatusDto } from "../client/model/common/Enum/CourtStatusDto";
+import { CardClubInfo } from "../components/club/card.club.info";
+import { HeaderClub } from "../components/club/header.club";
+import { TableBookingClub } from "../components/booking/table.booking.club";
+import { SendBookingClub } from "../components/booking/send.booking.club";
 
 
 export function meta({}: Route.MetaArgs) {
@@ -34,306 +21,138 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export async function loader({ params }: LoaderFunctionArgs) {
-  if(params.id === undefined){
-    throw new Error("Club non specificato");
-  }
-
-  const response = await apiClient.getClub(params.id);
-
-  if (!response.IsSuccess) {
-    throw new Error("Impossibile recuperare i dettagli del club");
-  }
-  return response.Data;
-}
+//TODO: DA LEVARE IL MOCK
+export const MOCK_CLUB: ClubResDto = {
+  id: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
+  ownerId: "8f8fc242-8719-45a9-b141-8028e39d45df",
+  name: "Up Padel Arzano",
+  email: "uppadelarzano@gmail.com",
+  slotDurationMinutes: 90,
+  openingTime: "08:00",
+  closingTime: "23:00",
+  position: "Via Atellana n. 65, Arzano",
+  timezone: "Europe/Rome",
+  status: ClubStatusDto.ACTIVE,
+  courtsInDoor: 0,
+  courtsOutDoor: 4,
+  averagePrice: 30,
+  racketPrice: 2,
+  courts: [
+    {
+      id: "a7c7f6e8-0727-4972-9e26-61fc4ee8fd17",
+      clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
+      name: "campo 1",
+      isIndoor: false,
+      offsetMinutes: 0,
+      price: 30,
+      status: CourtStatusDto.AVAILABLE,
+    },
+    {
+      id: "66346bfe-0c06-424e-b2aa-08e9a455e386",
+      clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
+      name: "campo 2",
+      isIndoor: false,
+      offsetMinutes: 0,
+      price: 30,
+      status: CourtStatusDto.AVAILABLE,
+    },
+    {
+      id: "bfd98d5c-a393-4bbf-a2f1-d9620a744222",
+      clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
+      name: "campo 3",
+      isIndoor: false,
+      offsetMinutes: 0,
+      price: 30,
+      status: CourtStatusDto.AVAILABLE,
+    },
+    {
+      id: "e4b520a7-539a-404b-b896-98cfd1b9cae3",
+      clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
+      name: "campo 4",
+      isIndoor: false,
+      offsetMinutes: 30,
+      price: 30,
+      status: CourtStatusDto.AVAILABLE,
+    },
+  ],
+};
 
 
 export default function ClubDetailPage() {
-  const club = useLoaderData<ClubResDto>();
-  const [auth,] = useContext(AuthContext);
+  const [club, setClub] = useState<ClubResDto | null>(null);
+  const { id: clubId } = useParams<{ id: string }>();
   const [selectedDate, setSelectedDate] = useState<string>( new Date().toISOString().split("T")[0] );
   
-  // Stato per le prenotazioni lette dall'API e relativo caricamento
-  const [bookings, setBookings] = useState<BookingResDto[]>([]);
+  const [bookings, setBookings] = useState<BookingResDto[] | null >(null);
   const [isLoadingBookings, setIsLoadingBookings] = useState<boolean>(false);
 
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [selectedCourt, setSelectedCourt] = useState<ClubCourtDto | null>(null);
 
-  const todayStr = new Date().toISOString().split("T")[0];
-  const maxDate = new Date();
-  maxDate.setMonth(maxDate.getMonth() + 1);
-  const maxDateStr = maxDate.toISOString().split("T")[0];
-
-  const detailsRef = useRef<HTMLDivElement>(null);
-
-  const [openSelectCourtDialog, setOpenSelectCourtDialog] = useState(false);
-  const [selectCourtDialogProps, setSelectCourtDialogProps] = useState<ICourtSelectionDialogProps | null>(null);
-
-
-  // Fetch per caricare le prenotazioni ogni volta che cambia il club o la data selezionata
   useEffect(() => {
-    async function fetchBookings() {
-      setIsLoadingBookings(true);
-      try {
-        const res = await apiClient.getBookingsOfClub(club.id, selectedDate);
-        setBookings(res.Data || []);
-
-      } catch (error) {
-        console.error("Errore nel recupero delle prenotazioni:", error);
-        setBookings([]);
-      } finally {
-        setIsLoadingBookings(false);
-      }
-    }
-
-    if (club?.id) {
-      fetchBookings();
-    }
-  }, [club.id, selectedDate]);
-
-
-  useEffect(() => {
-  if (selectedCourt && detailsRef.current) {
-    detailsRef.current.scrollIntoView({ 
-      behavior: 'smooth', 
-      block: 'nearest'
-    });
-  }
-}, [selectedCourt]);
-
-  async function sendBooking(){
-    if (!selectedCourt?.id || !selectedSlot) return;
-    if(!auth.auth){
-      window.alert("devi accedere per poter prenotare")
+    if(clubId == undefined){
+      alert("Club non specificato")
       return;
     }
-    
-    var newBooking : CreateBookingDto = {
-      courtId: selectedCourt.id,
-      description: "Prenotazione da: "+auth.username,
-      startsAt: new Date(`${selectedDate}T${selectedSlot}`).toISOString(),
-      slots: 1 
-    }  
 
+    apiClient.getClub(clubId)
+      .then(res => {
+        if(!res.IsSuccess){
+          alert(res.Error?.message ?? "Errore nel recupero del club");
+          //TODO: SOLO PER I MOCK
+          // setClub(MOCK_CLUB)
+          return;
+        }
+        setClub(res.Data ?? null);
+      })
+      .catch(err => console.error("Errore nel recupero dei club", err))
+  }, [])
+
+  useEffect(() => {
+    if(!club) return;
     setIsLoadingBookings(true);
 
-    try {
-      const res = await apiClient.createBooking(club.id, newBooking);
-
-      if (!res.Data) {
-        if(res.Error){ 
-          window.alert(res.Error?.message);
-        }else{
-          throw new Error("errore")
+    apiClient.getBookingsOfClub(club.id, selectedDate)
+      .then(res => {
+        if(!res.IsSuccess){
+            alert(res.Error?.message ?? "errore nell ritrovamento delle prenotazioni")
         }
-        return;
-      }
-      const createdBooking = res.Data;
+        setBookings(res.Data || []);
+      })
+      .catch(() => alert("errore nell ritrovamento delle prenotazioni"))
+      .finally(() => setIsLoadingBookings(false))
 
-      setBookings((prev) => [...prev, createdBooking]);
-      window.alert("Campo prenotato correttamente!");
-
-    } catch (error) {
-      throw new Error("si è verificato un errore, riprova più tardi")
-    } finally {
-      setIsLoadingBookings(false);
-      setSelectedSlot(null);
-    }
-  }
-
-  const handleOpenCourtSelection = (slot: string, courts: ClubCourtDto[]) => {
-    setSelectedSlot(slot);
-    setSelectedCourt(null);
-
-    const courtModels: CourtWithStatusDto[] = courts.map((court) => ({
-      ...court,
-      isOccupied: false,
-    }));
-
-    setSelectCourtDialogProps({
-      slot,
-      selectedDate,
-      courts:courtModels,
-      bookings:bookings,
-      onSelectCourt: (court) => {
-        setSelectedCourt(court);
-    }})
-    setOpenSelectCourtDialog(true);
-  };
-
+  }, [club , selectedDate]);
+ 
   return (<>
     <div className="min-h-screen bg-background text-foreground p-2 md:p-4 lg:p-8">
-      {/* Header del Club */}
-      <header className="mb-2 mt-2 flex flex-col md:flex-row md:items-center md:justify-between border-b border-border pb-4 gap-4">
-        <div>
-          <h1 className="text-xl text-center md:text-3xl md:text-start font-extrabold tracking-tight">{club.name}</h1>
-          <div className="flex justify-center md:justify-start items-center gap-3">
-            <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground text-center md:text-left">{club.position}</p>
-          </div>
-        </div>
-        {auth.id === club.ownerId && (
-          <Link
-            to="./manager"
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shrink-0"
-          >
-            <ShieldCheck className="h-4 w-4" />
-            <span>Area Manager</span>
-          </Link>
-        )}
-      </header>
-
+      <HeaderClub club={club}/>
+      
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        
-        {/* Sidebar Info Circolo */}
         <aside className="lg:col-span-1 space-y-6">
-          <Card className="bg-card border-primary/20">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2 text-primary">
-                <Info className="h-5 w-5" /> Info Circolo
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 text-sm">
-              <div className="flex justify-between items-center border-b border-border/50 pb-2">
-                <span className="text-muted-foreground flex items-center gap-1.5">
-                  <Clock className="h-4 w-4" /> Orario
-                </span>
-                <span className="font-semibold">{club.openingTime} - {club.closingTime}</span>
-              </div>
-
-              <div className="flex justify-between items-center border-b border-border/50 pb-2">
-                <span className="text-muted-foreground flex items-center gap-1.5">
-                  <Clock className="h-4 w-4" /> Durata Slot
-                </span>
-                <span className="font-semibold">{club.slotDurationMinutes} min</span>
-              </div>
-
-              <div className="flex justify-between items-center border-b border-border/50 pb-2">
-                <span className="text-muted-foreground flex items-center gap-1.5">
-                  <CircleDollarSign className="h-4 w-4" /> Prezzo Medio
-                </span>
-                <span className="font-bold text-primary">€ {club.averagePrice}</span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground flex items-center gap-1.5">
-                  <CircleDollarSign className="h-4 w-4" /> Noleggio Pala
-                </span>
-                <span className="font-bold">€ {club.racketPrice.toFixed(2)}</span>
-              </div>
-            </CardContent>
-
-            {/* BANNER PROMO NELLA SIDEBAR */}
-            <div className="bg-primary/10 p-3.5 flex items-start gap-2.5 rounded-b-xl border-t border-primary/20">
-              <Gift className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-              <p className="text-xs text-muted-foreground leading-snug">
-                Prenotando da qui, <strong className="text-primary font-semibold">in omaggio</strong> il noleggio delle <strong className="text-primary font-semibold">pale</strong> per tutti i partecipanti.
-              </p>
-            </div>
-          </Card>
+          <CardClubInfo club={club}/>
         </aside>
 
         {/* Sezione Calendario e Slot Orari */}
-        <main className="lg:col-span-3 space-y-6">
-          <Card className="bg-card border-primary/20">
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <CardTitle className="text-xl flex items-center gap-2">
-                  <CalendarIcon className="h-5 w-5 text-primary" /> 
-                  Seleziona Orario
-                </CardTitle>
-                <CardDescription>
-                  Clicca sull'orario desiderato per scegliere il campo
-                </CardDescription>
-              </div>
+        <TableBookingClub 
+          club={club}
+          dateState={[selectedDate, setSelectedDate]}
+          slotState={[selectedSlot, setSelectedSlot]}
+          bookingsState={[bookings, setBookings]}
+          isLoadingBooking={isLoadingBookings}
+          setSelectedCourt={setSelectedCourt}
+        />
 
-              <div className="relative flex items-center">
-                <input
-                  type="date"
-                  id="date"
-                  value={selectedDate}
-                  min={todayStr}
-                  max={maxDateStr}
-                  onChange={(e) => {
-                    setSelectedDate(e.target.value);
-                    setSelectedSlot(null);
-                    setSelectedCourt(null);
-                  }}
-                  className="w-full sm:w-auto bg-background border-input text-foreground dark:scheme-dark rounded-lg border-2 px-4 py-2.5 text-base font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:border-primary/50 cursor-pointer"
-                />
-              </div>
-            </CardHeader>
-
-            <CardContent className="space-y-6">
-              {/* BANNER PROMO PRINCIPALE */}
-              <div className="p-3.5 rounded-lg bg-primary/10 border border-primary/30 flex items-center gap-3">
-                <div className="p-2 bg-primary text-primary-foreground rounded-md shrink-0">
-                  <Gift className="h-5 w-5" />
-                </div>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  Prenotando su <strong className="text-foreground">PadelInTwo</strong>,per ricevere il noleggio delle pale <strong className="text-primary font-semibold">in omaggio</strong> per tutti i partecipanti!
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-muted-foreground">
-                    Orari per il {selectedDate}:
-                  </h3>
-                  {/* Grafica di caricamento durante la chiamata API */}
-                  {isLoadingBookings && (
-                    <span className="text-xs text-primary flex items-center gap-1.5 font-medium animate-pulse">
-                      <Loader2 className="h-4 w-4 animate-spin text-primary" /> Caricamento prenotazioni...
-                    </span>
-                  )}
-                </div>
-                  <GroupedTimeSlot
-                      opening={club.openingTime}
-                      closing={club.closingTime}
-                      durationMinutes={club.slotDurationMinutes}
-                      selectedDateStr={selectedDate}
-                      selectedSlotStr={selectedSlot}
-                      courts={club.courts}
-                      isLoadingBookings={isLoadingBookings}
-                      onSelect={handleOpenCourtSelection}
-                  />
-                </div>
-
-              {/* Box di Conferma Finale */}
-              {selectedSlot && selectedCourt && (
-                <div ref={detailsRef} className="mt-8 p-4 rounded-lg bg-primary/10 border border-primary/30 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div>
-                    <p className="text-sm font-semibold text-primary">Campo Selezionato:</p>
-                    <p className="text-base font-medium">
-                      {selectedCourt.name} ({selectedCourt.isIndoor ? "Indoor" : "Outdoor"}) • {selectedDate} ore {selectedSlot}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Totale: € {selectedCourt.price?.toFixed(2)}
-                    </p>
-                  </div>
-                  <Button onClick={sendBooking} size="lg" className="w-full sm:w-auto font-bold">
-                    Invia Prenotazione
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </main>
+        {club && <SendBookingClub 
+          selectedCourtState={[selectedCourt, setSelectedCourt]}
+          bookingsState={[bookings, setBookings]}
+          isLoadingBookingsState={[isLoadingBookings, setIsLoadingBookings]}
+          slotState={[selectedSlot, setSelectedSlot]}
+          clubId={club.id}
+          selectedDate={selectedDate}
+        />}
       </div>
     </div>
-    
-    {openSelectCourtDialog &&  selectCourtDialogProps && 
-      <SelectCourtDialog
-        slot={selectCourtDialogProps.slot}
-        courts={selectCourtDialogProps.courts}
-        bookings={selectCourtDialogProps.bookings}
-        onSelectCourt={selectCourtDialogProps.onSelectCourt}
-        openState={[openSelectCourtDialog, setOpenSelectCourtDialog]}
-        selectedDate={selectCourtDialogProps.selectedDate}
-    />}
-    
-  
   </>
     
   );

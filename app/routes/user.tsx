@@ -23,7 +23,6 @@ export default function UserProfile() {
     const [deleteBookingDialog, setdeleteBookingDialog] = useState<IDeleteBookingDialogProps | null>(null);
     const [openBookingDialog, setOpenBookingDialog] = useState<boolean>(false);
 
-    // Fetch delle prenotazioni dell'utente
     useEffect(() => {
         async function fetchUserBookings() {
         try {
@@ -110,7 +109,7 @@ export default function UserProfile() {
 
       </div>
     </div>
-    
+
     {openBookingDialog && deleteBookingDialog && 
       <DeleteBookingDialog 
         booking={deleteBookingDialog.booking} 

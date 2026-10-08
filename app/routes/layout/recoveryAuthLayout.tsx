@@ -30,10 +30,7 @@ export default function RecoveryAuthLayout() {
         isUserAuthenticated = false;
       } finally {
         if (isMounted) {
-          // 1. Aggiorniamo il Context globale
-         
 
-          // 2. Aggiorniamo lo stato locale in un unico dispatch atomico
           setAuthState({
             isChecking: false,
             isAuth: isUserAuthenticated,

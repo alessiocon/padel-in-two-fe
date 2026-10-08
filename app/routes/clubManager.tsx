@@ -189,7 +189,7 @@ export default function ClubManagerPage() {
       }));
 
       setSelectCourtDialogProps({
-        slot,
+        slotState: [slot, setSelectedSlot],
         selectedDate,
         courts:courtModels,
         bookings:bookings,
@@ -349,8 +349,8 @@ export default function ClubManagerPage() {
                 durationMinutes={club.slotDurationMinutes}
                 selectedDateStr={selectedDate}
                 selectedSlotStr={selectedSlot}
+                isLoadingBookings={bookings === null}
                 courts={club.courts}
-                isLoadingBookings={isLoadingBookings}
                 onSelect={handleOpenCourtSelection}
             />
 
@@ -497,7 +497,7 @@ export default function ClubManagerPage() {
   
     {openSelectCourtDialog &&  selectCourtDialogProps && 
           <SelectCourtDialog
-            slot={selectCourtDialogProps.slot}
+            slotState={selectCourtDialogProps.slotState}
             courts={selectCourtDialogProps.courts}
             bookings={selectCourtDialogProps.bookings}
             onSelectCourt={selectCourtDialogProps.onSelectCourt}
