@@ -70,7 +70,7 @@ export function CardClubPreview({ club }: CardClubPreviewProps) {
         </div>
 
         <Link to={`/clubs/${club.id}`}>
-          <Button variant="default">Prenota Ora</Button>
+          Prenota Ora
         </Link>
       </CardFooter>
 

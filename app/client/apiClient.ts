@@ -1,14 +1,14 @@
 import type { IApiResponse, IBaseApiResponse } from "./interfaces/IApiResponse";
 import type { AuthReqDto } from "./model/request/AuthReqDto";
 import type { AuthUserResDto } from "./model/response/AuthResDto";
-import type { BookingResDto } from "./model/response/BookingsResDto";
+import type { BookingResDto } from "./model/response/booking.res.dto";
 import type { ClubResDto } from "./model/response/ClubResDto";
 import type { ClubsResDto } from "./model/response/ClubsResDto";
 import type { UserResDto } from "./model/response/UserResDto";
 import type { CreateUserDto } from "./model/request/CreateUserDto";
 import type { BookingUserResDto } from "./model/response/BookingUserResDto";
 import type { updateBookingDto } from "./model/request/updateBookingDto";
-import type { CreateBookingDto } from "./model/request/CreateBookingDto";
+import type { CreateBookingDto } from "./model/request/create.booking.dto";
 import type { resetPasswordReqDto } from "./model/request/resetPasswordReqDto";
 import type { DeleteBookingReqDto } from "./model/request/deleteBooking.req.dto";
 import type { RestoreBookingStatusReqDto } from "./model/request/restoreBookingStatus.req.dto";
@@ -17,6 +17,8 @@ import type { TournamentResDto } from "./model/response/tournament.res.dto";
 import type { UpdateMatchReqDto } from "./model/request/update.match.req.dto";
 import type { SetPointsMatchReqDto } from "./model/request/set.points.match.res.dto";
 import type { TournamentMatchResDto } from "./model/response/tournament.match.res.dto";
+import type { UserSearchListReqDto } from "./model/request/user.search.list.dto";
+import type { UserSearchListResDto } from "./model/response/user.search.list.res.dto";
 
 export class apiClient {
   private static getApiBaseUrl(): string {
@@ -173,6 +175,12 @@ private static async request<T = void>(
     return this.request<UserResDto>("/users", {
       method: "POST",
       body: JSON.stringify(input),
+    });
+  }
+
+  static async searchList(input: UserSearchListReqDto ) : Promise<IApiResponse<UserSearchListResDto[]>>{
+    return this.request<UserSearchListResDto[]>(`/users/list/?username=${encodeURIComponent(input.username ?? "") }`, {
+      method: "GET",
     });
   }
 

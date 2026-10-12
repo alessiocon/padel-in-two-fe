@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader } from "../ui/dialog";
-import { bookingStatus } from "../../client/model/common/Enum/bookingStatusDto";
-import type { BookingResDto } from "../../client/model/response/BookingsResDto";
+import { bookingStatus } from "../../client/model/common/Enum/booking.status.dto";
+import type { BookingResDto } from "../../client/model/response/booking.res.dto";
 import type { ClubCourtDto } from "../../client/model/common/ClubCourtDto";
 import { ButtonCourtSelection } from "../../component/ButtonCourtSelection";
 

@@ -22,9 +22,9 @@ import { Button } from "./../components/ui/button";
 import { apiClient } from "./../client/apiClient";
 import type { ClubResDto } from "../client/model/response/ClubResDto";
 import type { ClubCourtDto } from "./../client/model/common/ClubCourtDto";
-import type { BookingResDto } from "../client/model/response/BookingsResDto";
-import type { CreateBookingDto } from "./../client/model/request/CreateBookingDto";
-import { bookingStatus } from "./../client/model/common/Enum/bookingStatusDto";
+import type { BookingResDto } from "../client/model/response/booking.res.dto";
+import type { CreateBookingDto } from "../client/model/request/create.booking.dto";
+import { bookingStatus } from "../client/model/common/Enum/booking.status.dto";
 import { GroupedTimeSlot } from "../components/GroupedTimeSlot";
 import type { IApiResponse } from "../client/interfaces/IApiResponse";
 import type { CourtWithStatusDto, ICourtSelectionDialogProps } from "../components/dialog/select.court.dialog";
@@ -102,12 +102,13 @@ export default function ClubManagerPage() {
       ? `Prenotazione Manager: ${playerName.trim()}`
       : "Prenotazione Manager";
 
+      //TODO: DA SISTEMARE ATTUALMENTE MANCANO TUTTE LE PROPRIETà
     const newBooking: CreateBookingDto = {
       courtId: selectedCourt.id,
       description: formattedNotes,
       startsAt: new Date(`${selectedDate}T${selectedSlot}`).toISOString(),
       slots: 1
-    };
+    } as CreateBookingDto ;
 
     setIsLoadingBookings(true);
 
@@ -441,7 +442,7 @@ export default function ClubManagerPage() {
                             {courtName}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {booking.description || booking.userId || "Nessun dettaglio specificato"}
+                            {booking.description || booking.createdBy?.id || "Nessun dettaglio specificato"}
                           </p>
                         </div>
                       </div>

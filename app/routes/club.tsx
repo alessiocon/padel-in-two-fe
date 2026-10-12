@@ -2,16 +2,16 @@ import type { Route } from "./+types/home";
 import {useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { apiClient } from "./../client/apiClient";
 import type { ClubResDto } from "../client/model/response/ClubResDto";
 import type { ClubCourtDto } from "./../client/model/common/ClubCourtDto";
-import type { BookingResDto } from "../client/model/response/BookingsResDto";
+import type { BookingResDto } from "../client/model/response/booking.res.dto";
 import { ClubStatusDto } from "../client/model/common/Enum/ClubStatusDto";
 import { CourtStatusDto } from "../client/model/common/Enum/CourtStatusDto";
+import { apiClient } from "../client/apiClient";
 import { CardClubInfo } from "../components/club/card.club.info";
-import { HeaderClub } from "../components/club/header.club";
 import { TableBookingClub } from "../components/booking/table.booking.club";
 import { SendBookingClub } from "../components/booking/send.booking.club";
+
 
 
 export function meta({}: Route.MetaArgs) {
@@ -95,12 +95,12 @@ export default function ClubDetailPage() {
       return;
     }
 
+    //TODO: SOLO PER I MOCK
+    // setClub(MOCK_CLUB)
     apiClient.getClub(clubId)
       .then(res => {
         if(!res.IsSuccess){
           alert(res.Error?.message ?? "Errore nel recupero del club");
-          //TODO: SOLO PER I MOCK
-          // setClub(MOCK_CLUB)
           return;
         }
         setClub(res.Data ?? null);
@@ -126,7 +126,7 @@ export default function ClubDetailPage() {
  
   return (<>
     <div className="min-h-screen bg-background text-foreground p-2 md:p-4 lg:p-8">
-      <HeaderClub club={club}/>
+      {/* <HeaderClub club={club}/> */}
       
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <aside className="lg:col-span-1 space-y-6">

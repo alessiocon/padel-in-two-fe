@@ -6,6 +6,8 @@ import type { BookingUserResDto } from "../client/model/response/BookingUserResD
 import { CardBookingUser } from "./../component/CardBookingUser";
 import type { IDeleteBookingDialogProps } from "../components/dialog/delete.booking.dialog";
 import DeleteBookingDialog from "../components/dialog/delete.booking.dialog";
+import { ListBookingUser } from "../components/booking/list.booking.user";
+import type { BookingResDto } from "../client/model/response/booking.res.dto";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -16,7 +18,7 @@ export function meta({ }: Route.MetaArgs) {
 
 export default function UserProfile() {
     const [auth] = useContext(AuthContext);
-    const [bookings, setBookings] = useState<BookingUserResDto[]>([]);
+    const [bookings, setBookings] = useState<BookingUserResDto[] | null>([]);
     const [isLoadingBookings, setIsLoadingBookings] = useState<boolean>(true);
 
     // Stato per gestire il popup custom di conferma eliminazione
@@ -76,48 +78,13 @@ export default function UserProfile() {
         </section>
 
         {/* SEZIONE PRENOTAZIONI */}
-        <section className="bg-card text-card-foreground border border-border p-6 rounded-xl shadow-sm">
-          <div className="flex items-center justify-between mb-4 border-b border-border pb-2">
-            <h2 className="text-lg font-bold">Le Mie Prenotazioni</h2>
-            <span className="text-xs text-muted-foreground">
-              Totale: {bookings.length}
-            </span>
-          </div>
-
-          {isLoadingBookings ? (
-            <p className="text-sm text-muted-foreground">Caricamento prenotazioni...</p>
-          ) : bookings.length === 0 ? (
-            <div className="text-center py-8 border border-dashed border-border rounded-lg">
-              <p className="text-sm text-muted-foreground">
-                Nessuna prenotazione trovata.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3">
-                {bookings.map((booking) => (
-                    <CardBookingUser key={booking.id}
-                        booking={booking}
-                        onDelete={(e) => {
-                          setdeleteBookingDialog({booking: booking, setBookings: setBookings })
-                          setOpenBookingDialog(true)
-                        }}
-                    />
-                ))}
-            </div>
-          )}
-        </section>
+        <ListBookingUser 
+          isLoadingBookingsState={[isLoadingBookings, setIsLoadingBookings]}
+          bookingsState={[bookings, setBookings]}
+        />
 
       </div>
     </div>
-
-    {openBookingDialog && deleteBookingDialog && 
-      <DeleteBookingDialog 
-        booking={deleteBookingDialog.booking} 
-        setBookings={setBookings} 
-        openState={[openBookingDialog, setOpenBookingDialog]}
-      /> 
-    }
-  
   </>
    
 

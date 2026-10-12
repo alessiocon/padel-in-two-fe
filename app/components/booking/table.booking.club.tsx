@@ -6,7 +6,7 @@ import { GroupedTimeSlot } from "../GroupedTimeSlot";
 import type { ClubCourtDto } from "../../client/model/common/ClubCourtDto";
 import SelectCourtDialog, { type CourtWithStatusDto, type ICourtSelectionDialogProps } from "../dialog/select.court.dialog";
 import { useState } from "react";
-import type { BookingResDto } from "../../client/model/response/BookingsResDto";
+import type { BookingResDto } from "../../client/model/response/booking.res.dto";
 
 export interface ITableBookingClubProps {
     club: ClubResDto | null,

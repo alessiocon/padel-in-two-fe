@@ -5,11 +5,12 @@ import { apiClient } from "../../client/apiClient";
 import type { BookingUserResDto } from "../../client/model/response/BookingUserResDto";
 import { dateHelper } from "../../helper/dateHelper";
 import { Button } from "../ui/button";
-import { bookingStatus } from "../../client/model/common/Enum/bookingStatusDto";
+import { bookingStatus } from "../../client/model/common/Enum/booking.status.dto";
+import type { BookingResDto } from "../../client/model/response/booking.res.dto";
 
 
 export interface IDeleteBookingDialogProps {
-    setBookings: React.Dispatch<React.SetStateAction<BookingUserResDto[]>>
+    setBookings: React.Dispatch<React.SetStateAction<BookingUserResDto[] | null>>
     booking: BookingUserResDto,
 }
 
@@ -30,13 +31,13 @@ export default function DeleteBookingDialog({booking, setBookings, openState} : 
             const updatedBooking = res.Data;
 
             if (updatedBooking.status === bookingStatus.PENDING) {
-                setBookings((prev) => prev.filter((b) => b.id !== bookingId));
+                setBookings((prev) => (prev ?? []).filter((b) => b.id !== bookingId));
                 alert("Prenotazione rimossa con successo.");
                 return;
             }
 
             setBookings((prev) =>
-                prev.map((b) => {
+                (prev ?? []).map((b) => {
                     if (b.id === bookingId) {
                         return {...b,
                             status: bookingStatus.CANCELLED,

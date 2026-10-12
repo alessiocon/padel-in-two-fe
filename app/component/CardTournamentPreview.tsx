@@ -117,9 +117,7 @@ export function CardTournamentPreview() {
                         </div>
                         <ItemFooter className="p-0 flex items-center justify-center md:justify-end w-full md:w-auto mt-1">
                             <Link to={`/tournaments/${tournament.id}`} className="w-full md:w-auto">
-                                <Button variant="default" className="w-full md:w-auto">
                                     Visualizza
-                                </Button>
                             </Link>
                         </ItemFooter>
                     </Item>
