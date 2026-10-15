@@ -64,6 +64,7 @@ export const GroupedTimeSlot: FC<{
 
     return (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {slots.length === 0 && <div className="col-span-full text-center text-muted-foreground">Nessuno slot disponibile, cambia giorno</div>}
             {slots.map(slot => {
                 const isSelected = selectedSlotStr === slot.time ;
                 return <Button

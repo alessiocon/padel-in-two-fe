@@ -1,7 +1,7 @@
 import { Link } from "react-router";
-import { MapPin, Award, Clock, CalendarClock } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { MapPin, Award, Clock } from "lucide-react";
 import { Skeleton } from "~/components/ui/skeleton";
+import { buttonVariants } from "../components/ui/button";
 import type { TournamentsResDto } from "../client/model/response/tournaments.res.dto";
 import { useEffect, useState } from "react";
 import { apiClient } from "../client/apiClient";
@@ -116,8 +116,11 @@ export function CardTournamentPreview() {
                             </ItemContent>
                         </div>
                         <ItemFooter className="p-0 flex items-center justify-center md:justify-end w-full md:w-auto mt-1">
-                            <Link to={`/tournaments/${tournament.id}`} className="w-full md:w-auto">
-                                    Visualizza
+                            <Link
+                                to={`/tournaments/${tournament.id}`}
+                                className={`${buttonVariants({ variant: "default", size: "sm" })} w-full md:w-auto`}
+                            >
+                                Visualizza
                             </Link>
                         </ItemFooter>
                     </Item>

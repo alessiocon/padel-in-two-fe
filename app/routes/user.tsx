@@ -3,11 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext} from "./../store/context";
 import { apiClient } from "./../client/apiClient";
 import type { BookingUserResDto } from "../client/model/response/BookingUserResDto";
-import { CardBookingUser } from "./../component/CardBookingUser";
-import type { IDeleteBookingDialogProps } from "../components/dialog/delete.booking.dialog";
-import DeleteBookingDialog from "../components/dialog/delete.booking.dialog";
-import { ListBookingUser } from "../components/booking/list.booking.user";
-import type { BookingResDto } from "../client/model/response/booking.res.dto";
+import { ListBookingUser } from "../components/booking/userPrenotation/list.user.penotation";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -20,10 +16,6 @@ export default function UserProfile() {
     const [auth] = useContext(AuthContext);
     const [bookings, setBookings] = useState<BookingUserResDto[] | null>([]);
     const [isLoadingBookings, setIsLoadingBookings] = useState<boolean>(true);
-
-    // Stato per gestire il popup custom di conferma eliminazione
-    const [deleteBookingDialog, setdeleteBookingDialog] = useState<IDeleteBookingDialogProps | null>(null);
-    const [openBookingDialog, setOpenBookingDialog] = useState<boolean>(false);
 
     useEffect(() => {
         async function fetchUserBookings() {

@@ -10,7 +10,7 @@ import { CourtStatusDto } from "../client/model/common/Enum/CourtStatusDto";
 import { apiClient } from "../client/apiClient";
 import { CardClubInfo } from "../components/club/card.club.info";
 import { TableBookingClub } from "../components/booking/table.booking.club";
-import { SendBookingClub } from "../components/booking/send.booking.club";
+import { SendPrenotation } from "../components/booking/send.prenotation";
 
 
 
@@ -112,7 +112,7 @@ export default function ClubDetailPage() {
     if(!club) return;
     setIsLoadingBookings(true);
 
-    apiClient.getBookingsOfClub(club.id, selectedDate)
+    apiClient.getBookingsOfClub(club.id, {from: selectedDate, to: selectedDate})
       .then(res => {
         if(!res.IsSuccess){
             alert(res.Error?.message ?? "errore nell ritrovamento delle prenotazioni")
@@ -142,8 +142,8 @@ export default function ClubDetailPage() {
           isLoadingBooking={isLoadingBookings}
           setSelectedCourt={setSelectedCourt}
         />
-
-        {club && <SendBookingClub 
+        <div></div>{/*spazzio per css da modificare il css per poterlo levare*/}
+        {club && <SendPrenotation 
           selectedCourtState={[selectedCourt, setSelectedCourt]}
           bookingsState={[bookings, setBookings]}
           isLoadingBookingsState={[isLoadingBookings, setIsLoadingBookings]}

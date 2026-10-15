@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { MapPin, CalendarClock, Timer, DoorClosed, DoorOpen, Gift } from "lucide-react";
-import { Button } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -69,7 +69,9 @@ export function CardClubPreview({ club }: CardClubPreviewProps) {
           <span className="font-bold text-base">€ {club.racketPrice}</span>
         </div>
 
-        <Link to={`/clubs/${club.id}`}>
+        <Link to={`/clubs/${club.id}`}
+          className={`${buttonVariants({ variant: "default", size: "sm" })} w-full md:w-auto max-w-[150px] text-center whitespace-nowrap`}
+        >
           Prenota Ora
         </Link>
       </CardFooter>

@@ -19,6 +19,10 @@ import type { SetPointsMatchReqDto } from "./model/request/set.points.match.res.
 import type { TournamentMatchResDto } from "./model/response/tournament.match.res.dto";
 import type { UserSearchListReqDto } from "./model/request/user.search.list.dto";
 import type { UserSearchListResDto } from "./model/response/user.search.list.res.dto";
+import type { UpdateBookingPlayerDto } from "./model/request/update.booking.player.dto";
+import type { CreateBookingPlayerDto } from "./model/request/create.booking.player.dto";
+import type { RemovePlayerInBookingTeamReqDto } from "./model/request/remove.player.in.bookig.team";
+import type { SearchBookingQueryDto } from "./model/request/search.booking.query.dto";
 
 export class apiClient {
   private static getApiBaseUrl(): string {
@@ -114,15 +118,25 @@ private static async request<T = void>(
     return this.request<ClubResDto>(`/clubs/${idClub}`, { method: "GET" });
   }
 
-  static async getClubManager(idClub: string): Promise<IApiResponse<ClubResDto>> {
-    return this.request<ClubResDto>(`/clubs/${idClub}/manager`, { method: "GET" });
-  }
-
   // ==========================================
   // API Endpoints - Booking
   // ==========================================
-  static async getBookingsOfClub(clubId: string, date: string): Promise<IApiResponse<BookingResDto[]>> {
-    return this.request<BookingResDto[]>(`/bookings/clubs/${clubId}?date=${date}`, { method: "GET" });
+  static async getBookingsOfClub(clubId: string, search: SearchBookingQueryDto): Promise<IApiResponse<BookingResDto[]>> {
+    const queryString = new URLSearchParams({
+      ...(search.from && { from: search.from }),
+      ...(search.to && { to: search.to }),
+    }).toString();
+
+    return this.request<BookingResDto[]>(`/bookings/clubs/${clubId}?${queryString}`, { method: "GET" });
+  }
+
+  static async getBookingsOfClubForManager(clubId: string, search: SearchBookingQueryDto): Promise<IApiResponse<BookingUserResDto[]>> {
+    const queryString = new URLSearchParams({
+      ...(search.from && { from: search.from }),
+      ...(search.to && { to: search.to }),
+    }).toString();
+
+    return this.request<BookingUserResDto[]>(`/bookings/clubs/${clubId}?${queryString}`, { method: "GET" });
   }
 
   static async getBookingsOfUser(): Promise<IApiResponse<BookingUserResDto[]>> {
@@ -160,6 +174,27 @@ private static async request<T = void>(
     return this.request<BookingResDto>(`/bookings/${bookingId}/restore`, { 
       method: "PATCH", 
       body: JSON.stringify(input)
+    });
+  }
+
+  static async updateBookingPlayer(bookingId: string, input: UpdateBookingPlayerDto): Promise<IApiResponse<BookingResDto>> {
+    return this.request<BookingResDto>(`/bookings/${bookingId}/user/isAccepted`, {
+     method: "PATCH",
+      body: JSON.stringify(input)
+    });
+  }
+
+  static async inviteBookingPlayer(bookingId: string, input: CreateBookingPlayerDto & { teamId: string }): Promise<IApiResponse<BookingResDto>> {
+    return this.request<BookingResDto>(`/bookings/${bookingId}/user/invited`, {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  }
+
+  static async removeBookingPlayer(bookingId: string, input: RemovePlayerInBookingTeamReqDto): Promise<IApiResponse<BookingResDto>> {
+    return this.request<BookingResDto>(`/bookings/${bookingId}/user/remove`, {
+      method: "DELETE",
+      body: JSON.stringify(input),
     });
   }
 

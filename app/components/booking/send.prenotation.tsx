@@ -10,7 +10,8 @@ import { AddGuestForBookingDialog } from "../dialog/add.guest.for.booking.dialog
 import { AddUserForBookingDialog } from "../dialog/add.user.for.booking.dialog";
 import type { CreateBookingPlayerDto } from "../../client/model/request/create.booking.player.dto";
 import type { CreateBookingTeamDto } from "../../client/model/request/create.booking.team.dto";
-import { FieldPlayerForBooking } from "./field.player.for.booking";
+import { AddTeamPlayer } from "./add.team.player";
+import { ManageTeamPlayer } from "./menage.team.player";
 import { Input } from "../ui/input";
 
 export interface IInfoBookingClubProps {
@@ -22,7 +23,7 @@ export interface IInfoBookingClubProps {
     isLoadingBookingsState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
 }
 
-export function SendBookingClub({
+export function SendPrenotation({
     clubId,
     selectedDate,
     slotState,
@@ -110,6 +111,34 @@ export function SendBookingClub({
         });
     };
 
+    const renderPlayerSlot = (index: number) => {
+        const player = players[index];
+        if (player) {
+            return (
+                <ManageTeamPlayer
+                    key={index}
+                    index={index}
+                    teamId={index < 2 ? "team1" : "team2"}
+                    player={player}
+                    currentUserId={auth?.id}
+                    onRemovePlayer={handleRemovePlayer}
+                />
+            );
+        }
+
+        return (
+            <AddTeamPlayer
+                key={index}
+                index={index}
+                isCaptainPlaced={isCaptainPlaced}
+                isAuthenticated={Boolean(auth?.auth)}
+                onAssignMe={handleAssignMe}
+                onOpenGuestDialog={(slotIndex) => { setActiveDialogSlot(slotIndex); setDialogType("GUEST"); }}
+                onOpenRegisteredDialog={(slotIndex) => { setActiveDialogSlot(slotIndex); setDialogType("REGISTERED"); }}
+            />
+        );
+    };
+
     async function sendBooking() {
         if (!selectedCourt?.id || !selectedSlot) return;
         if (!auth?.auth) {
@@ -173,7 +202,7 @@ export function SendBookingClub({
     if (!selectedSlot || !selectedCourt) return null;
 
     return (
-        <div ref={detailsRef} className="mt-8 p-3 bg-card border border-border/60 shadow-lg space-y-6">
+        <div ref={detailsRef} className="lg:col-span-3 space-y-6 p-3 bg-card border border-border/60 shadow-lg space-y-6">
             <div className="grid grid-cols-[1fr_auto] items-start sm:items-center gap-4 pb-4 border-b border-border/40">
                 <div>
                     <h3 className="text-xl font-bold">
@@ -230,29 +259,8 @@ export function SendBookingClub({
                             />
                         </div>
 
-                        <FieldPlayerForBooking
-                            index={0}
-                            player={players[0]}
-                            isCaptainPlaced={isCaptainPlaced}
-                            isAuthenticated={!!auth?.auth}
-                            currentUserId={auth?.id}
-                            onAssignMe={handleAssignMe}
-                            onRemovePlayer={handleRemovePlayer}
-                            onOpenGuestDialog={(idx) => { setActiveDialogSlot(idx); setDialogType('GUEST'); }}
-                            onOpenRegisteredDialog={(idx) => { setActiveDialogSlot(idx); setDialogType('REGISTERED'); }}
-                        />
-
-                        <FieldPlayerForBooking
-                            index={1}
-                            player={players[1]}
-                            isCaptainPlaced={isCaptainPlaced}
-                            isAuthenticated={!!auth?.auth}
-                            currentUserId={auth?.id}
-                            onAssignMe={handleAssignMe}
-                            onRemovePlayer={handleRemovePlayer}
-                            onOpenGuestDialog={(idx) => { setActiveDialogSlot(idx); setDialogType('GUEST'); }}
-                            onOpenRegisteredDialog={(idx) => { setActiveDialogSlot(idx); setDialogType('REGISTERED'); }}
-                        />
+                        {renderPlayerSlot(0)}
+                        {renderPlayerSlot(1)}
                     </div>
 
                     {/* TEAM 2 */}
@@ -270,29 +278,8 @@ export function SendBookingClub({
                             />
                         </div>
 
-                        <FieldPlayerForBooking
-                            index={2}
-                            player={players[2]}
-                            isCaptainPlaced={isCaptainPlaced}
-                            isAuthenticated={!!auth?.auth}
-                            currentUserId={auth?.id}
-                            onAssignMe={handleAssignMe}
-                            onRemovePlayer={handleRemovePlayer}
-                            onOpenGuestDialog={(idx) => { setActiveDialogSlot(idx); setDialogType('GUEST'); }}
-                            onOpenRegisteredDialog={(idx) => { setActiveDialogSlot(idx); setDialogType('REGISTERED'); }}
-                        />
-
-                        <FieldPlayerForBooking
-                            index={3}
-                            player={players[3]}
-                            isCaptainPlaced={isCaptainPlaced}
-                            isAuthenticated={!!auth?.auth}
-                            currentUserId={auth?.id}
-                            onAssignMe={handleAssignMe}
-                            onRemovePlayer={handleRemovePlayer}
-                            onOpenGuestDialog={(idx) => { setActiveDialogSlot(idx); setDialogType('GUEST'); }}
-                            onOpenRegisteredDialog={(idx) => { setActiveDialogSlot(idx); setDialogType('REGISTERED'); }}
-                        />
+                        {renderPlayerSlot(2)}
+                        {renderPlayerSlot(3)}
                     </div>
                 </div>
             </div>

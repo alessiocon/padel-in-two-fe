@@ -2,9 +2,15 @@ import { Clock, CircleDollarSign, Gift } from "lucide-react";
 import type { ClubResDto } from "../../client/model/response/ClubResDto";
 import { Card, CardContent } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
+import { AuthContext } from "~/store/context";
+import { useContext } from "react";
+import { Link } from "react-router";
+import { buttonVariants } from "../ui/button";
 
 export function CardClubInfo({club} :  {club :ClubResDto | null}) {
-  // 1. Stato Loading / Skeleton
+  const [auth, setAuth] = useContext(AuthContext);
+
+
   if (!club) {
     return (
       <Card className="bg-card border-primary/20 overflow-hidden">
@@ -43,6 +49,12 @@ export function CardClubInfo({club} :  {club :ClubResDto | null}) {
   return (
     <Card className="bg-card border-primary/20 overflow-hidden">
       <CardContent className="space-y-4 text-sm pt-6">
+        {auth?.id === club.ownerId && <>
+        <Link to={`/clubs/${club.id}/manage`} 
+          className={`${buttonVariants({ variant: "default", size: "sm" })} w-full md:w-auto max-w-[150px] text-center whitespace-nowrap`}>
+          gestisci il club
+        </Link>
+        </>}
         <div className="flex justify-between items-center border-b border-border/50 pb-2">
           <span className="text-muted-foreground flex items-center gap-1.5">
             <Clock className="h-4 w-4 text-primary" /> Orario

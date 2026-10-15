@@ -18,7 +18,7 @@ export class BookingResDto {
     endsAt: Date;
     status: bookingStatus;
     teams: BookingTeamResDto[];
-    auditLogs: BookingLogResDto[];
+    logs: BookingLogResDto[];
 
     cancBy: BookingCancBy | null;
     cancAt: Date | null;
