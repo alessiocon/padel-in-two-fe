@@ -6,6 +6,8 @@ import type { CreateBookingPlayerDto } from "../../client/model/request/create.b
 import type { BookingPlayerResDto } from "../../client/model/response/booking.player.res.dto";
 import type { BookingUserResDto } from "../../client/model/response/BookingUserResDto";
 
+
+//TODO: QUESTO COMPNENTE DEV'ESSER UNICO E NON LO DEVE PIù UTILIZZARE IL SEND
 interface ManageTeamPlayerProps {
     index: number;
     teamId: string;
@@ -79,6 +81,7 @@ export function ManageTeamPlayer({
                 ) : (
                     <p className="text-sm font-semibold">{playerName || "Ospite"}</p>
                 )}
+                <p>{(player as BookingPlayerResDto).status}</p>
             </div>
             <Button
                 size="sm"

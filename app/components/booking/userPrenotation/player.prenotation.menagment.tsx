@@ -9,6 +9,7 @@ import { AddTeamPlayer } from "../add.team.player";
 import { ManageTeamPlayer } from "../menage.team.player";
 import { AddGuestForBookingDialog } from "../../dialog/add.guest.for.booking.dialog";
 import { AddUserForBookingDialog } from "../../dialog/add.user.for.booking.dialog";
+import {BookingQuickResDto} from "~/client/model/response/booking.quick.res.dto";
 
 interface PlayerPrenotationManagementProps {
     bookingState: [BookingUserResDto, React.Dispatch<React.SetStateAction<BookingUserResDto[] | null>>];

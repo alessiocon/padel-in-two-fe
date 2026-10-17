@@ -24,6 +24,7 @@ export default [
     // Rotte PROTETTE: richiedono autenticazione (auth === true)
     route("/", "routes/layout/protectedLayout.tsx", [
       route("/user", "routes/user.tsx"),
+      route("/booking/:id", "routes/booking.tsx"),
       route("/clubs/:id/manage", "routes/clubManage.tsx"),
       route("/tournaments/:id/adminalessio", "routes/adminTournamentManagement.tsx"),
     ]),

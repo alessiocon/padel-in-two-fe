@@ -6,13 +6,13 @@ import { GroupedTimeSlot } from "../GroupedTimeSlot";
 import type { ClubCourtDto } from "../../client/model/common/ClubCourtDto";
 import SelectCourtDialog, { type CourtWithStatusDto, type ICourtSelectionDialogProps } from "../dialog/select.court.dialog";
 import { useState } from "react";
-import type { BookingResDto } from "../../client/model/response/booking.res.dto";
+import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 
 export interface ITableBookingClubProps {
     club: ClubResDto | null,
     dateState: [string ,React.Dispatch<React.SetStateAction<string>>]
     slotState: [string | null, React.Dispatch<React.SetStateAction<string | null>>]
-    bookingsState: [BookingResDto[] | null,React.Dispatch<React.SetStateAction<BookingResDto[] | null>>],
+    bookingsState: [BookingQuickResDto[] | null,React.Dispatch<React.SetStateAction<BookingQuickResDto[] | null>>],
     isLoadingBooking: boolean,
     setSelectedCourt: React.Dispatch<React.SetStateAction<ClubCourtDto | null>>
 }

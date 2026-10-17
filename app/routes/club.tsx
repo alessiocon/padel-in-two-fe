@@ -4,13 +4,11 @@ import { useParams } from "react-router";
 
 import type { ClubResDto } from "../client/model/response/ClubResDto";
 import type { ClubCourtDto } from "./../client/model/common/ClubCourtDto";
-import type { BookingResDto } from "../client/model/response/booking.res.dto";
-import { ClubStatusDto } from "../client/model/common/Enum/ClubStatusDto";
-import { CourtStatusDto } from "../client/model/common/Enum/CourtStatusDto";
 import { apiClient } from "../client/apiClient";
 import { CardClubInfo } from "../components/club/card.club.info";
 import { TableBookingClub } from "../components/booking/table.booking.club";
 import { SendPrenotation } from "../components/booking/send.prenotation";
+import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 
 
 
@@ -22,60 +20,60 @@ export function meta({}: Route.MetaArgs) {
 }
 
 //TODO: DA LEVARE IL MOCK
-export const MOCK_CLUB: ClubResDto = {
-  id: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
-  ownerId: "8f8fc242-8719-45a9-b141-8028e39d45df",
-  name: "Up Padel Arzano",
-  email: "uppadelarzano@gmail.com",
-  slotDurationMinutes: 90,
-  openingTime: "08:00",
-  closingTime: "23:00",
-  position: "Via Atellana n. 65, Arzano",
-  timezone: "Europe/Rome",
-  status: ClubStatusDto.ACTIVE,
-  courtsInDoor: 0,
-  courtsOutDoor: 4,
-  averagePrice: 30,
-  racketPrice: 2,
-  courts: [
-    {
-      id: "a7c7f6e8-0727-4972-9e26-61fc4ee8fd17",
-      clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
-      name: "campo 1",
-      isIndoor: false,
-      offsetMinutes: 0,
-      price: 30,
-      status: CourtStatusDto.AVAILABLE,
-    },
-    {
-      id: "66346bfe-0c06-424e-b2aa-08e9a455e386",
-      clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
-      name: "campo 2",
-      isIndoor: false,
-      offsetMinutes: 0,
-      price: 30,
-      status: CourtStatusDto.AVAILABLE,
-    },
-    {
-      id: "bfd98d5c-a393-4bbf-a2f1-d9620a744222",
-      clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
-      name: "campo 3",
-      isIndoor: false,
-      offsetMinutes: 0,
-      price: 30,
-      status: CourtStatusDto.AVAILABLE,
-    },
-    {
-      id: "e4b520a7-539a-404b-b896-98cfd1b9cae3",
-      clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
-      name: "campo 4",
-      isIndoor: false,
-      offsetMinutes: 30,
-      price: 30,
-      status: CourtStatusDto.AVAILABLE,
-    },
-  ],
-};
+// export const MOCK_CLUB: ClubResDto = {
+//   id: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
+//   ownerId: "8f8fc242-8719-45a9-b141-8028e39d45df",
+//   name: "Up Padel Arzano",
+//   email: "uppadelarzano@gmail.com",
+//   slotDurationMinutes: 90,
+//   openingTime: "08:00",
+//   closingTime: "23:00",
+//   position: "Via Atellana n. 65, Arzano",
+//   timezone: "Europe/Rome",
+//   status: ClubStatusDto.ACTIVE,
+//   courtsInDoor: 0,
+//   courtsOutDoor: 4,
+//   averagePrice: 30,
+//   racketPrice: 2,
+//   courts: [
+//     {
+//       id: "a7c7f6e8-0727-4972-9e26-61fc4ee8fd17",
+//       clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
+//       name: "campo 1",
+//       isIndoor: false,
+//       offsetMinutes: 0,
+//       price: 30,
+//       status: CourtStatusDto.AVAILABLE,
+//     },
+//     {
+//       id: "66346bfe-0c06-424e-b2aa-08e9a455e386",
+//       clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
+//       name: "campo 2",
+//       isIndoor: false,
+//       offsetMinutes: 0,
+//       price: 30,
+//       status: CourtStatusDto.AVAILABLE,
+//     },
+//     {
+//       id: "bfd98d5c-a393-4bbf-a2f1-d9620a744222",
+//       clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
+//       name: "campo 3",
+//       isIndoor: false,
+//       offsetMinutes: 0,
+//       price: 30,
+//       status: CourtStatusDto.AVAILABLE,
+//     },
+//     {
+//       id: "e4b520a7-539a-404b-b896-98cfd1b9cae3",
+//       clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
+//       name: "campo 4",
+//       isIndoor: false,
+//       offsetMinutes: 30,
+//       price: 30,
+//       status: CourtStatusDto.AVAILABLE,
+//     },
+//   ],
+// };
 
 
 export default function ClubDetailPage() {
@@ -83,7 +81,7 @@ export default function ClubDetailPage() {
   const { id: clubId } = useParams<{ id: string }>();
   const [selectedDate, setSelectedDate] = useState<string>( new Date().toISOString().split("T")[0] );
   
-  const [bookings, setBookings] = useState<BookingResDto[] | null >(null);
+  const [bookings, setBookings] = useState<BookingQuickResDto[] | null >(null);
   const [isLoadingBookings, setIsLoadingBookings] = useState<boolean>(false);
 
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -112,7 +110,7 @@ export default function ClubDetailPage() {
     if(!club) return;
     setIsLoadingBookings(true);
 
-    apiClient.getBookingsOfClub(club.id, {from: selectedDate, to: selectedDate})
+    apiClient.searchBookings({from: selectedDate, to: selectedDate, clubId: club.id})
       .then(res => {
         if(!res.IsSuccess){
             alert(res.Error?.message ?? "errore nell ritrovamento delle prenotazioni")
@@ -126,11 +124,9 @@ export default function ClubDetailPage() {
  
   return (<>
     <div className="min-h-screen bg-background text-foreground p-2 md:p-4 lg:p-8">
-      {/* <HeaderClub club={club}/> */}
-      
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <aside className="lg:col-span-1 space-y-6">
-          <CardClubInfo club={club}/>
+          <CardClubInfo club={club} isClubManagerPage={false}/>
         </aside>
 
         {/* Sezione Calendario e Slot Orari */}

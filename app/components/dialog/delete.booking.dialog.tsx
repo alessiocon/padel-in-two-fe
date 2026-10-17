@@ -6,12 +6,12 @@ import type { BookingUserResDto } from "../../client/model/response/BookingUserR
 import { dateHelper } from "../../helper/dateHelper";
 import { Button } from "../ui/button";
 import { bookingStatus } from "../../client/model/common/Enum/booking.status.dto";
-import type { BookingResDto } from "../../client/model/response/booking.res.dto";
+import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 
 
 export interface IDeleteBookingDialogProps {
-    setBookings: React.Dispatch<React.SetStateAction<BookingUserResDto[] | null>>
-    booking: BookingUserResDto,
+    setBookings: React.Dispatch<React.SetStateAction<BookingQuickResDto[] | null>>
+    booking: BookingQuickResDto,
 }
 
 export default function DeleteBookingDialog({booking, setBookings, openState} : IDeleteBookingDialogProps 

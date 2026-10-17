@@ -2,8 +2,8 @@ import type { Route } from "./+types/user";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext} from "./../store/context";
 import { apiClient } from "./../client/apiClient";
-import type { BookingUserResDto } from "../client/model/response/BookingUserResDto";
 import { ListBookingUser } from "../components/booking/userPrenotation/list.user.penotation";
+import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -14,7 +14,8 @@ export function meta({ }: Route.MetaArgs) {
 
 export default function UserProfile() {
     const [auth] = useContext(AuthContext);
-    const [bookings, setBookings] = useState<BookingUserResDto[] | null>([]);
+    const [bookings, setBookings] = useState<BookingQuickResDto[] | null>([]);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [isLoadingBookings, setIsLoadingBookings] = useState<boolean>(true);
 
     useEffect(() => {
@@ -22,7 +23,7 @@ export default function UserProfile() {
         try {
             setIsLoadingBookings(true);
 
-            const res = await apiClient.getBookingsOfUser();
+            const res = await apiClient.searchBookingOfUser({});
             if (!res.IsSuccess || res.Data === null) {
             throw new Error("Bookings non caricati");
             }
@@ -70,6 +71,8 @@ export default function UserProfile() {
         </section>
 
         {/* SEZIONE PRENOTAZIONI */}
+
+
         <ListBookingUser 
           isLoadingBookingsState={[isLoadingBookings, setIsLoadingBookings]}
           bookingsState={[bookings, setBookings]}

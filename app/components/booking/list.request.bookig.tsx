@@ -1,17 +1,16 @@
 import { useRef, useState } from "react";
-import { CheckCircle2, LoaderCircle, XCircle } from "lucide-react";
+import { CheckCircle2, LoaderCircle, XCircle, InfoIcon } from "lucide-react";
 import { apiClient } from "../../client/apiClient";
 import { bookingStatus } from "../../client/model/common/Enum/booking.status.dto";
-import type { BookingResDto } from "../../client/model/response/booking.res.dto";
 import { dateHelper } from "../../helper/dateHelper";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import type { BookingUserResDto } from "~/client/model/response/BookingUserResDto";
+import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 
 interface ListRequestBookingProps {
-    bookingState: [BookingUserResDto[] | null, React.Dispatch<React.SetStateAction<BookingUserResDto[] | null>>];
+    bookingState: [BookingQuickResDto[] | null, React.Dispatch<React.SetStateAction<BookingQuickResDto[] | null>>];
     isLoading: boolean;
     courtNameMap: Map<string, string>;
 }
@@ -40,7 +39,7 @@ export function ListRequestBookig({ bookingState, isLoading, courtNameMap }: Lis
             const status = accepted ? bookingStatus.CONFIRMED : bookingStatus.CANCELLED;
             setBookings((currentBookings) => currentBookings?.map((booking) => (
                 booking.id === bookingId
-                    ? { ...booking, status, logs: response.Data?.logs ?? booking.logs }
+                    ? { ...booking, status, /*logs: response.Data?.logs ?? booking.logs*/ }
                     : booking
             )) ?? null);
         } catch {
@@ -53,18 +52,17 @@ export function ListRequestBookig({ bookingState, isLoading, courtNameMap }: Lis
 
     return (
         <Card className="border-amber-500/40 bg-amber-500/5 shadow-md">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-3 px-1">
                 <CardTitle className="text-amber-500 text-lg">
-                    Richieste Giocatori in Attesa ({pendingBookings.length})
+                    Richieste prenotazioni ({pendingBookings.length})
                 </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-1">
                 <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead>Giorno</TableHead>
                             <TableHead>Campo</TableHead>
-                            <TableHead>Team e giocatori</TableHead>
                             <TableHead className="text-right">Azioni</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -100,36 +98,6 @@ export function ListRequestBookig({ bookingState, isLoading, courtNameMap }: Lis
                                         {courtNameMap.get(booking.courtId) || booking.courtId || "Campo"}
                                     </TableCell>
                                     <TableCell className="align-top">
-                                        <div className="grid min-w-[20rem] gap-3 sm:grid-cols-2">
-                                            {booking.teams.map((team, teamIndex) => (
-                                                <div key={team.id} className="space-y-1">
-                                                    <p className="text-xs font-semibold text-primary">
-                                                        {team.teamName || `Team ${teamIndex + 1}`}
-                                                    </p>
-                                                    {team.players.length > 0 ? (
-                                                        <ul className="space-y-1">
-                                                            {team.players.map((player) => {
-                                                                const playerName = [player.firstName, player.lastName].filter(Boolean).join(" ");
-                                                                return (
-                                                                    <li key={player.id} className="text-xs">
-                                                                        <span className="font-medium">
-                                                                            {playerName || player.username || "Giocatore"}
-                                                                        </span>
-                                                                        <span className="ml-1 text-muted-foreground">
-                                                                            {player.type === "GUEST" ? "Ospite" : "Utente registrato"}
-                                                                        </span>
-                                                                    </li>
-                                                                );
-                                                            })}
-                                                        </ul>
-                                                    ) : (
-                                                        <p className="text-xs text-muted-foreground">Nessun giocatore</p>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="align-top">
                                         <div className="flex justify-end gap-2">
                                             <Button
                                                 size="sm"
@@ -158,6 +126,15 @@ export function ListRequestBookig({ bookingState, isLoading, courtNameMap }: Lis
                                                     <XCircle className="h-4 w-4" />
                                                 )}
                                                 Rifiuta
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                disabled={submittingBookingId !== null}
+                                                onClick={() => void updateBookingStatus(booking.id, false)}
+                                            >
+                                                <InfoIcon className="h-4 w-4" />
+                                                Info
                                             </Button>
                                         </div>
                                     </TableCell>

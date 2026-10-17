@@ -3,19 +3,20 @@ import { LoaderCircle, RefreshCw } from "lucide-react";
 import { apiClient } from "../../../client/apiClient";
 import { Skeleton } from "../../ui/skeleton";
 import { Button } from "../../ui/button";
-import { CardUserPrenotation } from "./card.user.prenotation";
+
 import type { IDeleteBookingDialogProps } from "../../dialog/delete.booking.dialog";
 import DeleteBookingDialog from "../../dialog/delete.booking.dialog";
-import type { BookingUserResDto } from "../../../client/model/response/BookingUserResDto";
+import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
+import { CardUserPrenotation } from "./card.user.prenotation";
 
 export interface IInfoBookingClubProps {
-    bookingsState: [BookingUserResDto[] | null,React.Dispatch<React.SetStateAction<BookingUserResDto[] | null>>],
+    bookingsState: [BookingQuickResDto[] | null,React.Dispatch<React.SetStateAction<BookingQuickResDto[] | null>>],
     isLoadingBookingsState: [boolean, React.Dispatch<React.SetStateAction<boolean>>]
 }
 
 
 export function ListBookingUser({
-    bookingsState, 
+    bookingsState,
     isLoadingBookingsState,
 } :  IInfoBookingClubProps) {
     const [bookings, setBookings] = bookingsState;
@@ -26,13 +27,13 @@ export function ListBookingUser({
     const [deleteBookingDialog, setdeleteBookingDialog] = useState<IDeleteBookingDialogProps | null>(null);
     const [openBookingDialog, setOpenBookingDialog] = useState<boolean>(false);
 
-    function deleteBooking(booking: BookingUserResDto) {
+    function deleteBooking(booking: BookingQuickResDto) {
         setdeleteBookingDialog({
             booking: booking,
             setBookings: setBookings,
         });
         setOpenBookingDialog(true);
-    } 
+    }
 
     const refreshBookings = async () => {
         if (refreshInFlight.current) return;
@@ -40,7 +41,7 @@ export function ListBookingUser({
         refreshInFlight.current = true;
         setIsRefreshing(true);
         try {
-            const response = await apiClient.getBookingsOfUser();
+            const response = await apiClient.searchBookingOfUser({});
             if (!response.IsSuccess || !response.Data) {
                 window.alert(response.Error?.message || "Impossibile aggiornare le prenotazioni.");
                 return;
@@ -143,12 +144,12 @@ export function ListBookingUser({
                 </div>
             )}
             </section>
-            {openBookingDialog && deleteBookingDialog && 
-            <DeleteBookingDialog 
-                booking={deleteBookingDialog.booking} 
-                setBookings={setBookings} 
+            {openBookingDialog && deleteBookingDialog &&
+            <DeleteBookingDialog
+                booking={deleteBookingDialog.booking}
+                setBookings={setBookings}
                 openState={[openBookingDialog, setOpenBookingDialog]}
-            /> 
+            />
     }
     </>
     );

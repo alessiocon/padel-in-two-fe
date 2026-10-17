@@ -1,24 +1,18 @@
 import type { ClubCourtDto } from "../../client/model/common/ClubCourtDto";
 import { useContext, useEffect, useRef, useState } from "react";
-import type { BookingResDto } from "../../client/model/response/booking.res.dto";
 import { apiClient } from "../../client/apiClient";
 import { Button } from "../ui/button";
 import type { CreateBookingDto } from "../../client/model/request/create.booking.dto";
 import { AuthContext } from "../../store/context";
-import {  Edit3, Lock, ArrowRight } from "lucide-react";
-import { AddGuestForBookingDialog } from "../dialog/add.guest.for.booking.dialog";
-import { AddUserForBookingDialog } from "../dialog/add.user.for.booking.dialog";
-import type { CreateBookingPlayerDto } from "../../client/model/request/create.booking.player.dto";
-import type { CreateBookingTeamDto } from "../../client/model/request/create.booking.team.dto";
-import { AddTeamPlayer } from "./add.team.player";
-import { ManageTeamPlayer } from "./menage.team.player";
+import {  Lock, ArrowRight } from "lucide-react";
 import { Input } from "../ui/input";
+import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 
 export interface IInfoBookingClubProps {
     clubId: string;
     selectedDate: string;
     slotState: [string | null, React.Dispatch<React.SetStateAction<string | null>>];
-    bookingsState: [BookingResDto[] | null, React.Dispatch<React.SetStateAction<BookingResDto[] | null>>];
+    bookingsState: [BookingQuickResDto[] | null, React.Dispatch<React.SetStateAction<BookingQuickResDto[] | null>>];
     selectedCourtState: [ClubCourtDto | null, React.Dispatch<React.SetStateAction<ClubCourtDto | null>>];
     isLoadingBookingsState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
 }

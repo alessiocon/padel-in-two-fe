@@ -1,8 +1,8 @@
 import { Dialog, DialogContent, DialogHeader } from "../ui/dialog";
 import { bookingStatus } from "../../client/model/common/Enum/booking.status.dto";
-import type { BookingResDto } from "../../client/model/response/booking.res.dto";
 import type { ClubCourtDto } from "../../client/model/common/ClubCourtDto";
 import { ButtonCourtSelection } from "../../component/ButtonCourtSelection";
+import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 
 
 export type CourtWithStatusDto = ClubCourtDto & { isOccupied: boolean; };
@@ -11,7 +11,7 @@ export interface ICourtSelectionDialogProps {
   slotState: [string ,React.Dispatch<React.SetStateAction<string | null>>]
   selectedDate: string;
   courts: CourtWithStatusDto[];
-  bookings: BookingResDto[];
+  bookings: BookingQuickResDto[];
   onSelectCourt: (court: ClubCourtDto) => void;
 }
 
