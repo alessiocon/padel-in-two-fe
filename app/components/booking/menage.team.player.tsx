@@ -4,17 +4,17 @@ import { LoaderCircle, Trash2 } from "lucide-react";
 import { apiClient } from "../../client/apiClient";
 import type { CreateBookingPlayerDto } from "../../client/model/request/create.booking.player.dto";
 import type { BookingPlayerResDto } from "../../client/model/response/booking.player.res.dto";
-import type { BookingUserResDto } from "../../client/model/response/BookingUserResDto";
+import type { BookingDetailResDto } from "../../client/model/response/booking.detail.res.dto";
+import { PlayerStatusBadge } from "../budge/player.status.badge";
 
 
 //TODO: QUESTO COMPNENTE DEV'ESSER UNICO E NON LO DEVE PIù UTILIZZARE IL SEND
 interface ManageTeamPlayerProps {
     index: number;
     teamId: string;
-    player: CreateBookingPlayerDto | BookingPlayerResDto;
-    bookingState?: [BookingUserResDto, React.Dispatch<React.SetStateAction<BookingUserResDto[] | null>>];
-    currentUserId?: string;
-    onRemovePlayer?: (index: number) => void;
+    player: BookingPlayerResDto;
+    bookingState: [BookingDetailResDto, React.Dispatch<React.SetStateAction<BookingDetailResDto[] | null>>];
+    currentUserId: string;
 }
 
 export function ManageTeamPlayer({
@@ -23,7 +23,6 @@ export function ManageTeamPlayer({
     player,
     bookingState,
     currentUserId,
-    onRemovePlayer,
 }: ManageTeamPlayerProps) {
     const [isRemoving, setIsRemoving] = useState(false);
     const requestInFlight = useRef(false);
@@ -32,10 +31,6 @@ export function ManageTeamPlayer({
 
     const handleRemove = async () => {
         if (requestInFlight.current) return;
-        if (!bookingState) {
-            onRemovePlayer?.(index);
-            return;
-        }
 
         const [booking, setBookings] = bookingState;
         const playerId = "id" in player ? player.id : undefined;
@@ -71,34 +66,33 @@ export function ManageTeamPlayer({
     };
 
     return (
-        <div className="relative p-3 rounded-md bg-card border border-border/50 flex items-center justify-between gap-2">
-            <div>
+        <div className="relative p-3 rounded-md bg-card border border-border/50">
+            <div className="flex justify-between items-center">
                 <p className="text-xs text-muted-foreground font-medium">
                     Giocatore {index + 1} {isMe && "(Tu)"}
                 </p>
-                {player.userId ? (
-                    <p>{player.username || "Utente"}</p>
-                ) : (
-                    <p className="text-sm font-semibold">{playerName || "Ospite"}</p>
-                )}
-                <p>{(player as BookingPlayerResDto).status}</p>
+
+                <PlayerStatusBadge status={(player as BookingPlayerResDto).status}/>
             </div>
-            <Button
-                size="sm"
-                variant="ghost"
-                disabled={isRemoving}
-                onClick={() => void handleRemove()}
-                className="text-destructive h-8 w-8 p-0 hover:bg-destructive/10"
-                aria-label="Rimuovi giocatore"
-            >
-                {isRemoving ? <LoaderCircle className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-            </Button>
-            {isRemoving && (
-                <div role="status" className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-background/85 text-xs font-semibold">
-                    <LoaderCircle className="h-4 w-4 animate-spin text-primary" />
-                    Rimozione in corso...
-                </div>
-            )}
+ 
+            <div className="flex justify-between items-center">
+                {player.userId 
+                    ? <p>{player.username || "Utente"}</p>
+                    : <p className="text-sm font-semibold">{playerName || "Ospite"}</p>
+                }
+
+                <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={isRemoving}
+                    onClick={() => void handleRemove()}
+                    className="text-destructive  hover:bg-destructive/10 p-0"
+                    aria-label="Rimuovi giocatore"
+                >
+                    {isRemoving ? <LoaderCircle className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                    rimuovi
+                </Button>
+            </div>
         </div>
     );
 }

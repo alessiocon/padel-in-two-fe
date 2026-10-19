@@ -2,13 +2,13 @@ import { Gift, CalendarIcon, Loader2 } from "lucide-react";
 import type { ClubResDto } from "../../client/model/response/ClubResDto";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
-import { GroupedTimeSlot } from "../GroupedTimeSlot";
+import { GroupedTimeSlot } from "../grouped.time.slot";
 import type { ClubCourtDto } from "../../client/model/common/ClubCourtDto";
 import SelectCourtDialog, { type CourtWithStatusDto, type ICourtSelectionDialogProps } from "../dialog/select.court.dialog";
 import { useState } from "react";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 
-export interface ITableBookingClubProps {
+export interface ISlotPrenotationProps {
     club: ClubResDto | null,
     dateState: [string ,React.Dispatch<React.SetStateAction<string>>]
     slotState: [string | null, React.Dispatch<React.SetStateAction<string | null>>]
@@ -18,14 +18,14 @@ export interface ITableBookingClubProps {
 }
 
 
-export function TableBookingClub({
+export function SlotPrenotation({
     club, 
     dateState, 
     slotState, 
     bookingsState, 
     isLoadingBooking,
     setSelectedCourt
-} :  ITableBookingClubProps) {
+} :  ISlotPrenotationProps) {
     const [selectedDate, setSelectedDate] = dateState;
     const [selectedSlot, setSelectedSlot] = slotState;
     const [bookings, setBookings] = bookingsState;
@@ -59,7 +59,7 @@ export function TableBookingClub({
     };
 
     if (!club) {
-        return <div className="lg:col-span-3 space-y-6">
+        return <div>
             <Card className="bg-card border-primary/20 overflow-hidden">
             {/* Skeleton Banner Promo */}
             <div className="p-3.5 bg-primary/10 border-b border-primary/20 flex items-center gap-3">
@@ -89,16 +89,16 @@ export function TableBookingClub({
     }
 
     return (<>
-        <div className="lg:col-span-3 space-y-6">
+        <div>
             <Card className="bg-card border-primary/20">
                 {/* BANNER PROMO PRINCIPALE */}
                 <div className="p-3.5  bg-primary/10 border border-primary/30 flex items-center gap-3">
                 <div className="p-2 bg-primary text-primary-foreground  shrink-0">
                     <Gift className="h-5 w-5" />
                 </div>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                    Prenotando su <strong className="text-foreground">PadelInTwo</strong>,per ricevere il noleggio delle pale <strong className="text-primary font-semibold">in omaggio</strong> per tutti i partecipanti!
-                </p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                        Prenotando su <strong className="text-foreground">PadelInTwo</strong>,per ricevere il noleggio delle pale <strong className="text-primary font-semibold">in omaggio</strong> per tutti i partecipanti!
+                    </p>
                 </div>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
@@ -130,36 +130,37 @@ export function TableBookingClub({
 
                 <CardContent className="space-y-6">
                 <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                    {!bookings && (
-                        <span className="text-xs text-primary flex items-center gap-1.5 font-medium animate-pulse">
-                        <Loader2 className="h-4 w-4 animate-spin text-primary" /> Caricamento prenotazioni...
-                        </span>
-                    )}
-                    </div>
-                    <GroupedTimeSlot
-                        opening={club.openingTime}
-                        closing={club.closingTime}
-                        durationMinutes={club.slotDurationMinutes}
-                        selectedDateStr={selectedDate}
-                        selectedSlotStr={selectedSlot}
-                        isLoadingBookings={isLoadingBooking && Boolean(bookings === null)}
-                        courts={club.courts}
-                        onSelect={handleOpenCourtSelection}
-                    />
+                        <div className="flex items-center justify-between">
+                            {!bookings && (
+                                <span className="text-xs text-primary flex items-center gap-1.5 font-medium animate-pulse">
+                                <Loader2 className="h-4 w-4 animate-spin text-primary" /> Caricamento prenotazioni...
+                                </span>
+                            )}
+                        </div>
+                        <GroupedTimeSlot
+                            opening={club.openingTime}
+                            closing={club.closingTime}
+                            durationMinutes={club.slotDurationMinutes}
+                            selectedDateStr={selectedDate}
+                            selectedSlotStr={selectedSlot}
+                            isLoadingBookings={isLoadingBooking && Boolean(bookings === null)}
+                            courts={club.courts}
+                            onSelect={handleOpenCourtSelection}
+                        />
                     </div>
                 </CardContent>
             </Card>
         </div>
+
         {openSelectCourtDialog &&  selectCourtDialogProps && 
-        <SelectCourtDialog
-            slotState={selectCourtDialogProps.slotState}
-            courts={selectCourtDialogProps.courts}
-            bookings={selectCourtDialogProps.bookings}
-            onSelectCourt={selectCourtDialogProps.onSelectCourt}
-            openState={[openSelectCourtDialog, setOpenSelectCourtDialog]}
-            selectedDate={selectCourtDialogProps.selectedDate}
-        />}
+            <SelectCourtDialog
+                slotState={selectCourtDialogProps.slotState}
+                courts={selectCourtDialogProps.courts}
+                bookings={selectCourtDialogProps.bookings}
+                onSelectCourt={selectCourtDialogProps.onSelectCourt}
+                openState={[openSelectCourtDialog, setOpenSelectCourtDialog]}
+                selectedDate={selectCourtDialogProps.selectedDate}
+            />}
     </>
     );
 }

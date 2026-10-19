@@ -3,20 +3,28 @@ import type { bookingStatus } from "../common/Enum/booking.status.dto";
 import type { BookingLogResDto } from "./booking.log.res.dto";
 import type { BookingTeamResDto } from "./booking.team.res.dto";
 
-export class BookingMaster {
+export class BookingDetailResDto{
     id: string;
     clubId: string;
+    clubName: string;
+
     courtId: string;
+    courtName: string;
+    isCourtIndoor: boolean;
+
+    position: string;
+    status: bookingStatus;
+    description: string;
+    startsAt: string;
+    endsAt: string;
+    isIndoor: boolean;
+
     createdBy: {
         id: string,
         username: string,
         firstName: string,
         lastName: string,
     } | null;
-    description: string | null;
-    startsAt: Date;
-    endsAt: Date;
-    status: bookingStatus;
     teams: BookingTeamResDto[];
     logs: BookingLogResDto[];
 

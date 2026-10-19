@@ -3,11 +3,9 @@ import {useEffect, useState } from "react";
 import { useParams } from "react-router";
 
 import type { ClubResDto } from "../client/model/response/ClubResDto";
-import type { ClubCourtDto } from "./../client/model/common/ClubCourtDto";
 import { apiClient } from "../client/apiClient";
 import { CardClubInfo } from "../components/club/card.club.info";
-import { TableBookingClub } from "../components/booking/table.booking.club";
-import { SendPrenotation } from "../components/booking/send.prenotation";
+import { BookingPrenotation } from "../components/booking/prenotation/booking.prenotation";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 
 
@@ -19,7 +17,6 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-//TODO: DA LEVARE IL MOCK
 // export const MOCK_CLUB: ClubResDto = {
 //   id: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
 //   ownerId: "8f8fc242-8719-45a9-b141-8028e39d45df",
@@ -78,14 +75,9 @@ export function meta({}: Route.MetaArgs) {
 
 export default function ClubDetailPage() {
   const [club, setClub] = useState<ClubResDto | null>(null);
+  const [bookings, setBookings] = useState<BookingQuickResDto[] | null>(null);
+  const [isLoadingBookings, setIsLoadingBookings] = useState(false);
   const { id: clubId } = useParams<{ id: string }>();
-  const [selectedDate, setSelectedDate] = useState<string>( new Date().toISOString().split("T")[0] );
-  
-  const [bookings, setBookings] = useState<BookingQuickResDto[] | null >(null);
-  const [isLoadingBookings, setIsLoadingBookings] = useState<boolean>(false);
-
-  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
-  const [selectedCourt, setSelectedCourt] = useState<ClubCourtDto | null>(null);
 
   useEffect(() => {
     if(clubId == undefined){
@@ -93,8 +85,6 @@ export default function ClubDetailPage() {
       return;
     }
 
-    //TODO: SOLO PER I MOCK
-    // setClub(MOCK_CLUB)
     apiClient.getClub(clubId)
       .then(res => {
         if(!res.IsSuccess){
@@ -106,47 +96,19 @@ export default function ClubDetailPage() {
       .catch(err => console.error("Errore nel recupero dei club", err))
   }, [])
 
-  useEffect(() => {
-    if(!club) return;
-    setIsLoadingBookings(true);
 
-    apiClient.searchBookings({from: selectedDate, to: selectedDate, clubId: club.id})
-      .then(res => {
-        if(!res.IsSuccess){
-            alert(res.Error?.message ?? "errore nell ritrovamento delle prenotazioni")
-        }
-        setBookings(res.Data || []);
-      })
-      .catch(() => alert("errore nell ritrovamento delle prenotazioni"))
-      .finally(() => setIsLoadingBookings(false))
-
-  }, [club , selectedDate]);
- 
   return (<>
     <div className="min-h-screen bg-background text-foreground p-2 md:p-4 lg:p-8">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <aside className="lg:col-span-1 space-y-6">
           <CardClubInfo club={club} isClubManagerPage={false}/>
         </aside>
-
-        {/* Sezione Calendario e Slot Orari */}
-        <TableBookingClub 
+        
+        <BookingPrenotation 
           club={club}
-          dateState={[selectedDate, setSelectedDate]}
-          slotState={[selectedSlot, setSelectedSlot]}
-          bookingsState={[bookings, setBookings]}
-          isLoadingBooking={isLoadingBookings}
-          setSelectedCourt={setSelectedCourt}
-        />
-        <div></div>{/*spazzio per css da modificare il css per poterlo levare*/}
-        {club && <SendPrenotation 
-          selectedCourtState={[selectedCourt, setSelectedCourt]}
           bookingsState={[bookings, setBookings]}
           isLoadingBookingsState={[isLoadingBookings, setIsLoadingBookings]}
-          slotState={[selectedSlot, setSelectedSlot]}
-          clubId={club.id}
-          selectedDate={selectedDate}
-        />}
+        />
       </div>
     </div>
   </>

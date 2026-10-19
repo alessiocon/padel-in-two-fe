@@ -59,7 +59,7 @@ export function ListBookingUser({
 
     return (<>
         <section
-            className="relative bg-card text-card-foreground border border-border p-6 rounded-xl shadow-sm"
+            className="relative bg-card text-card-foreground border border-border p-2 rounded-xl shadow-sm"
             aria-busy={isRefreshing}
             onClickCapture={(event) => {
                 if (isRefreshing) {
@@ -68,20 +68,13 @@ export function ListBookingUser({
                 }
             }}
         >
-            <div className="flex items-center justify-between mb-4 border-b border-border pb-2">
-                <h2 className="text-lg font-bold">Le Mie Prenotazioni</h2>
-                <div className="flex items-center gap-3">
-                    {isLoadingBookings || bookings == null ? (
-                        <Skeleton className="h-4 w-16" />
-                    ) : (
-                        <span className="text-xs text-muted-foreground">
-                            Totale: {bookings.length}
-                        </span>
-                    )}
+            <div className="mb-4 flex justify-between items-center border-b border-border pb-2">
+                <h2 className="text-lg font-bold">Prenotazioni</h2>
+                <div className="mt-3 text-right">
                     <Button
                         type="button"
                         variant="outline"
-                        size="sm"
+                        size="xs"
                         onClick={() => void refreshBookings()}
                         disabled={isRefreshing || isLoadingBookings}
                         aria-label="Aggiorna prenotazioni"
@@ -127,7 +120,6 @@ export function ListBookingUser({
                     <CardUserPrenotation
                         key={booking.id}
                         bookingState={[booking, setBookings]}
-                        onDelete={(e) => {deleteBooking(booking)}}
                     />
                 ))}
                 </div>

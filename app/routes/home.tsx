@@ -1,5 +1,4 @@
 import type { Route } from "./+types/home";
-import { useLoaderData } from "react-router";
 
 
 import { CardClubPreview } from "./../component/CardClubPreview";
@@ -37,14 +36,14 @@ export default function Home() {
     <div className="my-10  m-auto">
       <h2 className="mb-2 text-center text-xl font-medium" >CAMPI IN PROMOZIONE</h2>
         <div className="flex flex-row flex-wrap items-center justify-center md:justify-start gap-3">
-          <CardUpcomingClubs/>
-
+        
           {clubs === null && <>
             <CardClubSkeleton />
             <CardClubSkeleton />
             <CardClubSkeleton />
           </>}
 
+        
           {clubs !== null && clubs.length === 0 && (
               <div className="w-[350px] sm:w-auto p-4 py-28 bg-card text-center">
                 <p className="text-lg font-semibold tracking-tight">
@@ -57,6 +56,8 @@ export default function Home() {
             clubs.map((club) => (
               <CardClubPreview key={`club-${club.id}`} club={club} />
           ))}
+
+          <CardUpcomingClubs/>
 
         </div>
       </div>

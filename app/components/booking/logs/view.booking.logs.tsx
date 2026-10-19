@@ -26,12 +26,12 @@ export function ViewBookingLogs({ logs }: ViewBookingLogsProps) {
             </button>
 
             {isOpen && (
-                <div className="p-3 border-t border-border/40 bg-background/50 space-y-2 text-xs font-mono text-muted-foreground">
+                <div className="p-1 border-t border-border/40 bg-background/50 space-y-2 text-xs font-mono text-muted-foreground">
                     {logs.length > 0 ? (
                         logs.map((log, index) => (
-                            <div key={`${log.createdAt}-${index}`} className="flex items-center justify-between py-1 border-b border-border/20 last:border-0">
+                            <div key={`${log.createdAt}-${index}`} className="w-full py-1 border-b border-border/20 last:border-0 scrollbar-auto overflow-auto">
+                                <span className="text-[10px] block">{log.createdAt ? dateHelper.formatDate(log.createdAt) : ""}: </span>
                                 <span>{log.message || "Evento di sistema"}</span>
-                                <span className="text-[10px]">{log.createdAt ? dateHelper.formatDate(log.createdAt) : ""}</span>
                             </div>
                         ))
                     ) : (

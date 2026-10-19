@@ -3,7 +3,7 @@ import type { bookingStatus } from "../common/Enum/booking.status.dto";
 import type { BookingLogResDto } from "./booking.log.res.dto";
 import type { BookingTeamResDto } from "./booking.team.res.dto";
 
-export class BookingUserResDto{
+export class BookingDetailResDto{
     id: string;
     clubId: string;
     clubName: string;

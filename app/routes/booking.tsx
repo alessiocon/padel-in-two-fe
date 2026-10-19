@@ -4,7 +4,7 @@ import { LoaderCircle } from "lucide-react";
 import { useParams } from "react-router";
 import { apiClient } from "../client/apiClient";
 import { bookingStatus } from "../client/model/common/Enum/booking.status.dto";
-import type { BookingUserResDto } from "../client/model/response/BookingUserResDto";
+import type { BookingDetailResDto } from "../client/model/response/booking.detail.res.dto";
 import { CardUserPrenotationDetail } from "../components/booking/userPrenotation/card.user.prenotation.detali";
 
 export function meta({}: Route.MetaArgs) {
@@ -16,7 +16,7 @@ export function meta({}: Route.MetaArgs) {
 
 export default function BookingPage() {
 	const { id: bookingId } = useParams<{ id: string }>();
-	const [bookings, setBookings] = useState<BookingUserResDto[] | null>(null);
+	const [bookings, setBookings] = useState<BookingDetailResDto[] | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -62,7 +62,7 @@ export default function BookingPage() {
 
 	const booking = bookings?.find((currentBooking) => currentBooking.id === bookingId) ?? null;
 
-	const handleDeleteBooking = async (bookingToDelete: BookingUserResDto) => {
+	const handleDeleteBooking = async (bookingToDelete: BookingDetailResDto) => {
 		if (isDeleting || !window.confirm("Vuoi davvero eliminare questa prenotazione?")) return;
 
 		setIsDeleting(true);

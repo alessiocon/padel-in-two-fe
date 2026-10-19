@@ -35,7 +35,7 @@ export function AddGuestForBookingDialog({ isOpen, onClose, onAddGuest }: IAddGu
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="bg-background border border-border/40 rounded-xl shadow-xl w-full max-w-md p-6 relative animate-in fade-in zoom-in-95 duration-200">
+            <div className="bg-background border border-border/40 rounded-xl shadow-xl w-full max-w-md p-4 sm:p-6 relative animate-in fade-in zoom-in-95 duration-200">
                 <button 
                     onClick={onClose}
                     className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
@@ -88,11 +88,11 @@ export function AddGuestForBookingDialog({ isOpen, onClose, onAddGuest }: IAddGu
                         />
                     </div>
 
-                    <div className="flex justify-end gap-3 pt-4">
-                        <Button type="button" variant="outline" onClick={onClose}>
+                    <div className="flex flex-col gap-2 pt-4 sm:flex-row sm:justify-end">
+                        <Button type="button" variant="outline" onClick={onClose} className="w-full sm:w-auto">
                             Annulla
                         </Button>
-                        <Button type="submit">
+                        <Button type="submit" className="w-full sm:w-auto">
                             Conferma Ospite
                         </Button>
                     </div>

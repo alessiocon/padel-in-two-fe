@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
-import { Search, Users, X } from "lucide-react";
+import { Check, Search, Users, X } from "lucide-react";
 import { apiClient } from "../../client/apiClient";
 import type { CreateBookingPlayerDto } from "../../client/model/request/create.booking.player.dto";
 import type { UserSearchListReqDto } from "../../client/model/request/user.search.list.dto";
@@ -52,8 +52,11 @@ export function AddUserForBookingDialog({ isOpen, onClose, onSelectUser }: ISele
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="bg-background border border-border/40 rounded-xl shadow-xl w-full max-w-md p-6 relative animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-2" onClick={onClose}>
+            <div
+                className="bg-background border border-border/40 rounded-xl shadow-xl w-full max-w-md p-4 sm:p-6 relative animate-in fade-in zoom-in-95 duration-200"
+                onClick={(event) => event.stopPropagation()}
+            >
                 <button 
                     onClick={onClose}
                     className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
@@ -66,8 +69,7 @@ export function AddUserForBookingDialog({ isOpen, onClose, onSelectUser }: ISele
                         <Users className="w-6 h-6" />
                     </div>
                     <div>
-                        <h3 className="text-lg font-semibold">Seleziona Utente Registrato</h3>
-                        <p className="text-xs text-muted-foreground">Cerca tra gli utenti della piattaforma</p>
+                        <h3 className="text-lg font-semibold">Seleziona Utente</h3>
                     </div>
                 </div>
 
@@ -78,7 +80,7 @@ export function AddUserForBookingDialog({ isOpen, onClose, onSelectUser }: ISele
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Cerca per nome o username..."
+                            placeholder="Cerca per nome utente"
                             className="w-full pl-9 pr-3 py-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                         />
                     </div>
@@ -90,24 +92,31 @@ export function AddUserForBookingDialog({ isOpen, onClose, onSelectUser }: ISele
                             <p className="text-center text-xs text-muted-foreground py-4">Nessun utente trovato</p>
                         ) : (
                             users.map((user) => (
-                                <div key={user.id}
-                                    className="flex items-center justify-between p-1 px-3 rounded-lg hover:bg-muted/60 bg-card cursor-pointer transition-colors border border-transparent hover:border-border/40"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        onSelectUser({ 
-                                            userId: user.id, 
-                                            username:user.username,
-                                            firstName: user.firstName,
-                                            lastName: user.lastName,
-                                            phone: user.phone
-                                        });
-                                    }}
-                                >
+                                <div key={user.id} className="flex items-center gap-3 rounded-lg border border-transparent bg-card p-2 px-3 transition-colors hover:border-border/40 hover:bg-muted/60">
                                     <div>
                                         <p className="text-sm font-medium">{user.username}</p>
                                         {user.firstName && <p className="text-xs text-muted-foreground">{user.firstName}{user.lastName ?  " "+user.lastName : ""}</p>}
                                     </div>
-                                    <Button size="sm" variant="ghost">Seleziona</Button>
+                                    <Button
+                                        type="button"
+                                        size="xs"
+                                        variant="default"
+                                        className="ml-auto shrink-0"
+                                        aria-label={`Seleziona ${user.username}`}
+                                        title="Seleziona utente"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            onSelectUser({
+                                                userId: user.id,
+                                                username: user.username,
+                                                firstName: user.firstName,
+                                                lastName: user.lastName,
+                                                phone: user.phone,
+                                            });
+                                        }}
+                                    >
+                                        <Check /> invita
+                                    </Button>
                                 </div>
                             ))
                         )}

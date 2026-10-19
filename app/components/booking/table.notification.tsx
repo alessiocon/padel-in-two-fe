@@ -31,10 +31,10 @@ export function TableNotification({
     return (
         <Card className="bg-card border-border py-3 ">
             <CardHeader className="px-4">
-                <CardTitle className="text-xl">{title}</CardTitle>
-                {description && <CardDescription>{description}</CardDescription>}
+                <CardTitle className="text-sm">{title}</CardTitle>
+                {description && <CardDescription className="text-xs">{description}</CardDescription>}
             </CardHeader>
-            <CardContent className="px-4">
+            <CardContent className="px-1">
                 {isLoading ? (
                     <div className="space-y-3" aria-label="Caricamento prenotazioni">
                         {Array.from({ length: 3 }, (_, index) => (
@@ -54,7 +54,7 @@ export function TableNotification({
                 ) : !bookings?.length ? (
                     <p className="py-6 text-center text-sm text-muted-foreground">{emptyMessage}</p>
                 ) : (
-                    <div className="max-h-[200px] space-y-1 overflow-y-auto pr-2">
+                    <div className="space-y-1 overflow-y-auto">
                         {bookings.map((booking) => (
                             <BookingNotificationRaw
                                 key={booking.id}

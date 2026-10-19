@@ -1,5 +1,5 @@
 import type { ClubCourtDto } from "../../client/model/common/ClubCourtDto";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import { apiClient } from "../../client/apiClient";
 import { Button } from "../ui/button";
 import type { CreateBookingDto } from "../../client/model/request/create.booking.dto";
@@ -13,24 +13,27 @@ import { AddTeamPlayer } from "./add.team.player";
 import { ManageTeamPlayer } from "./menage.team.player";
 import { Input } from "../ui/input";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
+import { ManageTeamPlayerPrenotation } from "./menage.team.player.prenotation";
 
-export interface IInfoBookingClubProps {
-    clubId: string;
+export interface IEditTeamPrenotationProps {
+    clubId: string | null;
     selectedDate: string;
     slotState: [string | null, React.Dispatch<React.SetStateAction<string | null>>];
     bookingsState: [BookingQuickResDto[] | null, React.Dispatch<React.SetStateAction<BookingQuickResDto[] | null>>];
     selectedCourtState: [ClubCourtDto | null, React.Dispatch<React.SetStateAction<ClubCourtDto | null>>];
     isLoadingBookingsState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+    onCancel: () => void;
 }
 
-export function SendPrenotation({
+export function EditTeamPrenotation({
     clubId,
     selectedDate,
     slotState,
     bookingsState,
     isLoadingBookingsState,
-    selectedCourtState
-}: IInfoBookingClubProps) {
+    selectedCourtState,
+    onCancel
+}: IEditTeamPrenotationProps) {
     const [auth] = useContext(AuthContext);
     const [selectedSlot, setSelectedSlot] = slotState;
     const [bookings, setBookings] = bookingsState;
@@ -45,18 +48,24 @@ export function SendPrenotation({
     const [activeDialogSlot, setActiveDialogSlot] = useState<number | null>(null);
     const [dialogType, setDialogType] = useState<'GUEST' | 'REGISTERED' | null>(null);
 
-    const detailsRef = useRef<HTMLDivElement>(null);
-
     const isCaptainPlaced = players.some(p => p?.userId && auth?.id && p.userId === auth.id);
 
-    useEffect(() => {
-        if (selectedCourt && detailsRef.current) {
-            detailsRef.current.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'nearest'
-            });
-        }
-    }, [selectedCourt]);
+    const teams = [
+        {
+            name: team1Name,
+            setName: setTeam1Name,
+            placeholder: "Nome Team 1",
+            colorClasses: "text-primary focus:ring-primary",
+            playerSlots: [0, 1],
+        },
+        {
+            name: team2Name,
+            setName: setTeam2Name,
+            placeholder: "Nome Team 2",
+            colorClasses: "text-amber-600 focus:ring-amber-500",
+            playerSlots: [2, 3],
+        },
+    ];
 
     const handleAssignMe = (index: number) => {
         if (!auth?.auth || !auth?.id) {
@@ -104,24 +113,16 @@ export function SendPrenotation({
         setDialogType(null);
     };
 
-    const handleRemovePlayer = (index: number) => {
-        setPlayers(prev => {
-            prev[index] = null;
-            return  [...prev];
-        });
-    };
 
     const renderPlayerSlot = (index: number) => {
         const player = players[index];
         if (player) {
             return (
-                <ManageTeamPlayer
+                <ManageTeamPlayerPrenotation
                     key={index}
                     index={index}
-                    teamId={index < 2 ? "team1" : "team2"}
-                    player={player}
+                    playerState={[players, setPlayers]}
                     currentUserId={auth?.id}
-                    onRemovePlayer={handleRemovePlayer}
                 />
             );
         }
@@ -139,8 +140,10 @@ export function SendPrenotation({
         );
     };
 
+   
+
     async function sendBooking() {
-        if (!selectedCourt?.id || !selectedSlot) return;
+        if (!selectedCourt?.id || !selectedSlot || !clubId) return;
         if (!auth?.auth) {
             window.alert("Devi accedere per poter prenotare");
             return;
@@ -202,8 +205,13 @@ export function SendPrenotation({
     if (!selectedSlot || !selectedCourt) return null;
 
     return (
-        <div ref={detailsRef} className="lg:col-span-3 space-y-6 p-3 bg-card border border-border/60 shadow-lg space-y-6">
-            <div className="grid grid-cols-[1fr_auto] items-start sm:items-center gap-4 pb-4 border-b border-border/40">
+        <div className="p-2 pt-3">
+            <div className="mb-4 text-right">
+                <Button type="button" variant="outline" className="bg-destructive/70" onClick={onCancel}>
+                    Annulla
+                </Button>
+            </div>
+            <div className="my-8 flex gap-3 justify-between ">
                 <div>
                     <h3 className="text-xl font-bold">
                         {selectedCourt.name} <span className="text-sm font-normal text-muted-foreground">({selectedCourt.isIndoor ? "Indoor" : "Outdoor"})</span>
@@ -212,88 +220,52 @@ export function SendPrenotation({
                         <strong className="text-foreground">{selectedDate}</strong> - <strong className="text-foreground">{selectedSlot}</strong>
                     </p>
                 </div>
-                <div className="text-left sm:text-right">
-                    <p className="text-xs text-muted-foreground">Prezzo</p>
-                    <p className="text-2xl font-extrabold text-primary">€ {selectedCourt.price?.toFixed(2)}</p>
+                <div className="flex items-start gap-4">
+                    <div className="text-left sm:text-right">
+                        <p className="text-xs text-muted-foreground">Prezzo</p>
+                        <p className="text-2xl font-extrabold text-primary">€ {selectedCourt.price?.toFixed(2)}</p>
+                    </div>
                 </div>
             </div>
 
-            {!auth?.auth && (
-                <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 space-y-2">
-                    <div className="flex items-start gap-3">
-                        <Lock className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                        <p className="text-sm leading-relaxed">
-                            Autenticazione richiesta: per poter prenotare questo campo e comporre i team è necessario effettuare l'accesso.
-                        </p>
+            {auth?.auth && (
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                        <h4 className="font-semibold text-base">Componi i Team</h4>
                     </div>
-                    <div className="text-right">
-                        <a 
-                            href="/auth" 
-                            className="inline-flex items-center gap-1 text-sm font-semibold underline hover:text-amber-800 dark:hover:text-amber-300 transition-colors group"
-                        >
-                            <span>vai al login</span>
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                        </a>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {teams.map((team, teamIndex) => (
+                            <div key={teamIndex} className="p-2 rounded-lg bg-muted/30 border border-border/40 space-y-3">
+                                <div className="relative">
+                                    <span className="absolute left-2.5 top-2.5 text-xs text-muted-foreground">
+                                        <Edit3 className="w-3.5 h-3.5" />
+                                    </span>
+                                    <Input
+                                        type="text"
+                                        value={team.name}
+                                        onChange={(event) => team.setName(event.target.value)}
+                                        placeholder={team.placeholder}
+                                        className={`w-full rounded-md border border-border/50 bg-background/80 py-1.5 pl-8 pr-3 text-sm font-medium focus:outline-none focus:ring-2 ${team.colorClasses}`}
+                                    />
+                                </div>
+                                {team.playerSlots.map(renderPlayerSlot)}
+                            </div>
+                        ))}
                     </div>
                 </div>
             )}
 
-            <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                    <h4 className="font-semibold text-base">Componi i Team</h4>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* TEAM 1 */}
-                    <div className="p-4 rounded-lg bg-muted/30 border border-border/40 space-y-3">
-                        <div className="relative">
-                            <span className="absolute left-2.5 top-2.5 text-xs text-muted-foreground">
-                                <Edit3 className="w-3.5 h-3.5" />
-                            </span>
-                            <Input
-                                type="text"
-                                value={team1Name}
-                                onChange={(e) => setTeam1Name(e.target.value)}
-                                placeholder="Nome Team 1"
-                                className="w-full pl-8 pr-3 py-1.5 text-sm font-medium text-primary bg-background/80 border border-border/50 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                            />
-                        </div>
-
-                        {renderPlayerSlot(0)}
-                        {renderPlayerSlot(1)}
-                    </div>
-
-                    {/* TEAM 2 */}
-                    <div className="p-4 rounded-lg bg-muted/30 border border-border/40 space-y-3">
-                        <div className="relative">
-                            <span className="absolute left-2.5 top-2.5 text-xs text-muted-foreground">
-                                <Edit3 className="w-3.5 h-3.5" />
-                            </span>
-                            <Input
-                                type="text"
-                                value={team2Name}
-                                onChange={(e) => setTeam2Name(e.target.value)}
-                                placeholder="Nome Team 2"
-                                className="w-full pl-8 pr-3 py-1.5 text-sm font-medium text-amber-600 bg-background/80 border border-border/50 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
-                            />
-                        </div>
-
-                        {renderPlayerSlot(2)}
-                        {renderPlayerSlot(3)}
-                    </div>
-                </div>
-            </div>
 
             {/* Pulsante di Invio Prenotazione Finale / Link Auth */}
             <div className="flex justify-end pt-2">
                 {auth?.auth ? (
                     <Button 
-                        size="lg" 
-                        className="w-full sm:w-auto font-bold px-8"
-                        disabled={isLoadingBookings}
+                        type="button" 
+                        disabled={isLoadingBookings || players.length < 4}
                         onClick={sendBooking}
                     >
-                        {isLoadingBookings ? "Invio in corso..." : "Conferma e Invia Prenotazione"}
+                        {isLoadingBookings ? "Invio in corso..." : "Conferma"}
                     </Button>
                 ) : (
                     <a href="/auth" className="w-full sm:w-auto">

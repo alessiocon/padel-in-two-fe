@@ -2,7 +2,6 @@ import { Loader2} from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader } from "../ui/dialog";
 import { useState } from "react";
 import { apiClient } from "../../client/apiClient";
-import type { BookingUserResDto } from "../../client/model/response/BookingUserResDto";
 import { dateHelper } from "../../helper/dateHelper";
 import { Button } from "../ui/button";
 import { bookingStatus } from "../../client/model/common/Enum/booking.status.dto";

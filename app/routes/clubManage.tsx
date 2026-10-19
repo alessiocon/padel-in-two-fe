@@ -15,11 +15,12 @@ import type { ClubCourtDto } from "../client/model/common/ClubCourtDto";
 import { bookingStatus } from "../client/model/common/Enum/booking.status.dto";
 import type { IApiResponse } from "../client/interfaces/IApiResponse";
 import { CardClubInfo } from "~/components/club/card.club.info";
-import { TableBookingClub } from "~/components/booking/table.booking.club";
+import { SlotPrenotation } from "~/components/booking/slot.prenotation";
 import { useParams } from "react-router";
 import { SendPrenotationByClub } from "~/components/booking/send.prenotation.by.club";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 import { TableNotification } from "~/components/booking/table.notification";
+import type { BookingDetailResDto } from "~/client/model/response/booking.detail.res.dto";
 
 
 export function meta({}: Route.MetaArgs) {
@@ -102,7 +103,7 @@ export default function ClubManagerPage() {
   const handleUpdateStatus = async (bookingId: string, newStatus: bookingStatus) => {
     setIsSubmitting(true);
     try {
-      let res : IApiResponse<BookingQuickResDto> = {Data: null, Error: null, IsSuccess: false};
+      let res : IApiResponse<BookingDetailResDto> = {Data: null, Error: null, IsSuccess: false};
 
       if(newStatus === bookingStatus.CANCELLED){
         res = await apiClient.deleteBooking(bookingId, { isStaff: true });
@@ -182,7 +183,7 @@ export default function ClubManagerPage() {
         />
 
         {/* Sezione Griglia Oraria / Prenotazione Manuale */}
-        <TableBookingClub 
+        <SlotPrenotation 
           club={club}
           dateState={[selectedDate, setSelectedDate]}
           slotState={[selectedSlot, setSelectedSlot]}

@@ -3,16 +3,15 @@ import { LoaderCircle } from "lucide-react";
 import { apiClient } from "../../../client/apiClient";
 import { BookingPlayerStatus } from "../../../client/model/common/Enum/booking.player.status";
 import type { CreateBookingPlayerDto } from "../../../client/model/request/create.booking.player.dto";
-import type { BookingUserResDto } from "../../../client/model/response/BookingUserResDto";
+import type { BookingDetailResDto } from "../../../client/model/response/booking.detail.res.dto";
 import { AuthContext } from "../../../store/context";
 import { AddTeamPlayer } from "../add.team.player";
 import { ManageTeamPlayer } from "../menage.team.player";
 import { AddGuestForBookingDialog } from "../../dialog/add.guest.for.booking.dialog";
 import { AddUserForBookingDialog } from "../../dialog/add.user.for.booking.dialog";
-import {BookingQuickResDto} from "~/client/model/response/booking.quick.res.dto";
 
 interface PlayerPrenotationManagementProps {
-    bookingState: [BookingUserResDto, React.Dispatch<React.SetStateAction<BookingUserResDto[] | null>>];
+    bookingState: [BookingDetailResDto, React.Dispatch<React.SetStateAction<BookingDetailResDto[] | null>>];
 }
 
 export function PlayerPrenotationManagement({ bookingState }: PlayerPrenotationManagementProps) {
