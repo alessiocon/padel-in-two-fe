@@ -12,7 +12,6 @@ import { buttonVariants } from "../ui/button";
 
 export function CardClubInfo({club, isClubManagerPage} :  {club :ClubResDto | null, isClubManagerPage: boolean}) {
   const [auth, setAuth] = useContext(AuthContext);
-  
 
   if (!club) {
     return (
@@ -48,11 +47,11 @@ export function CardClubInfo({club, isClubManagerPage} :  {club :ClubResDto | nu
     );
   }
 
-  // 2. Rendering effettivo dei dati del Club
+  let isMemberOfAClub : boolean = Boolean(club.members.find(m => m.userId === auth?.sub));
   return (
     <Card className="bg-card border-primary/20 overflow-hidden">
       <CardContent className="space-y-4 text-sm pt-6">
-        {auth?.id === club.ownerId &&  !isClubManagerPage  && <>
+        {isMemberOfAClub &&  !isClubManagerPage  && <>
         <Link to={`/clubs/${club.id}/manage`} 
           className={`${buttonVariants({ variant: "default", size: "sm" })} w-full md:w-auto max-w-[150px] text-center whitespace-nowrap`}>
           gestisci il club

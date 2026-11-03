@@ -5,6 +5,7 @@ import { BookingPlayerStatus } from "../../../client/model/common/Enum/booking.p
 import type { BookingDetailResDto } from "../../../client/model/response/booking.detail.res.dto";
 import type { BookingPlayerResDto } from "../../../client/model/response/booking.player.res.dto";
 import { Button } from "../../ui/button";
+import { BookingStatus } from "../../../client/model/common/Enum/booking.status.dto";
 
 interface PlayerMePrenotationProps {
     bookingState: [BookingDetailResDto, React.Dispatch<React.SetStateAction<BookingDetailResDto[] | null>>];
@@ -41,7 +42,7 @@ export function PlayerMePrenotation({ bookingState, player }: PlayerMePrenotatio
                         teams: currentBooking.teams.map((team) => ({
                             ...team,
                             players: team.players.map((currentPlayer) => (
-                               currentPlayer.userId === player.userId
+                               currentPlayer.playerId === player.playerId
                                     ? { ...currentPlayer, status: BookingPlayerStatus.ACCEPTED }
                                     : currentPlayer
                             )),
@@ -88,7 +89,6 @@ export function PlayerMePrenotation({ bookingState, player }: PlayerMePrenotatio
         }
     };
 
-    const playerName = [player.firstName, player.lastName].filter(Boolean).join(" ");
     const isPending = player.status === BookingPlayerStatus.PENDING;
     const isAccepted = player.status === BookingPlayerStatus.ACCEPTED;
 
@@ -119,7 +119,7 @@ export function PlayerMePrenotation({ bookingState, player }: PlayerMePrenotatio
                     </div>
                 )}
 
-                {isAccepted && (
+                {isAccepted && (booking.status !== BookingStatus.IN_PROGRESS && booking.status !== BookingStatus.END ) &&(
                     <Button
                         size="sm"
                         variant="outline"

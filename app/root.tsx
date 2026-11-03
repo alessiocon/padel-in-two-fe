@@ -25,7 +25,7 @@ import { AlertCircle, RefreshCw , Home } from "lucide-react";
 import { Footer } from "./components/block/footer";
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const [auth, setAuth] = useState<I_AuthContext>({auth: false, firstName: "" , lastName: "", email:"", username:"", id:""});
+  const [auth, setAuth] = useState<I_AuthContext>({auth: false, firstName: "" , lastName: "", email:"", username:"", sub:"", playerId:""});
 
 
   return (

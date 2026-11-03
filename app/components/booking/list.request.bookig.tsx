@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { CheckCircle2, LoaderCircle, XCircle, InfoIcon } from "lucide-react";
 import { apiClient } from "../../client/apiClient";
-import { bookingStatus } from "../../client/model/common/Enum/booking.status.dto";
+import { BookingStatus } from "../../client/model/common/Enum/booking.status.dto";
 import { dateHelper } from "../../helper/dateHelper";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -19,7 +19,7 @@ export function ListRequestBookig({ bookingState, isLoading, courtNameMap }: Lis
     const [bookings, setBookings] = bookingState;
     const [submittingBookingId, setSubmittingBookingId] = useState<string | null>(null);
     const requestInFlight = useRef(false);
-    const pendingBookings = bookings?.filter((booking) => booking.status === bookingStatus.PENDING) ?? [];
+    const pendingBookings = bookings?.filter((booking) => booking.status === BookingStatus.PENDING) ?? [];
 
     const updateBookingStatus = async (bookingId: string, accepted: boolean) => {
         if (requestInFlight.current) return;
@@ -36,7 +36,7 @@ export function ListRequestBookig({ bookingState, isLoading, courtNameMap }: Lis
                 return;
             }
 
-            const status = accepted ? bookingStatus.CONFIRMED : bookingStatus.CANCELLED;
+            const status = accepted ? BookingStatus.CONFIRMED : BookingStatus.CANCELLED;
             setBookings((currentBookings) => currentBookings?.map((booking) => (
                 booking.id === bookingId
                     ? { ...booking, status, /*logs: response.Data?.logs ?? booking.logs*/ }

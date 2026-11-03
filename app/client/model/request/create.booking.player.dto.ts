@@ -1,5 +1,5 @@
 export class CreateBookingPlayerDto {
-  userId?: string;
+  playerId?: string;
   username?: string; 
   firstName?: string;
   lastName?: string;

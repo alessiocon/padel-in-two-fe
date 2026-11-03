@@ -4,7 +4,7 @@ import type { AuthUserResDto } from "./model/response/AuthResDto";
 import type { ClubResDto } from "./model/response/ClubResDto";
 import type { ClubsResDto } from "./model/response/ClubsResDto";
 import type { UserResDto } from "./model/response/UserResDto";
-import type { CreateUserDto } from "./model/request/CreateUserDto";
+import type { CreateUserDto } from "./model/request/create.user.dto";
 import type { BookingDetailResDto } from "./model/response/booking.detail.res.dto";
 import type { CreateBookingDto } from "./model/request/create.booking.dto";
 import type { resetPasswordReqDto } from "./model/request/resetPasswordReqDto";
@@ -22,6 +22,10 @@ import type { CreateBookingPlayerDto } from "./model/request/create.booking.play
 import type { RemovePlayerInBookingTeamReqDto } from "./model/request/remove.player.in.bookig.team";
 import type { SearchBookingQueryDto } from "./model/request/search.booking.query.dto";
 import type { BookingQuickResDto } from "./model/response/booking.quick.res.dto";
+import type { BookingMatchResDto } from "./model/response/booking.match.res.dto";
+import type { BookingResultProposeDto } from "./model/request/booking.result.dto";
+import type { BookingIsAcceptedMatchProposeDto } from "./model/request/booking.accepted.match.propose.dto";
+import type { BookingRemoveMatchProposeDto } from "./model/request/match.propose.remove.dto";
 
 export class apiClient {
   private static getApiBaseUrl(): string {
@@ -88,7 +92,6 @@ private static async request<T = void>(
       if (response.status === 204) {
         return { IsSuccess: true, Data: null as unknown as T, Error: null };
       }
-
       const data = await response.json();
 
       return { IsSuccess: true, Data: data as T, Error: null };
@@ -139,9 +142,10 @@ private static async request<T = void>(
 
   static async searchBookingForManager(clubId: string, search: SearchBookingQueryDto): Promise<IApiResponse<BookingQuickResDto[]>> {
     const queryString = new URLSearchParams({
+      ...(search.clubId && {clubId: search.clubId}),
       ...(search.from && { from: search.from }),
       ...(search.to && { to: search.to }),
-      ...(search.userId && { userId: search.userId }),
+      ...(search.playerId && { userId: search.playerId }),
       ...(search.status && { status: search.status }),
     }).toString();
 
@@ -159,8 +163,15 @@ private static async request<T = void>(
     return this.request<BookingQuickResDto[]>(`/bookings/user?${queryString}`, { method: "GET" });
   }
 
-  static async createBooking(clubId: string, input: CreateBookingDto): Promise<IApiResponse<BookingQuickResDto>> {
-    return this.request<BookingQuickResDto>(`/bookings/clubs/${clubId}`, {
+  static async createBooking(input: CreateBookingDto): Promise<IApiResponse<BookingQuickResDto>> {
+    return this.request<BookingQuickResDto>(`/bookings`, {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  }
+
+  static async createBookingByStaff(input: CreateBookingDto): Promise<IApiResponse<BookingQuickResDto>> {
+    return this.request<BookingQuickResDto>(`/bookings/staff`, {
       method: "POST",
       body: JSON.stringify(input),
     });
@@ -175,6 +186,12 @@ private static async request<T = void>(
 
   static async acceptBooking(bookingId: string): Promise<IApiResponse<BookingQuickResDto>> {
     return this.request<BookingQuickResDto>(`/bookings/${bookingId}/accept`, { 
+      method: "PATCH", 
+    });
+  }
+
+  static async startBooking(bookingId: string): Promise<IApiResponse<BookingQuickResDto>> {
+    return this.request<BookingQuickResDto>(`/bookings/${bookingId}/start`, { 
       method: "PATCH", 
     });
   }
@@ -216,6 +233,38 @@ private static async request<T = void>(
 
 
   // ==========================================
+  // API Endpoints - Match
+  // ==========================================
+
+  static async getMatchOfBooking(bookingId: string): Promise<IApiResponse<BookingMatchResDto>> {
+    return this.request<BookingMatchResDto>(`/bookings/${bookingId}/match`, {
+      method: "GET",
+    });
+  }
+
+  static async addMatchPropose(bookingId: string, input: BookingResultProposeDto ): Promise<IApiResponse<BookingMatchResDto>> {
+    return this.request<BookingMatchResDto>(`/bookings/${bookingId}/match/propose`, {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  }
+
+  static async acceptMatchPropose(bookingId: string, input: BookingIsAcceptedMatchProposeDto ): Promise<IApiResponse<BookingMatchResDto>> {
+    return this.request<BookingMatchResDto>(`/bookings/${bookingId}/match/propose`, {
+      method: "PATCH",
+      body: JSON.stringify(input),
+    });
+  }
+
+    static async deleteMatchPropose(bookingId: string, input: BookingRemoveMatchProposeDto ): Promise<IBaseApiResponse> {
+    return this.request(`/bookings/${bookingId}/match/propose`, {
+      method: "DELETE",
+      body: JSON.stringify(input),
+    });
+  }
+
+
+  // ==========================================
   // API Endpoints - User
   // ==========================================
   static async getUser(): Promise<IApiResponse<UserResDto>> {
@@ -238,8 +287,8 @@ private static async request<T = void>(
   // ==========================================
   // API Endpoints - Auth
   // ==========================================
-  static async login(input: AuthReqDto): Promise<IApiResponse<AuthUserResDto>> {
-    return this.request<AuthUserResDto>("/auth/login", {
+  static async login(input: AuthReqDto): Promise<IApiResponse<UserResDto>> {
+    return this.request<UserResDto>("/auth/login", {
       method: "POST",
       body: JSON.stringify(input),
     });

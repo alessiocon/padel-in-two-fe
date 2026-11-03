@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import { useParams } from "react-router";
 import { apiClient } from "../client/apiClient";
-import { bookingStatus } from "../client/model/common/Enum/booking.status.dto";
 import type { BookingDetailResDto } from "../client/model/response/booking.detail.res.dto";
 import { CardUserPrenotationDetail } from "../components/booking/userPrenotation/card.user.prenotation.detali";
+import { BookingStatus } from "../client/model/common/Enum/booking.status.dto";
 
 export function meta({}: Route.MetaArgs) {
 	return [
@@ -67,19 +67,19 @@ export default function BookingPage() {
 
 		setIsDeleting(true);
 		try {
-			const response = await apiClient.deleteBooking(bookingToDelete.id, { isStaff: false });
+			const response = await apiClient.deleteBooking(bookingToDelete.id, { isStaff: false});
 			if (!response.IsSuccess || !response.Data) {
 				window.alert(response.Error?.message || "Impossibile eliminare la prenotazione.");
 				return;
 			}
 
 			const updatedBooking = response.Data;
-			if (updatedBooking.status === bookingStatus.PENDING) {
+			if (updatedBooking.status === BookingStatus.PENDING) {
 				setBookings((currentBookings) => currentBookings?.filter((currentBooking) => currentBooking.id !== bookingToDelete.id) ?? null);
 			} else {
 				setBookings((currentBookings) => currentBookings?.map((currentBooking) => (
 					currentBooking.id === bookingToDelete.id
-						? { ...currentBooking, status: bookingStatus.CANCELLED, description: updatedBooking.description || currentBooking.description }
+						? { ...currentBooking, status: BookingStatus.CANCELLED, description: updatedBooking.description || currentBooking.description }
 						: currentBooking
 				)) ?? null);
 			}
@@ -98,11 +98,12 @@ export default function BookingPage() {
 						<LoaderCircle className="h-5 w-5 animate-spin" />
 						Caricamento prenotazione...
 					</div>
-				) : booking ? (
+				) : booking && !booking.createdByStaff ? (<>
 					<CardUserPrenotationDetail
 						bookingState={[booking, setBookings]}
 						onDelete={handleDeleteBooking}
 					/>
+				</>
 				) : (
 					<p className="py-16 text-center text-muted-foreground" role="status">
 						{error || "Prenotazione non trovata."}

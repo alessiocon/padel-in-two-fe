@@ -3,7 +3,7 @@ import type { BookingPlayerStatus } from "../common/Enum/booking.player.status";
 export class BookingPlayerResDto{
   id: string;
   username?: string;
-  userId?: string;
+  playerId?: string;
   status: BookingPlayerStatus;
   type: 'GUEST' | 'REGISTERED';
   firstName: string | null;

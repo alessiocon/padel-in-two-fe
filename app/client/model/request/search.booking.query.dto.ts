@@ -1,9 +1,11 @@
-import type { bookingStatus } from "../common/Enum/booking.status.dto";
+import type { BookingStatus } from "../common/Enum/booking.status.dto";
 
 export class SearchBookingQueryDto {
    from?: string;
    to?: string;
    clubId?: string;
-   userId?: string;
-   status?: bookingStatus
+   createdById?: string;
+   playerId?: string;
+   member?: string; 
+   status?: BookingStatus
 }

@@ -4,6 +4,7 @@ import type { BookingQuickResDto } from "../../client/model/response/booking.qui
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 import { BookingNotificationRaw } from "./raw/booking.notification.raw";
+import type { BookingStatus } from "../../client/model/common/Enum/booking.status.dto";
 
 interface TableNotificationProps {
     bookings: BookingQuickResDto[] | null;
@@ -12,7 +13,7 @@ interface TableNotificationProps {
     title: ReactNode;
     description?: ReactNode;
     emptyMessage?: ReactNode;
-    onAccept: (bookingId: string) => void;
+    onAccept: (bookingId: string, status: BookingStatus) => void;
     onCancel: (bookingId: string) => void;
     onRestore: (bookingId: string) => void;
 }
@@ -60,9 +61,9 @@ export function TableNotification({
                                 key={booking.id}
                                 booking={booking}
                                 isSubmitting={isSubmitting}
-                                onAccept={() => onAccept(booking.id)}
-                                onCancel={() => onCancel(booking.id)}
-                                onRestore={() => onRestore(booking.id)}
+                                onAccept={onAccept}
+                                onCancel={onCancel}
+                                onRestore={onRestore}
                             />
                         ))}
                     </div>

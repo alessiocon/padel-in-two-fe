@@ -31,7 +31,7 @@ export function Header() {
         try{
           const res = await apiClient.logOut();
           if(res.IsSuccess){
-            setAuth({auth: false, email:"",firstName:"", lastName:"", username:"",id: ""});
+            setAuth({auth: false, email:"",firstName:"", lastName:"", username:"",sub: ""});
             window.navigation.reload();
           }
         }catch{}

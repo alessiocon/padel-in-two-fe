@@ -48,7 +48,7 @@ export function EditTeamPrenotation({
     const [activeDialogSlot, setActiveDialogSlot] = useState<number | null>(null);
     const [dialogType, setDialogType] = useState<'GUEST' | 'REGISTERED' | null>(null);
 
-    const isCaptainPlaced = players.some(p => p?.userId && auth?.id && p.userId === auth.id);
+    const isCaptainPlaced = players.some(p => p?.playerId && auth?.playerId && p.playerId === auth.playerId);
 
     const teams = [
         {
@@ -68,12 +68,12 @@ export function EditTeamPrenotation({
     ];
 
     const handleAssignMe = (index: number) => {
-        if (!auth?.auth || !auth?.id) {
+        if (!auth?.auth || !auth?.sub) {
             window.alert("Devi effettuare l'accesso");
             return;
         }
 
-        if (players.some(p => p?.userId === auth.id)) {
+        if (players.some(p => p?.playerId === auth.playerId)) {
             window.alert("Sei già inserito in questo match!");
             return;
         }
@@ -81,11 +81,10 @@ export function EditTeamPrenotation({
         setPlayers(prev => {
             const updated = [...prev];
             updated[index] = {
-                userId: auth.id,
+                playerId: auth.playerId,
                 username: auth.username || "Tu",
                 firstName: auth.firstName,
                 lastName: auth.lastName
-
             };
             return updated;
         });
@@ -94,7 +93,7 @@ export function EditTeamPrenotation({
     const handleAssignPlayer = (player: CreateBookingPlayerDto) => {
         if (activeDialogSlot === null) return;
 
-        if (player.userId && players.some(p => p?.userId === player.userId)) {
+        if (player.playerId && players.some(p => p?.playerId === player.playerId)) {
             window.alert("Questo utente partecipa già alla partita!");
             return;
         }
@@ -122,7 +121,6 @@ export function EditTeamPrenotation({
                     key={index}
                     index={index}
                     playerState={[players, setPlayers]}
-                    currentUserId={auth?.id}
                 />
             );
         }
@@ -151,11 +149,28 @@ export function EditTeamPrenotation({
 
         const team1Players = [players[0], players[1]].filter(Boolean) as CreateBookingPlayerDto[];
         const team2Players = [players[2], players[3]].filter(Boolean) as CreateBookingPlayerDto[];
-        if(!team1Players){
-            window.alert(`Inserisci tutti i giocatori per il team: ${team1Name.trim() || "Team 1"} `);
+
+        if (team1Players.length === 0) {
+            window.alert(`Inserisci almeno un giocatore per il team: ${team1Name.trim() || "Team 1"}`);
+            return;
         }
-        if(!team2Players){
-            window.alert(`Inserisci tutti i giocatori per il team: ${team1Name.trim() || "Team 2"} `);
+
+        if (team2Players.length === 0) {
+            window.alert(`Inserisci almeno un giocatore per il team: ${team2Name.trim() || "Team 2"}`);
+            return;
+        }
+
+        const team1HasUser = team1Players.some(p => p.playerId);
+        const team2HasUser = team2Players.some(p => p.playerId);
+
+        if (!team1HasUser || !team2HasUser) {
+            const missingTeam = !team1HasUser && !team2HasUser ? "entrambi i team non hanno" : (!team1HasUser ? "il Team 1 non ha" : "il Team 2 non ha");
+            
+            const confirmed = window.confirm(
+                `${missingTeam} nessun utente registrato. Questa partita non verrà conteggiata per le statistiche. Vuoi procedere comunque?`
+            );
+
+            if (!confirmed) return;
         }
 
         const teams: CreateBookingTeamDto[] = [
@@ -169,8 +184,9 @@ export function EditTeamPrenotation({
             }
         ];
 
-        var newBooking: CreateBookingDto = {
+        const newBooking: CreateBookingDto = {
             courtId: selectedCourt.id,
+            clubId,
             description: "Prenotazione da: " + auth.username,
             startsAt: new Date(`${selectedDate}T${selectedSlot}`).toISOString(),
             slots: 1,
@@ -180,7 +196,7 @@ export function EditTeamPrenotation({
         setIsLoadingBookings(true);
 
         try {
-            const res = await apiClient.createBooking(clubId, newBooking);
+            const res = await apiClient.createBooking(newBooking);
 
             if (!res.Data) {
                 if (res.Error) {
@@ -196,7 +212,8 @@ export function EditTeamPrenotation({
             setSelectedSlot(null);
             window.alert("Campo prenotato correttamente!");
         } catch (error) {
-            throw new Error("Si è verificato un errore, riprova più tardi");
+            // Nota: se lanci un nuovo errore dentro il catch, è meglio passargli l'originale o gestirlo a monte
+            window.alert("Si è verificato un errore, riprova più tardi");
         } finally {
             setIsLoadingBookings(false);
         }

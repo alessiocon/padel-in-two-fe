@@ -31,7 +31,7 @@ export function ViewBookingLogs({ logs }: ViewBookingLogsProps) {
                         logs.map((log, index) => (
                             <div key={`${log.createdAt}-${index}`} className="w-full py-1 border-b border-border/20 last:border-0 scrollbar-auto overflow-auto">
                                 <span className="text-[10px] block">{log.createdAt ? dateHelper.formatDate(log.createdAt) : ""}: </span>
-                                <span>{log.message || "Evento di sistema"}</span>
+                                <p className="whitespace-pre-line">{log.message || "Evento di sistema"}</p>
                             </div>
                         ))
                     ) : (

@@ -1,5 +1,5 @@
 import { CheckCircle2, RotateCcw, XCircle, Info, Timer} from "lucide-react";
-import { bookingStatus } from "../../../client/model/common/Enum/booking.status.dto";
+import { BookingStatus } from "../../../client/model/common/Enum/booking.status.dto";
 import type { BookingQuickResDto } from "../../../client/model/response/booking.quick.res.dto";
 import { Button, buttonVariants } from "../../ui/button";
 import { Link } from "react-router";
@@ -9,13 +9,13 @@ import { dateHelper } from "~/helper/dateHelper";
 interface BookingNotificationRawProps {
     booking: BookingQuickResDto;
     isSubmitting: boolean;
-    onAccept: () => void;
-    onCancel: () => void;
-    onRestore: () => void;
+    onAccept: (bookingId: string, status: BookingStatus) => void;
+    onCancel: (bookingId: string) => void;
+    onRestore: (bookingId: string) => void;
 }
 
-export function BookingNotificationRaw({ booking, isSubmitting, onAccept, onCancel, onRestore }: BookingNotificationRawProps) {
-    const isCancelled = booking.status === bookingStatus.CANCELLED;
+export function BookingNotificationRaw({ booking, isSubmitting, onAccept, onCancel, onRestore}: BookingNotificationRawProps) {
+    const isCancelled = booking.status === BookingStatus.CANCELLED;
 
     return (
         <div className={`flex flex-col sm:flex-row sm:items-center justify-between border transition-colors gap-3 p-1.5 ${
@@ -47,14 +47,25 @@ export function BookingNotificationRaw({ booking, isSubmitting, onAccept, onCanc
 
             <div className="flex items-center gap-1 justify-center">
                 <div className="flex gap-1">
-                    {booking.status === bookingStatus.PENDING && (
+                    {booking.status === BookingStatus.PENDING && (
                         <Button
                             size="xs"
                             variant="default"
                             disabled={isSubmitting}
-                            onClick={onAccept}
+                            onClick={e => onAccept(booking.id, BookingStatus.CONFIRMED)}
                         >
                             <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Accetta
+                        </Button>
+                    )}
+
+                    {booking.status === BookingStatus.CONFIRMED && (
+                        <Button
+                            size="xs"
+                            variant="default"
+                            disabled={isSubmitting}
+                            onClick={e => onAccept(booking.id, BookingStatus.IN_PROGRESS)}
+                        >
+                            <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Avvia
                         </Button>
                     )}
                     
@@ -63,7 +74,7 @@ export function BookingNotificationRaw({ booking, isSubmitting, onAccept, onCanc
                             size="xs"
                             variant="default"
                             disabled={isSubmitting}
-                            onClick={onRestore}
+                            onClick={e =>onRestore(booking.id)}
                         >
                             <RotateCcw className="h-3.5 w-3.5 mr-1" /> Ripristina
                         </Button>
@@ -71,15 +82,17 @@ export function BookingNotificationRaw({ booking, isSubmitting, onAccept, onCanc
                         <Button
                             size="xs"
                             variant="destructive"
-                            disabled={isSubmitting}
-                            onClick={onCancel}
+                            disabled={isSubmitting || booking.status === BookingStatus.END || booking.status === BookingStatus.IN_PROGRESS}
+                            onClick={e =>onCancel(booking.id)}
                         >
                             <XCircle className="h-3.5 w-3.5 mr-1" /> Annulla
                         </Button>
                     )}
-                    <Link to={`/booking/${booking.id}`} className={buttonVariants({ variant: "secondary", size: "xs" })}>
-                        <Info className="h-4 w-4" /> Info
-                    </Link>
+                    {!booking.createdByStaff && 
+                        <Link to={`/booking/${booking.id}`} className={buttonVariants({ variant: "secondary", size: "xs" })}>
+                            <Info className="h-4 w-4" /> Info
+                        </Link>
+                    }
                 </div>
             </div>
         </div>

@@ -9,7 +9,8 @@ import { createContext} from "react";
 // }
 
 export interface I_AuthContext {
-    id: string;
+    sub: string;
+    playerId: string;
     auth: boolean;
     username: string;
     firstName: string;

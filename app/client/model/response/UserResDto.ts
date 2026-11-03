@@ -1,5 +1,6 @@
 export class UserResDto{
-    id: string;
+    sub: string;
+    playerId: string;
     email: string;
     firstName: string;
     lastName: string;

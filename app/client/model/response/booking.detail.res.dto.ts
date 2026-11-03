@@ -1,5 +1,5 @@
 import type { BookingCancBy } from "../common/Enum/booking.cancby";
-import type { bookingStatus } from "../common/Enum/booking.status.dto";
+import type { BookingStatus } from "../common/Enum/booking.status.dto";
 import type { BookingLogResDto } from "./booking.log.res.dto";
 import type { BookingTeamResDto } from "./booking.team.res.dto";
 
@@ -10,10 +10,11 @@ export class BookingDetailResDto{
 
     courtId: string;
     courtName: string;
+    courtSize: number;
     isCourtIndoor: boolean;
 
     position: string;
-    status: bookingStatus;
+    status: BookingStatus;
     description: string;
     startsAt: string;
     endsAt: string;
@@ -25,6 +26,7 @@ export class BookingDetailResDto{
         firstName: string,
         lastName: string,
     } | null;
+    createdByStaff: boolean;
     teams: BookingTeamResDto[];
     logs: BookingLogResDto[];
 

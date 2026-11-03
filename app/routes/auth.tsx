@@ -4,7 +4,7 @@ import { DynamicForm, DynamicInput } from "./../component/form/form";
 import { AuthContext } from "./../store/context";
 import { apiClient } from "./../client/apiClient";
 import type { AuthReqDto } from "./../client/model/request/AuthReqDto";
-import type { CreateUserDto } from "./../client/model/request/CreateUserDto";
+import type { CreateUserDto } from "../client/model/request/create.user.dto";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -93,15 +93,8 @@ export default function Auth() {
         }
         return;
       }
-
-      setAuth({
-        auth: true,
-        email: res.Data.email.toLocaleLowerCase(),
-        firstName: res.Data.firstName,
-        lastName: res.Data.lastName,
-        username: res.Data.username,
-        id: res.Data.id
-      });
+      
+      setAuth({auth: true, ...res.Data});
 
     } catch (error) {
       alert("Credenziali non corrette, riprova");

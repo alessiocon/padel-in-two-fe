@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader } from "../ui/dialog";
-import { bookingStatus } from "../../client/model/common/Enum/booking.status.dto";
+import { BookingStatus } from "../../client/model/common/Enum/booking.status.dto";
 import type { ClubCourtDto } from "../../client/model/common/ClubCourtDto";
 import { ButtonCourtSelection } from "../../component/ButtonCourtSelection";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
@@ -22,7 +22,7 @@ export default function SelectCourtDialog({slotState, selectedDate, courts, book
 
     var slotTime = new Date(selectedDate+"T"+slot).toISOString();
     const bookedCourtIdsForSlot = bookings
-        .filter((b) => (b.startsAt.slice(0, 16) === slotTime.slice(0, 16) && b.status !== bookingStatus.CANCELLED ))
+        .filter((b) => (b.startsAt.slice(0, 16) === slotTime.slice(0, 16) && b.status !== BookingStatus.CANCELLED ))
         .map((b) => b.courtId);
 
     var courtsCheck: CourtWithStatusDto[] = courts.map((court, index) => {

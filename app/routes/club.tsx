@@ -17,61 +17,6 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-// export const MOCK_CLUB: ClubResDto = {
-//   id: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
-//   ownerId: "8f8fc242-8719-45a9-b141-8028e39d45df",
-//   name: "Up Padel Arzano",
-//   email: "uppadelarzano@gmail.com",
-//   slotDurationMinutes: 90,
-//   openingTime: "08:00",
-//   closingTime: "23:00",
-//   position: "Via Atellana n. 65, Arzano",
-//   timezone: "Europe/Rome",
-//   status: ClubStatusDto.ACTIVE,
-//   courtsInDoor: 0,
-//   courtsOutDoor: 4,
-//   averagePrice: 30,
-//   racketPrice: 2,
-//   courts: [
-//     {
-//       id: "a7c7f6e8-0727-4972-9e26-61fc4ee8fd17",
-//       clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
-//       name: "campo 1",
-//       isIndoor: false,
-//       offsetMinutes: 0,
-//       price: 30,
-//       status: CourtStatusDto.AVAILABLE,
-//     },
-//     {
-//       id: "66346bfe-0c06-424e-b2aa-08e9a455e386",
-//       clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
-//       name: "campo 2",
-//       isIndoor: false,
-//       offsetMinutes: 0,
-//       price: 30,
-//       status: CourtStatusDto.AVAILABLE,
-//     },
-//     {
-//       id: "bfd98d5c-a393-4bbf-a2f1-d9620a744222",
-//       clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
-//       name: "campo 3",
-//       isIndoor: false,
-//       offsetMinutes: 0,
-//       price: 30,
-//       status: CourtStatusDto.AVAILABLE,
-//     },
-//     {
-//       id: "e4b520a7-539a-404b-b896-98cfd1b9cae3",
-//       clubId: "e0fe08cf-fca4-4e10-b1d2-11793c3d1a92",
-//       name: "campo 4",
-//       isIndoor: false,
-//       offsetMinutes: 30,
-//       price: 30,
-//       status: CourtStatusDto.AVAILABLE,
-//     },
-//   ],
-// };
-
 
 export default function ClubDetailPage() {
   const [club, setClub] = useState<ClubResDto | null>(null);

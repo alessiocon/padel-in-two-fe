@@ -1,4 +1,4 @@
-import type { bookingStatus } from "../common/Enum/booking.status.dto";
+import type { BookingStatus } from "../common/Enum/booking.status.dto";
 
 export class BookingQuickResDto{
     id: string;
@@ -8,10 +8,11 @@ export class BookingQuickResDto{
     courtId: string;
     courtName: string;
     isCourtIndoor: boolean;
+    createdByStaff: boolean;
 
     nPlayer: number;
 
-    status: bookingStatus;
+    status: BookingStatus;
     description: string;
     startsAt: string;
     endsAt: string;

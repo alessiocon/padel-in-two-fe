@@ -7,13 +7,14 @@ import { dateHelper } from "../helper/dateHelper";
 import { Button } from "./../components/ui/button";
 import { ViewBookingLogs } from "../components/booking/logs/view.booking.logs";
 import { BookingStatusBadge } from "../components/budge/booking.status.badge";
-import { FieldPlayerForBooking } from "../components/booking/field.player.for.booking";
 import { AddGuestForBookingDialog } from "../components/dialog/add.guest.for.booking.dialog";
 import { AddUserForBookingDialog } from "../components/dialog/add.user.for.booking.dialog";
-import { bookingStatus } from "~/client/model/common/Enum/booking.status.dto";
+import { BookingStatus } from "~/client/model/common/Enum/booking.status.dto";
 import { AuthContext } from "../store/context";
 import type { CreateBookingPlayerDto } from "../client/model/request/create.booking.player.dto";
 import type { BookingDetailResDto } from "../client/model/response/booking.detail.res.dto";
+import { AddTeamPlayer } from "../components/booking/add.team.player";
+import type { BookingPlayerResDto } from "../client/model/response/booking.player.res.dto";
 
 interface BookingCardProps {
     bookingState: [BookingDetailResDto, React.Dispatch<React.SetStateAction<BookingDetailResDto[] | null>>];
@@ -52,7 +53,7 @@ export const CardUserPrenotation: React.FC<BookingCardProps> = ({
                         teams: currentBooking.teams.map((team) => ({
                             ...team,
                             players: team.players.map((player) => (
-                                player.userId === auth.id ? { ...player, status: BookingPlayerStatus.ACCEPTED } : player
+                                player.playerId === auth.playerId ? { ...player, status: BookingPlayerStatus.ACCEPTED } : player
                             )),
                         })),
                     }
@@ -64,14 +65,14 @@ export const CardUserPrenotation: React.FC<BookingCardProps> = ({
     };
 
     // Verifica se l'utente corrente è il proprietario/creatore della prenotazione
-    const isOwner = auth?.id && booking.createdBy?.id ? booking.createdBy.id === auth.id : true;
+    const isOwner = auth?.sub && booking.createdBy?.id ? booking.createdBy.id === auth.sub : true;
 
-    const isCaptainPlaced = Boolean(auth?.id && booking.teams.some((team) => (
-        team.players.some((player) => player.userId === auth.id)
+    const isCaptainPlaced = Boolean(auth?.sub && booking.teams.some((team) => (
+        team.players.some((player) => player.playerId === auth.sub)
     )));
 
     const invitePlayer = async (teamId: string, player: CreateBookingPlayerDto) => {
-        if (player.userId && booking.teams.some((team) => team.players.some((currentPlayer) => currentPlayer.userId === player.userId))) {
+        if (player.playerId && booking.teams.some((team) => team.players.some((currentPlayer) => currentPlayer.playerId === player.playerId))) {
             window.alert("Questo utente partecipa già alla partita!");
             return;
         }
@@ -89,46 +90,13 @@ export const CardUserPrenotation: React.FC<BookingCardProps> = ({
             }
 
             const updatedBooking = response.Data;
-            const responseTeam = updatedBooking.teams.find((team) => team.id === teamId);
-            const responsePlayer = responseTeam?.players.find((bookingPlayer) => (
-                player.userId
-                    ? bookingPlayer.userId === player.userId
-                    : player.phone
-                        ? bookingPlayer.phone === player.phone
-                        : bookingPlayer.firstName === player.firstName && bookingPlayer.lastName === player.lastName
-            ));
-            const playerToAdd = {
-                id: responsePlayer?.id ?? player.userId ?? player.phone ?? crypto.randomUUID(),
-                username: player.username ?? responsePlayer?.username,
-                userId: player.userId ?? responsePlayer?.userId,
-                status: responsePlayer?.status ?? (player.userId ? BookingPlayerStatus.PENDING : BookingPlayerStatus.ACCEPTED),
-                type: player.userId ? "REGISTERED" as const : "GUEST" as const,
-                firstName: player.firstName ?? responsePlayer?.firstName ?? null,
-                lastName: player.lastName ?? responsePlayer?.lastName ?? null,
-                phone: player.phone ?? responsePlayer?.phone ?? null,
-            };
 
             setBookings((currentBookings) => currentBookings?.map((currentBooking) => (
                 currentBooking.id === booking.id
-                    ? {
-                        ...currentBooking,
-                        logs: updatedBooking.logs ?? currentBooking.logs,
-                        teams: currentBooking.teams.map((team) => (
-                            team.id === teamId
-                                ? {
-                                    ...team,
-                                    players: team.players.some((currentPlayer) => (
-                                        (player.userId && currentPlayer.userId === player.userId)
-                                        || (player.phone && currentPlayer.phone === player.phone)
-                                    ))
-                                        ? team.players
-                                        : [...team.players, playerToAdd],
-                                }
-                                : team
-                        )),
-                    }
+                    ? updatedBooking
                     : currentBooking
             )) ?? null);
+            
             setDialogType(null);
             setActiveTeamId(null);
         } catch {
@@ -137,13 +105,13 @@ export const CardUserPrenotation: React.FC<BookingCardProps> = ({
     };
 
     const handleAssignMe = (teamId: string) => {
-        if (!auth?.auth || !auth?.id) {
+        if (!auth?.auth || !auth?.sub) {
             window.alert("Devi effettuare l'accesso");
             return;
         }
 
         void invitePlayer(teamId, {
-            userId: auth.id,
+            playerId: auth.playerId,
             username: auth.username || "Tu",
             firstName: auth.firstName,
             lastName: auth.lastName,
@@ -240,9 +208,9 @@ export const CardUserPrenotation: React.FC<BookingCardProps> = ({
                                     <div className="space-y-2">
                                         {slots.map((slotIdx) => {
                                             const player = players[slotIdx];
-                                            const isCurrentAuthUser = Boolean(auth?.id && player?.userId === auth.id);
+                                            const isCurrentAuthUser = Boolean(auth?.playerId && player?.playerId === auth.playerId);
 
-                                            if (player && (player.firstName || player.lastName || player.userId || player.username)) {
+                                            if (player && (player.firstName || player.lastName || player.playerId || player.username)) {
                                                 const playerName = [player.firstName, player.lastName].filter(Boolean).join(" ");
 
                                                 return (
@@ -299,16 +267,13 @@ export const CardUserPrenotation: React.FC<BookingCardProps> = ({
                                                 );
                                             } else {
                                                 return (
-                                                    <FieldPlayerForBooking
+                                                    <AddTeamPlayer
                                                         key={slotIdx}
                                                         index={slotIdx}
-                                                        player={null}
                                                         isCaptainPlaced={isCaptainPlaced}
                                                         isAuthenticated={Boolean(auth?.auth)}
                                                         canManage={Boolean(isOwner)}
-                                                        currentUserId={auth?.id}
                                                         onAssignMe={() => handleAssignMe(team.id)}
-                                                        onRemovePlayer={() => undefined}
                                                         onOpenGuestDialog={() => {
                                                             setActiveTeamId(team.id);
                                                             setDialogType("GUEST");
@@ -346,7 +311,7 @@ export const CardUserPrenotation: React.FC<BookingCardProps> = ({
                 <div className="flex items-center gap-2">
                     {isOwner && (
                         <Button
-                            disabled={booking.status === bookingStatus.CANCELLED}
+                            disabled={booking.status === BookingStatus.CANCELLED}
                             type="button"
                             size="sm"
                             onClick={(e) => { e.preventDefault(); onDelete(booking); }}

@@ -25,7 +25,7 @@ export default function RecoveryAuthLayout() {
 
         if(res.Data === null) throw new Error("errore in fase di ricerca della sessione");
 
-        setAuth({ auth: res.IsSuccess, email: res.Data.email, firstName: res.Data.firstName, lastName: res.Data.lastName, username:res.Data.username, id:res.Data.id});
+        setAuth({auth: true, ...res.Data});
       } catch (err) {
         isUserAuthenticated = false;
       } finally {

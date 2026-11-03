@@ -4,7 +4,7 @@ import { useState } from "react";
 import { apiClient } from "../../client/apiClient";
 import { dateHelper } from "../../helper/dateHelper";
 import { Button } from "../ui/button";
-import { bookingStatus } from "../../client/model/common/Enum/booking.status.dto";
+import { BookingStatus } from "../../client/model/common/Enum/booking.status.dto";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 
 
@@ -29,7 +29,7 @@ export default function DeleteBookingDialog({booking, setBookings, openState} : 
             }
             const updatedBooking = res.Data;
 
-            if (updatedBooking.status === bookingStatus.PENDING) {
+            if (updatedBooking.status === BookingStatus.PENDING) {
                 setBookings((prev) => (prev ?? []).filter((b) => b.id !== bookingId));
                 alert("Prenotazione rimossa con successo.");
                 return;
@@ -39,7 +39,7 @@ export default function DeleteBookingDialog({booking, setBookings, openState} : 
                 (prev ?? []).map((b) => {
                     if (b.id === bookingId) {
                         return {...b,
-                            status: bookingStatus.CANCELLED,
+                            status: BookingStatus.CANCELLED,
                             description: updatedBooking.description ?? "",
                         };
                     }

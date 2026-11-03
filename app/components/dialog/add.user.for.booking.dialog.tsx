@@ -106,13 +106,7 @@ export function AddUserForBookingDialog({ isOpen, onClose, onSelectUser }: ISele
                                         title="Seleziona utente"
                                         onClick={(event) => {
                                             event.stopPropagation();
-                                            onSelectUser({
-                                                userId: user.id,
-                                                username: user.username,
-                                                firstName: user.firstName,
-                                                lastName: user.lastName,
-                                                phone: user.phone,
-                                            });
+                                            onSelectUser(user);
                                         }}
                                     >
                                         <Check /> invita

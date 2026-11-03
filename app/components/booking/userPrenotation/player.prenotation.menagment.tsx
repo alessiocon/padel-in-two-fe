@@ -9,6 +9,9 @@ import { AddTeamPlayer } from "../add.team.player";
 import { ManageTeamPlayer } from "../menage.team.player";
 import { AddGuestForBookingDialog } from "../../dialog/add.guest.for.booking.dialog";
 import { AddUserForBookingDialog } from "../../dialog/add.user.for.booking.dialog";
+import type { BookingPlayerResDto } from "../../../client/model/response/booking.player.res.dto";
+import { BookingStatus } from "../../../client/model/common/Enum/booking.status.dto";
+import { PlayerOthersPrenotation } from "./player.others.prenotation";
 
 interface PlayerPrenotationManagementProps {
     bookingState: [BookingDetailResDto, React.Dispatch<React.SetStateAction<BookingDetailResDto[] | null>>];
@@ -21,13 +24,13 @@ export function PlayerPrenotationManagement({ bookingState }: PlayerPrenotationM
     const [activeTeamId, setActiveTeamId] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const requestInFlight = useRef(false);
-    const isCaptainPlaced = Boolean(auth?.id && booking.teams.some((team) => (
-        team.players.some((player) => player.userId === auth.id)
+    const isCaptainPlaced = Boolean(auth?.sub && booking.teams.some((team) => (
+        team.players.some((player) => player.playerId === auth.playerId)
     )));
 
     const invitePlayer = async (teamId: string, player: CreateBookingPlayerDto) => {
         if (requestInFlight.current) return;
-        if (player.userId && booking.teams.some((team) => team.players.some((currentPlayer) => currentPlayer.userId === player.userId))) {
+        if (player.playerId && booking.teams.some((team) => team.players.some((currentPlayer) => currentPlayer.playerId === player.playerId))) {
             window.alert("Questo utente partecipa già alla partita!");
             return;
         }
@@ -35,6 +38,9 @@ export function PlayerPrenotationManagement({ bookingState }: PlayerPrenotationM
             window.alert("Questo numero è già inserito per un altro player!");
             return;
         }
+
+        setDialogType(null);
+        setActiveTeamId(null);
 
         requestInFlight.current = true;
         setIsSubmitting(true);
@@ -49,40 +55,20 @@ export function PlayerPrenotationManagement({ bookingState }: PlayerPrenotationM
             const responsePlayer = updatedBooking.teams
                 .find((team) => team.id === teamId)
                 ?.players.find((bookingPlayer) => (
-                    player.userId
-                        ? bookingPlayer.userId === player.userId
+                    player.playerId
+                        ? bookingPlayer.playerId === player.playerId
                         : player.phone
                             ? bookingPlayer.phone === player.phone
                             : bookingPlayer.firstName === player.firstName && bookingPlayer.lastName === player.lastName
                 ));
-            const playerToAdd = {
-                id: responsePlayer?.id ?? player.userId ?? player.phone ?? crypto.randomUUID(),
-                username: player.username ?? responsePlayer?.username,
-                userId: player.userId ?? responsePlayer?.userId,
-                status: responsePlayer?.status ?? (player.userId ? BookingPlayerStatus.PENDING : BookingPlayerStatus.ACCEPTED),
-                type: player.userId ? "REGISTERED" as const : "GUEST" as const,
-                firstName: player.firstName ?? responsePlayer?.firstName ?? null,
-                lastName: player.lastName ?? responsePlayer?.lastName ?? null,
-                phone: player.phone ?? responsePlayer?.phone ?? null,
-            };
+
+            if(!responsePlayer) return alert("aggiorna la pagina per verificare le modifiche");
+
+            const playerToAdd : BookingPlayerResDto = {...responsePlayer};
 
             setBookings((currentBookings) => currentBookings?.map((currentBooking) => (
                 currentBooking.id === booking.id
-                    ? {
-                        ...currentBooking,
-                        logs: updatedBooking.logs ?? currentBooking.logs,
-                        teams: currentBooking.teams.map((team) => (
-                            team.id === teamId
-                                ? {
-                                    ...team,
-                                    players: team.players.some((currentPlayer) => (
-                                        (player.userId && currentPlayer.userId === player.userId)
-                                        || (player.phone && currentPlayer.phone === player.phone)
-                                    )) ? team.players : [...team.players, playerToAdd],
-                                }
-                                : team
-                        )),
-                    }
+                    ? updatedBooking
                     : currentBooking
             )) ?? null);
             setDialogType(null);
@@ -103,8 +89,6 @@ export function PlayerPrenotationManagement({ bookingState }: PlayerPrenotationM
 
     const handlePlayerSelection = (player: CreateBookingPlayerDto) => {
         const teamId = activeTeamId;
-        setDialogType(null);
-        setActiveTeamId(null);
         if (teamId) void invitePlayer(teamId, player);
     };
 
@@ -123,6 +107,9 @@ export function PlayerPrenotationManagement({ bookingState }: PlayerPrenotationM
                         <h5 className="font-semibold text-xs text-primary">{team.teamName || `Team ${teamIdx + 1}`}</h5>
                         <div className="space-y-2">
                             {[0, 1].map((slotIdx) => {
+
+                                if(booking.status === BookingStatus.IN_PROGRESS) return <PlayerOthersPrenotation key={slotIdx} player={team.players[slotIdx]} />
+                                
                                 const player = team.players[slotIdx];
                                 if (player) {
                                     return (
@@ -132,7 +119,6 @@ export function PlayerPrenotationManagement({ bookingState }: PlayerPrenotationM
                                             index={slotIdx}
                                             player={player}
                                             bookingState={bookingState}
-                                            currentUserId={auth?.id}
                                         />
                                     );
                                 }
@@ -145,7 +131,7 @@ export function PlayerPrenotationManagement({ bookingState }: PlayerPrenotationM
                                         isAuthenticated={Boolean(auth?.auth)}
                                         isLoading={isSubmitting}
                                         onAssignMe={() => void invitePlayer(team.id, {
-                                            userId: auth.id,
+                                            playerId: auth.playerId,
                                             username: auth.username || "Tu",
                                             firstName: auth.firstName,
                                             lastName: auth.lastName,

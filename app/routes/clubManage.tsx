@@ -12,7 +12,7 @@ import { Button } from "../components/ui/button";
 import { apiClient } from "../client/apiClient";
 import type { ClubResDto } from "../client/model/response/ClubResDto";
 import type { ClubCourtDto } from "../client/model/common/ClubCourtDto";
-import { bookingStatus } from "../client/model/common/Enum/booking.status.dto";
+import { BookingStatus } from "../client/model/common/Enum/booking.status.dto";
 import type { IApiResponse } from "../client/interfaces/IApiResponse";
 import { CardClubInfo } from "~/components/club/card.club.info";
 import { SlotPrenotation } from "~/components/booking/slot.prenotation";
@@ -89,7 +89,7 @@ export default function ClubManagerPage() {
     setIsLoadingRequestPrenotations(true);
 
     try {
-      const res = await apiClient.searchBookingForManager(club.id, {status: bookingStatus.PENDING});
+      const res = await apiClient.searchBookingForManager(club.id, {status: BookingStatus.PENDING});
       setRequestPrenotations(res.Data || []);
     } catch (error) {
       console.error("Errore nel recupero delle richieste di prenotazione:", error);
@@ -100,13 +100,13 @@ export default function ClubManagerPage() {
   };
 
 
-  const handleUpdateStatus = async (bookingId: string, newStatus: bookingStatus) => {
+  const handleUpdateStatus = async (bookingId: string, newStatus: BookingStatus) => {
     setIsSubmitting(true);
     try {
       let res : IApiResponse<BookingDetailResDto> = {Data: null, Error: null, IsSuccess: false};
 
-      if(newStatus === bookingStatus.CANCELLED){
-        res = await apiClient.deleteBooking(bookingId, { isStaff: true });
+      if(newStatus === BookingStatus.CANCELLED){
+        res = await apiClient.deleteBooking(bookingId, {isStaff: true});
       }else{
         res = await apiClient.restoreBookigStatus(bookingId, { isStaff: true });
       }
@@ -116,13 +116,14 @@ export default function ClubManagerPage() {
         return;
       }
 
+
       setRequestPrenotations((prev) => 
           [ ...(prev?.filter((b) => b.id !== bookingId) ?? [])]
         );
 
+      
       setBookings((prev) =>
-         [...(prev?.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b)) ?? [])]
-        
+         [...(prev?.map((b) => (b.id === bookingId ? { ...b, status: res.Data?.status ?? b.status } : b)) ?? [])]
       );
     } catch (error) {
       alert("Errore durante l'operazione.");
@@ -131,23 +132,26 @@ export default function ClubManagerPage() {
     }
   };
 
-  const handleAcceptBooking = async (bookingId: string) => {
+  const handleAcceptBooking = async (bookingId: string, status: BookingStatus) => {
       setIsSubmitting(true);
       try {
         let res : IApiResponse<BookingQuickResDto> = {Data: null, Error: null, IsSuccess: false};
-        res = await apiClient.acceptBooking(bookingId);
+        res =  status === BookingStatus.CONFIRMED ? await apiClient.acceptBooking(bookingId) : await apiClient.startBooking(bookingId) ;
 
         if (res && !res.IsSuccess) {
           alert(res.Error?.message || "Errore durante l'aggiornamento");
           return;
         }
 
-        setRequestPrenotations((prev) => 
-          [ ...(prev?.filter((b) => b.id !== bookingId) ?? [])]
-        );
+        if(status === BookingStatus.CONFIRMED){
+
+          setRequestPrenotations((prev) => 
+            [ ...(prev?.filter((b) => b.id !== bookingId) ?? [])]
+          );
+        }
 
         setBookings((prev) =>
-          [ ...(prev?.map((b) => (b.id === bookingId ? { ...b, status: bookingStatus.CONFIRMED } : b))) ?? []]
+          [ ...(prev?.map((b) => (b.id === bookingId ? { ...b, status } : b))) ?? []]
         
         );
       } catch (error) {
@@ -178,8 +182,8 @@ export default function ClubManagerPage() {
           description={`Visualizza e modifica lo stato delle prenotazioni`}
           emptyMessage="Nessuna richiesta presente presente"
           onAccept={handleAcceptBooking}
-          onCancel={(bookingId) => handleUpdateStatus(bookingId, bookingStatus.CANCELLED)}
-          onRestore={(bookingId) => handleUpdateStatus(bookingId, bookingStatus.CONFIRMED)}
+          onCancel={(bookingId) => handleUpdateStatus(bookingId, BookingStatus.CANCELLED)}
+          onRestore={(bookingId) => handleUpdateStatus(bookingId, BookingStatus.CONFIRMED)}
         />
 
         {/* Sezione Griglia Oraria / Prenotazione Manuale */}
@@ -210,8 +214,8 @@ export default function ClubManagerPage() {
           description={`Visualizza e modifica lo stato di qualsiasi prenotazione in data ${selectedDate}`}
           emptyMessage="Nessuna prenotazione presente per questa giornata."
           onAccept={handleAcceptBooking}
-          onCancel={(bookingId) => handleUpdateStatus(bookingId, bookingStatus.CANCELLED)}
-          onRestore={(bookingId) => handleUpdateStatus(bookingId, bookingStatus.CONFIRMED)}
+          onCancel={(bookingId) => handleUpdateStatus(bookingId, BookingStatus.CANCELLED)}
+          onRestore={(bookingId) => handleUpdateStatus(bookingId, BookingStatus.CONFIRMED)}
         />
       </div>
   </>);

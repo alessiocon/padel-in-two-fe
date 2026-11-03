@@ -8,10 +8,12 @@ import { AddTeamPlayer } from "../add.team.player";
 import { PlayerMePrenotation } from "./player.prenotation";
 import { PlayerPrenotationManagement } from "./player.prenotation.menagment";
 import { BookingStatusBadge } from "../../budge/booking.status.badge";
-import { bookingStatus } from "~/client/model/common/Enum/booking.status.dto";
+import { BookingStatus } from "~/client/model/common/Enum/booking.status.dto";
 import { AuthContext } from "../../../store/context";
 import type { BookingDetailResDto } from "~/client/model/response/booking.detail.res.dto";
 import { PlayerOthersPrenotation } from "./player.others.prenotation";
+import { BookingMatchSection } from "../match/booking.match.section";
+import { BookingPlayerStatus } from "../../../client/model/common/Enum/booking.player.status";
 
 interface CardUserPrenotationDetailProps {
     bookingState: [BookingDetailResDto, React.Dispatch<React.SetStateAction<BookingDetailResDto[] | null>>];
@@ -24,7 +26,10 @@ export const CardUserPrenotationDetail: React.FC<CardUserPrenotationDetailProps>
 }) => {
     const [auth] = useContext(AuthContext);
     const [booking] = bookingState;
-    const isOwner = Boolean(auth?.id && booking.createdBy?.id && booking.createdBy.id === auth.id);
+    const isOwner = Boolean(auth?.sub && booking.createdBy?.id && booking.createdBy.id === auth.sub);
+    const isStaff = !isOwner && !booking.teams.flatMap(team => team.players ?? []).find(player => player.playerId === auth.playerId); //SE NON è UN PLAYER E NON è IL CREATORE DEL MATCH ALLORA HA è DELLO STAFF ALTRIMENTI NON DOVREBBE VISUALIZZARE LA PAGINA
+    const acceptedPlayersCount = booking.teams.flatMap(team => team.players ?? [])
+      .filter(player => player.status === BookingPlayerStatus.ACCEPTED).length;
 
     return (
         <div className="flex flex-col p-2 bg-card border border-border/60 shadow-md gap-5 transition-colors">
@@ -79,8 +84,8 @@ export const CardUserPrenotationDetail: React.FC<CardUserPrenotationDetailProps>
                                         {[0, 1].map((slotIdx) => {
                                             const player = team.players[slotIdx];
                                             if (player) {
-                                                if(Boolean(auth?.id && player.userId === auth.id)){
-
+                                                
+                                                if(Boolean(auth?.playerId && player.playerId === auth.playerId)){
                                                     return <PlayerMePrenotation
                                                         key={player.id || slotIdx}
                                                         bookingState={bookingState}
@@ -88,6 +93,7 @@ export const CardUserPrenotationDetail: React.FC<CardUserPrenotationDetailProps>
                                                     />
                                                 }else{
                                                     return <PlayerOthersPrenotation
+                                                        key={player.id || slotIdx}
                                                         player={player}
                                                     />
                                                 }
@@ -113,6 +119,15 @@ export const CardUserPrenotationDetail: React.FC<CardUserPrenotationDetailProps>
                     )}
                 </div>
             )}
+            
+            <BookingMatchSection 
+                bookingId={booking.id} 
+                team1Name={booking.teams[0].teamName}
+                team2Name={booking.teams[1].teamName}
+                bookingStatus={booking.status}
+                isStaff={isStaff} 
+                allPlayer={acceptedPlayersCount === booking.courtSize}/>
+
 
             <ViewBookingLogs logs={booking.logs || []} />
 
@@ -131,7 +146,7 @@ export const CardUserPrenotationDetail: React.FC<CardUserPrenotationDetailProps>
                 <div className="flex items-center gap-2">
                     {isOwner && (
                         <Button
-                            disabled={booking.status === bookingStatus.CANCELLED}
+                            disabled={booking.status === BookingStatus.CANCELLED}
                             type="button"
                             size="sm"
                             onClick={(e) => { e.preventDefault(); onDelete(booking); }}

@@ -54,6 +54,7 @@ export function SendPrenotationByClub({
 
         var newBooking: CreateBookingDto = {
             courtId: selectedCourt.id,
+            clubId,
             description: `Prenotazione da: ${auth.username}: ${bookingDescription}`,
             startsAt: new Date(`${selectedDate}T${selectedSlot}`).toISOString(),
             slots: 1,
@@ -63,7 +64,7 @@ export function SendPrenotationByClub({
         setIsLoadingBookings(true);
 
         try {
-            const res = await apiClient.createBooking(clubId, newBooking);
+            const res = await apiClient.createBookingByStaff(newBooking);
 
             if (!res.Data) {
                 if (res.Error) {

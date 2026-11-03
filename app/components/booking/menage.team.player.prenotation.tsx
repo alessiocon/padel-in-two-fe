@@ -6,13 +6,11 @@ import type { CreateBookingPlayerDto } from "../../client/model/request/create.b
 interface ManageTeamPlayerPrenotationProps {
     index: number;
     playerState: [(CreateBookingPlayerDto | null)[], React.Dispatch<React.SetStateAction<(CreateBookingPlayerDto | null)[]>>];
-    currentUserId?: string;
 }
 
 export function ManageTeamPlayerPrenotation({
     index,
     playerState,
-    currentUserId,
 }: ManageTeamPlayerPrenotationProps) {
     const requestInFlight = useRef(false);
     const [players, setPlayers] = playerState;
@@ -20,8 +18,6 @@ export function ManageTeamPlayerPrenotation({
 
     if(!player) return;
 
-
-    const isMe = Boolean(currentUserId && player.userId === currentUserId);
     const playerName = [player.firstName, player.lastName].filter(Boolean).join(" ");
 
     const handleRemove = async () => {
@@ -37,12 +33,12 @@ export function ManageTeamPlayerPrenotation({
         <div className="relative p-3 rounded-md bg-card border border-border/50">
             <div className="flex justify-between items-center">
                 <p className="text-xs text-muted-foreground font-medium">
-                    Giocatore {index + 1} {isMe && "(Tu)"}
+                    Giocatore {index + 1}
                 </p>
             </div>
  
             <div className="flex justify-between items-center">
-                {player.userId 
+                {player.playerId 
                     ? <p>{player.username || "Utente"}</p>
                     : <p className="text-sm font-semibold">{playerName || "Ospite"}</p>
                 }

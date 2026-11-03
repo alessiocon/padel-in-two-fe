@@ -1,11 +1,19 @@
-import type { bookingStatus } from "~/client/model/common/Enum/booking.status.dto";
+import type { BookingStatus } from "~/client/model/common/Enum/booking.status.dto";
 
 interface BookingStatusBadgeProps {
-    status: bookingStatus;
+    status: BookingStatus;
     className?: string;
 }
 
 const statusConfig: Record<string, { label: string; classes: string }> = {
+     END: {
+        label: "Concluso",
+        classes: "bg-sky-500/30 text-sky-500 border-sky-500/20",
+    },
+    IN_PROGRESS: {
+        label: "In corso",
+        classes: "bg-lime-500/10 text-lime-500 border-lime-500/20",
+    },
     CONFIRMED: {
         label: "Confermato",
         classes: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
