@@ -8,6 +8,7 @@ import { AddTeamPlayer } from "../add.team.player";
 import { PlayerMePrenotation } from "./player.prenotation";
 import { PlayerPrenotationManagement } from "./player.prenotation.menagment";
 import { BookingStatusBadge } from "../../budge/booking.status.badge";
+import { PromotionBadges } from "../../budge/promotion.badges";
 import { BookingStatus } from "~/client/model/common/Enum/booking.status.dto";
 import { AuthContext } from "../../../store/context";
 import type { BookingDetailResDto } from "~/client/model/response/booking.detail.res.dto";
@@ -27,17 +28,18 @@ export const CardUserPrenotationDetail: React.FC<CardUserPrenotationDetailProps>
     const [auth] = useContext(AuthContext);
     const [booking] = bookingState;
     const isOwner = Boolean(auth?.sub && booking.createdBy?.id && booking.createdBy.id === auth.sub);
-    const isStaff = !isOwner && !booking.teams.flatMap(team => team.players ?? []).find(player => player.playerId === auth.playerId); //SE NON è UN PLAYER E NON è IL CREATORE DEL MATCH ALLORA HA è DELLO STAFF ALTRIMENTI NON DOVREBBE VISUALIZZARE LA PAGINA
+    const isStaff = !auth.playerId
     const acceptedPlayersCount = booking.teams.flatMap(team => team.players ?? [])
       .filter(player => player.status === BookingPlayerStatus.ACCEPTED).length;
-
-    return (
+    
+      return (
         <div className="flex flex-col p-2 bg-card border border-border/60 shadow-md gap-5 transition-colors">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border/40">
                 <div className="flex flex-col gap-1.5 w-full">
 
-                    <div className="text-right">
-                        <BookingStatusBadge status={booking.status} />
+                    <div className="flex items-center justify-between gap-2">
+                        <PromotionBadges promotions={booking.eligiblePromotions} />
+                        <BookingStatusBadge status={booking.status} className="ml-auto" />
                     </div>
                     <h3 className="font-bold text-sx mb-0.5 ">
                             {booking.clubName || "Campo da Padel"}
@@ -48,6 +50,9 @@ export const CardUserPrenotationDetail: React.FC<CardUserPrenotationDetailProps>
                         </span>
                         <span className="flex gap-1 text-xs font-semibold px-1 py-0.5 bg-primary/10 text-primary border border-primary/20 text-sm font-semibold text-foreground">
                             <Timer className="h-4 w-4 text-primary" /> {dateHelper.formatTime(booking.startsAt)} - {dateHelper.formatTime(booking.endsAt)}
+                        </span>
+                        <span className="flex gap-1 text-xs font-semibold px-1 py-0.5 bg-primary/10 text-primary border border-primary/20 text-sm font-semibold text-foreground">
+                            {booking.price ? `€ ${booking.price.toFixed(2)}` : "N/A"}
                         </span>
                     </div>
                      <h3 className="font-bold text-lg leading-tight mt-0.5">

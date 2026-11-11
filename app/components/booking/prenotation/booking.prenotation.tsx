@@ -80,6 +80,7 @@ export function BookingPrenotation({ club, bookingsState, isLoadingBookingsState
                     isLoadingBookingsState={[isLoadingBookings, setIsLoadingBookings]}
                     slotState={[selectedSlot, setSelectedSlot]}
                     clubId={club?.id ?? null}
+                    pricingRules={club?.priceRoles}
                     selectedDate={selectedDate}
                     onCancel={() => {
                         setSelectedCourt(null);

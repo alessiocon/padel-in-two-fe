@@ -200,7 +200,6 @@ export function BookingMatchSection({
   const isProponent = Boolean(match?.proposePlayerIds?.includes(playerId));
   const isPendingPlayer = Boolean(match?.pendingPlayerIds?.includes(playerId));
   const hasAccess = isStaff || Boolean(playerId);
-
   // Stati del match
   const isDeclined = match?.status === MatchPropose.DECLINED;
 

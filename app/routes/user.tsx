@@ -4,6 +4,8 @@ import { AuthContext} from "./../store/context";
 import { apiClient } from "./../client/apiClient";
 import { ListBookingUser } from "../components/booking/userPrenotation/list.user.penotation";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
+import type { PromotionAccountResDto } from "~/client/model/response/promotion.account.res.dto";
+import { PromotionPoints } from "~/components/promotion/promotion.points";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -17,6 +19,8 @@ export default function UserProfile() {
     const [bookings, setBookings] = useState<BookingQuickResDto[] | null>([]);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [isLoadingBookings, setIsLoadingBookings] = useState<boolean>(true);
+    const [promotions, setPromotions] = useState<PromotionAccountResDto[] | null>(null);
+    const [isLoadingPromotions, setIsLoadingPromotions] = useState<boolean>(true);
 
     useEffect(() => {
         async function fetchUserBookings() {
@@ -39,6 +43,19 @@ export default function UserProfile() {
         if (auth.auth) {
         fetchUserBookings();
         }
+    }, [auth.auth]);
+
+    useEffect(() => {
+        if (!auth.auth) return;
+
+        setIsLoadingPromotions(true);
+        apiClient.getUserPromotions()
+            .then(res => {
+                if (!res.IsSuccess) throw new Error(res.Error?.message ?? "Promozioni non caricate");
+                setPromotions(res.Data ?? []);
+            })
+            .catch(error => console.error("Errore durante il recupero delle promozioni:", error))
+            .finally(() => setIsLoadingPromotions(false));
     }, [auth.auth]);
 
 
@@ -69,6 +86,9 @@ export default function UserProfile() {
             </div>
           </div>
         </section>
+
+        {/* SEZIONE PROMOZIONI */}
+        <PromotionPoints accounts={promotions} isLoading={isLoadingPromotions} />
 
         {/* SEZIONE PRENOTAZIONI */}
 

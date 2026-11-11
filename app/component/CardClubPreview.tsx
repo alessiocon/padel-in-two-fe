@@ -1,5 +1,6 @@
 import { Link } from "react-router";
-import { MapPin, CalendarClock, Timer, DoorClosed, DoorOpen, Gift } from "lucide-react";
+import { MapPin, CalendarClock, Timer, DoorClosed, DoorOpen } from "lucide-react";
+import { PromotionBadges } from "~/components/budge/promotion.badges";
 import { Button, buttonVariants } from "~/components/ui/button";
 import {
   Card,
@@ -76,12 +77,11 @@ export function CardClubPreview({ club }: CardClubPreviewProps) {
         </Link>
       </CardFooter>
 
-      <CardDescription className="bg-primary/10  p-2.5 flex items-start gap-2 px-1">
-          <Gift className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-          <p className="text-xs text-muted-foreground leading-tight">
-            Prenotando da qui, <strong className="text-primary">in omaggio</strong> il noleggio delle <strong className="text-primary">pale</strong> per tutti i giocatori.
-          </p>
-      </CardDescription>
+      {club.promotions?.length > 0 && (
+        <div className="bg-primary/10 p-2.5">
+          <PromotionBadges promotions={club.promotions} />
+        </div>
+      )}
     </Card>
     
   );

@@ -1,4 +1,5 @@
 import type { BookingStatus } from "../common/Enum/booking.status.dto";
+import type { PromotionType } from "../common/Enum/promotion.type";
 
 export class BookingQuickResDto{
     id: string;
@@ -16,6 +17,9 @@ export class BookingQuickResDto{
     description: string;
     startsAt: string;
     endsAt: string;
+    price: number;
+
+    eligiblePromotions: PromotionType[];
     
     createdAt: Date;
 }

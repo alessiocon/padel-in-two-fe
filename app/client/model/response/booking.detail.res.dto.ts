@@ -1,7 +1,9 @@
 import type { BookingCancBy } from "../common/Enum/booking.cancby";
 import type { BookingStatus } from "../common/Enum/booking.status.dto";
+import type { PromotionType } from "../common/Enum/promotion.type";
 import type { BookingLogResDto } from "./booking.log.res.dto";
 import type { BookingTeamResDto } from "./booking.team.res.dto";
+
 
 export class BookingDetailResDto{
     id: string;
@@ -18,6 +20,7 @@ export class BookingDetailResDto{
     description: string;
     startsAt: string;
     endsAt: string;
+    price: number;
     isIndoor: boolean;
 
     createdBy: {
@@ -34,6 +37,8 @@ export class BookingDetailResDto{
     cancAt: Date | null;
     cancPostConfirm: boolean | null;
     cancReason: string | null;
+
+    eligiblePromotions: PromotionType[];
 
     createdAt: Date;
 }

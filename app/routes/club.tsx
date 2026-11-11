@@ -5,6 +5,7 @@ import { useParams } from "react-router";
 import type { ClubResDto } from "../client/model/response/ClubResDto";
 import { apiClient } from "../client/apiClient";
 import { CardClubInfo } from "../components/club/card.club.info";
+import { PriceList } from "../components/club/price.list";
 import { BookingPrenotation } from "../components/booking/prenotation/booking.prenotation";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 
@@ -47,6 +48,7 @@ export default function ClubDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <aside className="lg:col-span-1 space-y-6">
           <CardClubInfo club={club} isClubManagerPage={false}/>
+          <PriceList club={club} />
         </aside>
         
         <BookingPrenotation 

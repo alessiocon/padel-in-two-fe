@@ -1,9 +1,10 @@
 import React from "react";
 import { Link } from "react-router";
-import { DoorOpen, DoorClosed, Timer, UserRoundCheck, Info} from "lucide-react";
+import { Euro, Timer, UserRoundCheck, Info} from "lucide-react";
 import { dateHelper } from "../../../helper/dateHelper";
 import { buttonVariants } from "../../ui/button";
 import { BookingStatusBadge } from "../../budge/booking.status.badge";
+import { PromotionBadges } from "../../budge/promotion.badges";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 interface CardUserPrenotationProps {
     bookingState: [BookingQuickResDto, React.Dispatch<React.SetStateAction<BookingQuickResDto[] | null>>];
@@ -18,8 +19,9 @@ export const CardUserPrenotation: React.FC<CardUserPrenotationProps> = ({
     return (
         <div className="flex flex-col p-2 bg-card border border-border/60 shadow-md gap-5 transition-colors">
             <div className="flex flex-col gap-1.5">
-                <div className="text-right">
-                    <BookingStatusBadge status={booking.status} />
+                <div className="flex items-center justify-between gap-2">
+                    <PromotionBadges promotions={booking.eligiblePromotions} />
+                    <BookingStatusBadge status={booking.status} className="ml-auto" />
                 </div>
                 <h3 className="font-bold text-sx mb-0.5 ">
                         {booking.clubName || "Campo da Padel"}
@@ -29,7 +31,10 @@ export const CardUserPrenotation: React.FC<CardUserPrenotationProps> = ({
                         {dateHelper.formatDate(booking.startsAt)} 
                     </span>
                     <span className="flex gap-1 text-xs font-semibold px-1 py-0.5 bg-primary/10 text-primary border border-primary/20 text-sm font-semibold text-foreground">
-                        <Timer className="h-4 w-4 text-primary" /> {dateHelper.formatTime(booking.startsAt)} - {dateHelper.formatTime(booking.endsAt)}
+                        <Timer className="h-3 w-3 text-primary" /> {dateHelper.formatTime(booking.startsAt)} - {dateHelper.formatTime(booking.endsAt)}
+                    </span>
+                    <span className="flex gap-1 text-xs font-semibold px-1 py-0.5 bg-primary/10 text-primary border border-primary/20 text-sm font-semibold text-foreground">
+                        {booking.price ? `€ ${booking.price.toFixed(2)}` : "N/A"}
                     </span>
                 </div>
 

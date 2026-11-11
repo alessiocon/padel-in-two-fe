@@ -1,4 +1,5 @@
 import type { ClubStatusDto } from "../common/Enum/ClubStatusDto";
+import type { PromotionType } from "../common/Enum/promotion.type";
 
 export class ClubsResDto {
   id: string;
@@ -24,4 +25,6 @@ export class ClubsResDto {
   courtsOutDoor: number;
 
   averagePrice: number;
+
+  promotions: PromotionType[];
 }

@@ -21,6 +21,7 @@ import { SendPrenotationByClub } from "~/components/booking/send.prenotation.by.
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 import { TableNotification } from "~/components/booking/table.notification";
 import type { BookingDetailResDto } from "~/client/model/response/booking.detail.res.dto";
+import { PriceList } from "~/components/club/price.list";
 
 
 export function meta({}: Route.MetaArgs) {
@@ -172,6 +173,7 @@ export default function ClubManagerPage() {
           </Button>
           <aside className="lg:col-span-1 space-y-6">
             <CardClubInfo club={club} isClubManagerPage={true}/>
+            <PriceList club={club} />
           </aside>
         
         <TableNotification

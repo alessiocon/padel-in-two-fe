@@ -6,6 +6,7 @@ import { AuthContext } from "~/store/context";
 import { useContext } from "react";
 import { Link } from "react-router";
 import { buttonVariants } from "../ui/button";
+import { PromotionBadges } from "../budge/promotion.badges";
 
 
 
@@ -50,7 +51,15 @@ export function CardClubInfo({club, isClubManagerPage} :  {club :ClubResDto | nu
   let isMemberOfAClub : boolean = Boolean(club.members.find(m => m.userId === auth?.sub));
   return (
     <Card className="bg-card border-primary/20 overflow-hidden">
+
       <CardContent className="space-y-4 text-sm pt-6">
+
+        {club.promotions?.length > 0 && (
+          <div className="bg-primary/10 p-2.5 justify-center flex">
+            <PromotionBadges promotions={club.promotions} />
+          </div>
+        )}
+
         {isMemberOfAClub &&  !isClubManagerPage  && <>
         <Link to={`/clubs/${club.id}/manage`} 
           className={`${buttonVariants({ variant: "default", size: "sm" })} w-full md:w-auto max-w-[150px] text-center whitespace-nowrap`}>
@@ -88,16 +97,7 @@ export function CardClubInfo({club, isClubManagerPage} :  {club :ClubResDto | nu
         </div>
       </CardContent>
 
-      {/* BANNER PROMO NELLA SIDEBAR */}
-      <div className="bg-primary/10 p-3.5 flex items-start gap-2.5 border-t border-primary/20">
-        <Gift className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-        <p className="text-xs text-muted-foreground leading-snug">
-          Prenotando da qui,{" "}
-          <strong className="text-primary font-semibold">in omaggio</strong> il{" "}
-          noleggio delle <strong className="text-primary font-semibold">pale</strong>{" "}
-          per tutti i partecipanti.
-        </p>
-      </div>
+
     </Card>
   );
 }

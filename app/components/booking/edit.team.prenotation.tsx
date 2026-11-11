@@ -14,6 +14,8 @@ import { ManageTeamPlayer } from "./menage.team.player";
 import { Input } from "../ui/input";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 import { ManageTeamPlayerPrenotation } from "./menage.team.player.prenotation";
+import type { PricingRuleResDto } from "~/client/model/response/Pricing.rule.res.dto";
+import { resolveCourtPrice } from "~/lib/pricing";
 
 export interface IEditTeamPrenotationProps {
     clubId: string | null;
@@ -22,6 +24,7 @@ export interface IEditTeamPrenotationProps {
     bookingsState: [BookingQuickResDto[] | null, React.Dispatch<React.SetStateAction<BookingQuickResDto[] | null>>];
     selectedCourtState: [ClubCourtDto | null, React.Dispatch<React.SetStateAction<ClubCourtDto | null>>];
     isLoadingBookingsState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+    pricingRules?: PricingRuleResDto[];
     onCancel: () => void;
 }
 
@@ -32,6 +35,7 @@ export function EditTeamPrenotation({
     bookingsState,
     isLoadingBookingsState,
     selectedCourtState,
+    pricingRules,
     onCancel
 }: IEditTeamPrenotationProps) {
     const [auth] = useContext(AuthContext);
@@ -221,6 +225,8 @@ export function EditTeamPrenotation({
 
     if (!selectedSlot || !selectedCourt) return null;
 
+    const pricing = resolveCourtPrice(selectedCourt, pricingRules, selectedDate, selectedSlot);
+
     return (
         <div className="p-2 pt-3">
             <div className="mb-4 text-right">
@@ -239,8 +245,13 @@ export function EditTeamPrenotation({
                 </div>
                 <div className="flex items-start gap-4">
                     <div className="text-left sm:text-right">
-                        <p className="text-xs text-muted-foreground">Prezzo</p>
-                        <p className="text-2xl font-extrabold text-primary">€ {selectedCourt.price?.toFixed(2)}</p>
+                        <p className="text-xs text-muted-foreground">
+                            {pricing.appliedRule ? `Prezzo (${pricing.appliedRule.name})` : "Prezzo"}
+                        </p>
+                        {pricing.appliedRule && pricing.finalPrice !== pricing.basePrice && (
+                            <p className="text-sm text-muted-foreground line-through">€ {pricing.basePrice.toFixed(2)}</p>
+                        )}
+                        <p className="text-2xl font-extrabold text-primary">€ {pricing.finalPrice.toFixed(2)}</p>
                     </div>
                 </div>
             </div>
@@ -291,7 +302,7 @@ export function EditTeamPrenotation({
                             variant="outline"
                             className="w-full sm:w-auto font-bold px-8"
                         >
-                            Effettua l'accesso per prenotare
+                            {(auth?.auth && !auth.playerId) ? "Accedi con un profilo giocatore" : "Effettua l'accesso per prenotare"}
                         </Button>
                     </a>
                 )}

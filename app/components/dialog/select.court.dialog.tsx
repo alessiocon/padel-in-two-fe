@@ -5,6 +5,9 @@ import { ButtonCourtSelection } from "../../component/ButtonCourtSelection";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 
 
+import type { PricingRuleResDto } from "~/client/model/response/Pricing.rule.res.dto";
+import { resolveCourtPrice } from "~/lib/pricing";
+
 export type CourtWithStatusDto = ClubCourtDto & { isOccupied: boolean; };
 
 export interface ICourtSelectionDialogProps {
@@ -13,9 +16,10 @@ export interface ICourtSelectionDialogProps {
   courts: CourtWithStatusDto[];
   bookings: BookingQuickResDto[];
   onSelectCourt: (court: ClubCourtDto) => void;
+  pricingRules?: PricingRuleResDto[];
 }
 
-export default function SelectCourtDialog({slotState, selectedDate, courts, bookings, onSelectCourt, openState} : ICourtSelectionDialogProps 
+export default function SelectCourtDialog({slotState, selectedDate, courts, bookings, onSelectCourt, pricingRules, openState}  : ICourtSelectionDialogProps
     & {  openState: [boolean, React.Dispatch<React.SetStateAction<boolean>>]}) {
     const [open, setOpen] = openState;
     const [slot, setSlot] = slotState;
@@ -39,9 +43,10 @@ export default function SelectCourtDialog({slotState, selectedDate, courts, book
             {courtsCheck.map((court) => {
                 return (
                 <ButtonCourtSelection key={court.name} court={court} 
+                    pricing={resolveCourtPrice(court, pricingRules, selectedDate, slot)}                    
                     onSelect={() => {onSelectCourt(court), setSlot(slot)}} 
-                    onClose={() => setOpen(false)}/>
-                );
+                    onClose={() => setOpen(false)}
+                />);
             })}
         </div>
       </DialogContent>

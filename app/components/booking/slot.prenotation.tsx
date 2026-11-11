@@ -7,6 +7,7 @@ import type { ClubCourtDto } from "../../client/model/common/ClubCourtDto";
 import SelectCourtDialog, { type CourtWithStatusDto, type ICourtSelectionDialogProps } from "../dialog/select.court.dialog";
 import { useState } from "react";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
+import { PromotionBadges } from "../budge/promotion.badges";
 
 export interface ISlotPrenotationProps {
     club: ClubResDto | null,
@@ -52,6 +53,7 @@ export function SlotPrenotation({
             selectedDate,
             courts:courtModels,
             bookings: bookings,
+            pricingRules: club?.priceRoles,
             onSelectCourt: (court) => {
             setSelectedCourt(court);
         }})
@@ -90,16 +92,7 @@ export function SlotPrenotation({
 
     return (<>
         <div>
-            <Card className="bg-card border-primary/20">
-                {/* BANNER PROMO PRINCIPALE */}
-                <div className="p-3.5  bg-primary/10 border border-primary/30 flex items-center gap-3">
-                <div className="p-2 bg-primary text-primary-foreground  shrink-0">
-                    <Gift className="h-5 w-5" />
-                </div>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                        Prenotando su <strong className="text-foreground">PadelInTwo</strong>,per ricevere il noleggio delle pale <strong className="text-primary font-semibold">in omaggio</strong> per tutti i partecipanti!
-                    </p>
-                </div>
+            <Card className="bg-card border-primary/20">    
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <CardTitle className="text-xl flex items-center gap-2">
@@ -158,6 +151,7 @@ export function SlotPrenotation({
                 courts={selectCourtDialogProps.courts}
                 bookings={selectCourtDialogProps.bookings}
                 onSelectCourt={selectCourtDialogProps.onSelectCourt}
+                pricingRules={selectCourtDialogProps.pricingRules}
                 openState={[openSelectCourtDialog, setOpenSelectCourtDialog]}
                 selectedDate={selectCourtDialogProps.selectedDate}
             />}

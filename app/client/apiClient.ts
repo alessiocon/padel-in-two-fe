@@ -26,6 +26,7 @@ import type { BookingMatchResDto } from "./model/response/booking.match.res.dto"
 import type { BookingResultProposeDto } from "./model/request/booking.result.dto";
 import type { BookingIsAcceptedMatchProposeDto } from "./model/request/booking.accepted.match.propose.dto";
 import type { BookingRemoveMatchProposeDto } from "./model/request/match.propose.remove.dto";
+import type { PromotionAccountResDto } from "./model/response/promotion.account.res.dto";
 
 export class apiClient {
   private static getApiBaseUrl(): string {
@@ -280,6 +281,12 @@ private static async request<T = void>(
 
   static async searchList(input: UserSearchListReqDto ) : Promise<IApiResponse<UserSearchListResDto[]>>{
     return this.request<UserSearchListResDto[]>(`/users/list/?username=${encodeURIComponent(input.username ?? "") }`, {
+      method: "GET",
+    });
+  }
+
+  static async getUserPromotions(): Promise<IApiResponse<PromotionAccountResDto[]>> {
+    return this.request<PromotionAccountResDto[]>(`users/me/promotions`, {
       method: "GET",
     });
   }

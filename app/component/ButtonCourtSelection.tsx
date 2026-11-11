@@ -2,13 +2,17 @@ import { DoorClosed, DoorOpen } from "lucide-react";
 import type { FC } from "react";
 import type { ClubCourtDto } from "~/client/model/common/ClubCourtDto";
 import { Badge } from "~/components/ui/badge";
+import type { PriceResolution } from "~/lib/pricing";
 import type { CourtWithStatusDto } from "../components/dialog/select.court.dialog";
 
 export const ButtonCourtSelection: FC<{
   court: CourtWithStatusDto;
   onSelect: (court: ClubCourtDto) => void;
   onClose: () => void;
-}> = ({ court, onSelect, onClose }) => {
+  pricing?: PriceResolution;
+}> = ({ court, onSelect, onClose, pricing }) => {
+  const finalPrice = pricing?.finalPrice ?? court.price;
+  const hasDiscountOrSurcharge = Boolean(pricing?.appliedRule) && pricing?.finalPrice !== pricing?.basePrice;
   
   return (
     <button
@@ -40,7 +44,12 @@ export const ButtonCourtSelection: FC<{
       {/* Sezione inferiore: Prezzo e Badge */}
       <div className="flex flex-col md:flex-row items-center justify-between pt-1.5 border-t border-border text-[11px] md:text-[12px] w-full gap-1">
         <span className="font-extrabold truncate">
-          € {court.price?.toFixed(2)}
+          {hasDiscountOrSurcharge && (
+            <span className="mr-1 font-normal text-muted-foreground line-through">
+              € {pricing?.basePrice.toFixed(2)}
+            </span>
+          )}
+          € {finalPrice?.toFixed(2)}
         </span>
 
         {court.isOccupied ? (
