@@ -92,33 +92,33 @@ export function SlotPrenotation({
 
     return (<>
         <div>
-            <Card className="bg-card border-primary/20">    
-                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <CardTitle className="text-xl flex items-center gap-2">
-                    <CalendarIcon className="h-5 w-5 text-primary" /> 
-                    Seleziona Data e ora
-                    </CardTitle>
-                    <CardDescription>
-                    Clicca sull'orario desiderato per scegliere il campo
-                    </CardDescription>
-                </div>
+            <Card className="border-primary/20">    
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-2">
+                    <div>
+                        <CardTitle className="text-xl flex items-center gap-2">
+                        <CalendarIcon className="h-5 w-5 text-primary" /> 
+                        Seleziona Data e ora
+                        </CardTitle>
+                        <CardDescription>
+                        Clicca sull'orario desiderato per scegliere il campo
+                        </CardDescription>
+                    </div>
 
-                <div className="relative flex items-center">
-                    <input
-                    type="date"
-                    id="date"
-                    value={selectedDate}
-                    min={todayStr}
-                    max={maxDateStr}
-                    onChange={(e) => {
-                        setSelectedDate(e.target.value);
-                        setSelectedSlot(null);
-                        setSelectedCourt(null);
-                    }}
-                    className="w-full sm:w-auto bg-background border-input text-foreground dark:scheme-dark rounded-lg border-2 px-4 py-2.5 text-base font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:border-primary/50 cursor-pointer"
-                    />
-                </div>
+                    <div className="relative flex items-center">
+                        <input
+                            type="date"
+                            id="date"
+                            value={selectedDate}
+                            min={todayStr}
+                            max={maxDateStr}
+                            onChange={(e) => {
+                                setSelectedDate(e.target.value);
+                                setSelectedSlot(null);
+                                setSelectedCourt(null);
+                            }}
+                            className="w-full sm:w-auto bg-background border-input text-foreground dark:scheme-dark rounded-lg border-2 px-4 py-2.5 text-base font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:border-primary/50 cursor-pointer"
+                        />
+                    </div>
                 </CardHeader>
 
                 <CardContent className="space-y-6">

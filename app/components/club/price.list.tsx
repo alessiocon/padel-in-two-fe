@@ -14,13 +14,13 @@ export function PriceList({ club }: { club: ClubResDto | null }) {
   if (rules.length === 0) return null;
 
   return (
-    <Card className="bg-card border-primary/20 overflow-hidden">
-      <CardHeader className="pb-2 px-2">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Tag className="h-4 w-4 text-primary" /> Listino prezzi
+    <Card className="bg-card border-primary/20 overflow-hidden gap-3">
+      <CardHeader className="px-2">
+        <CardTitle className="text-base">
+          <Tag className="h-4 w-4 text-primary inline mr-1" /> Listino prezzi
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 text-sm px-2">
+      <CardContent className="space-y-3 text-sm px-2 max-h-45 overflow-y-auto">
         {rules.map((rule) => (
           <PriceRuleItem key={rule.id} rule={rule} courts={club.courts} />
         ))}

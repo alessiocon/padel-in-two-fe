@@ -66,25 +66,23 @@ export default function UserProfile() {
         {/* INFORMAZIONI UTENTE */}
         <section className="bg-card text-card-foreground border border-border p-6 rounded-xl shadow-sm">
           <h1 className="text-xl font-bold mb-4 border-b border-border pb-2">
-            Profilo Utente
+            {auth.firstName || "Nome"} {auth.lastName || "Cognome"}
           </h1>
 
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2 text-lg font-semibold">
-              <span>{auth.firstName || "Nome"}</span>
-              <span>{auth.lastName || "Cognome"}</span>
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+                <div className="text-sm text-muted-foreground flex items-center gap-1">
+                  <span className="font-medium text-foreground">Username:</span>
+                  <span>@{auth.username || "username"}</span>
+                </div>
 
-            <div className="text-sm text-muted-foreground flex items-center gap-1">
-              <span className="font-medium text-foreground">Username:</span>
-              <span>@{auth.username || "username"}</span>
-            </div>
-
-            <div className="text-sm text-muted-foreground flex items-center gap-1">
-              <span className="font-medium text-foreground">Email:</span>
-              <span>{auth.email || "email@esempio.com"}</span>
-            </div>
+                <div className="text-sm text-muted-foreground flex items-center gap-1">
+                  <span className="font-medium text-foreground">Email:</span>
+                  <span>{auth.email || "email@esempio.com"}</span>
+                </div>
+              </div>
           </div>
+            
         </section>
 
         {/* SEZIONE PROMOZIONI */}

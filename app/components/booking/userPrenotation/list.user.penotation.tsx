@@ -59,7 +59,7 @@ export function ListBookingUser({
 
     return (<>
         <section
-            className="relative bg-card text-card-foreground border border-border p-2 rounded-xl shadow-sm"
+            className="relative text-card-foreground border border-border p-2 rounded-xl shadow-sm"
             aria-busy={isRefreshing}
             onClickCapture={(event) => {
                 if (isRefreshing) {

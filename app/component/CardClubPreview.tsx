@@ -1,7 +1,7 @@
 import { Link } from "react-router";
-import { MapPin, CalendarClock, Timer, DoorClosed, DoorOpen } from "lucide-react";
+import { CalendarClock, Timer, DoorClosed, DoorOpen, Ban, MoveRight } from "lucide-react";
 import { PromotionBadges } from "~/components/budge/promotion.badges";
-import { Button, buttonVariants } from "~/components/ui/button";
+import { buttonVariants } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -20,46 +20,38 @@ export function CardClubPreview({ club }: CardClubPreviewProps) {
 
   return (
     <Card className="w-[350px] bg-card border-primary/20 py-5 gap-4">
+      
       <CardHeader>
+        {club.promotions?.length > 0 ? (
+            <PromotionBadges promotions={club.promotions} />
+        ) : <p className="inline-flex border border-primary/20 bg-primary/10 p-1 text-primary-foreground transition-colors hover:bg-primary/20"> <Ban className="h-4 w-4 text-primary-foreground inline-block mr-2 mt-0.5" />Promozioni non disponibili</p>}
         <CardTitle className="text-primary">{club.name}</CardTitle>
-        <CardDescription className="flex items-center gap-2 text-xs pt-1">
-          <span className="flex items-top gap-1 font-medium text-muted-foreground">
-            <MapPin className="h-3.5 w-3.5 text-primary" />
-            {club.position}
-          </span>
-        </CardDescription>
+        {club.position}
       </CardHeader>
 
       <CardContent className="space-y-2">
-        <CardDescription className="flex items-center gap-2 text-xm">
-          <span className="flex items-center gap-1 font-medium">
-            <CalendarClock className="h-3.5 w-3.5 text-primary" />
-            {club.openingTime} - {club.closingTime}
-          </span>
-          /
-          <span className="flex items-center gap-1 font-medium">
-            <Timer className="h-3.5 w-3.5 text-primary" /> {club.slotDurationMinutes}m
-          </span>
+        <CardDescription className="flex items-center gap-2 text-sm">
+          <CalendarClock className="h-4 w-4 text-primary inline" /> {club.openingTime} - {club.closingTime}
+          <Timer className="h-4 w-4 text-primary inline" /> {club.slotDurationMinutes}m
         </CardDescription>
-
-        <CardDescription className="flex items-center gap-2 text-xm">
-          <span className="font-medium text-muted-foreground pt-1">Campi:</span>
+        <CardDescription className="flex items-center gap-2 text-sm">
+         
           {club.courtsInDoor > 0 && (
             <span className="flex items-center gap-1 font-medium">
-              <DoorClosed className="h-3.5 w-3.5 text-primary" />
+              <DoorClosed className="h-4 w-4 text-primary" />
               {club.courtsInDoor}
             </span>
           )}
           {club.courtsOutDoor > 0 && (
             <span className="flex items-center gap-1 font-medium">
-              <DoorOpen className="h-3.5 w-3.5 text-primary" />
+              <DoorOpen className="h-4 w-4 text-primary" />
               {club.courtsOutDoor}
             </span>
           )}
         </CardDescription>
       </CardContent>
 
-      <CardFooter className="flex justify-between items-center gap-2">
+      <CardFooter className="flex justify-start items-center gap-4">
         <div className="flex flex-col">
           <span className="text-xs text-muted-foreground">Campo</span>
           <span className="font-bold text-base">€ {club.averagePrice}</span>
@@ -68,20 +60,13 @@ export function CardClubPreview({ club }: CardClubPreviewProps) {
         <div className="flex flex-col">
           <span className="text-xs text-muted-foreground">Pala</span>
           <span className="font-bold text-base">€ {club.racketPrice}</span>
-        </div>
-
-        <Link to={`/clubs/${club.id}`}
-          className={`${buttonVariants({ variant: "default", size: "sm" })} w-full md:w-auto max-w-[150px] text-center whitespace-nowrap`}
-        >
-          Prenota Ora
-        </Link>
+        </div>        
       </CardFooter>
-
-      {club.promotions?.length > 0 && (
-        <div className="bg-primary/10 p-2.5">
-          <PromotionBadges promotions={club.promotions} />
-        </div>
-      )}
+      <Link to={`/clubs/${club.id}`}
+        className={`${buttonVariants({ variant: "default", size: "sm" })} w-full md:w-auto max-w-[125px] text-center whitespace-nowrap ml-auto mr-5`}
+      >
+        Prenota Ora
+      </Link>
     </Card>
     
   );

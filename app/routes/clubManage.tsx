@@ -172,7 +172,7 @@ export default function ClubManagerPage() {
               )}
           </Button>
           <aside className="lg:col-span-1 space-y-6">
-            <CardClubInfo club={club} isClubManagerPage={true}/>
+            <CardClubInfo club={club}/>
             <PriceList club={club} />
           </aside>
         

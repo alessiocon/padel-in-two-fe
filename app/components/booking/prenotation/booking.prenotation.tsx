@@ -72,7 +72,7 @@ export function BookingPrenotation({ club, bookingsState, isLoadingBookingsState
     }, [club, selectedDate]);
 
     return (
-        <div ref={prenotationRef} className="lg:col-span-3 space-y-6 bg-card border-primary/20">
+        <div ref={prenotationRef} className="lg:col-span-3 space-y-6 border-primary/20">
             {selectedCourt && selectedSlot ? (
                 <EditTeamPrenotation
                     selectedCourtState={[selectedCourt, setSelectedCourt]}

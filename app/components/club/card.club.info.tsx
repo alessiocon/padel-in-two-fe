@@ -1,18 +1,13 @@
-import { Clock, CircleDollarSign, Gift } from "lucide-react";
+import { Clock, CircleDollarSign, Ban } from "lucide-react";
 import type { ClubResDto } from "../../client/model/response/ClubResDto";
 import { Card, CardContent } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
-import { AuthContext } from "~/store/context";
-import { useContext } from "react";
-import { Link } from "react-router";
-import { buttonVariants } from "../ui/button";
 import { PromotionBadges } from "../budge/promotion.badges";
 
 
 
 
-export function CardClubInfo({club, isClubManagerPage} :  {club :ClubResDto | null, isClubManagerPage: boolean}) {
-  const [auth, setAuth] = useContext(AuthContext);
+export function CardClubInfo({club} :  {club :ClubResDto | null}) {
 
   if (!club) {
     return (
@@ -48,27 +43,18 @@ export function CardClubInfo({club, isClubManagerPage} :  {club :ClubResDto | nu
     );
   }
 
-  let isMemberOfAClub : boolean = Boolean(club.members.find(m => m.userId === auth?.sub));
+
   return (
     <Card className="bg-card border-primary/20 overflow-hidden">
+      <CardContent className="space-y-4 text-sm pt-0 px-2">
 
-      <CardContent className="space-y-4 text-sm pt-6">
-
-        {club.promotions?.length > 0 && (
-          <div className="bg-primary/10 p-2.5 justify-center flex">
+        {club.promotions?.length > 0 ? (
             <PromotionBadges promotions={club.promotions} />
-          </div>
-        )}
-
-        {isMemberOfAClub &&  !isClubManagerPage  && <>
-        <Link to={`/clubs/${club.id}/manage`} 
-          className={`${buttonVariants({ variant: "default", size: "sm" })} w-full md:w-auto max-w-[150px] text-center whitespace-nowrap`}>
-          gestisci il club
-        </Link>
-        </>}
+        ) : <p className="inline-flex border border-primary/20 bg-primary/10 p-1 text-primary-foreground transition-colors hover:bg-primary/20"> <Ban className="h-4 w-4 text-primary-foreground inline-block mr-2 mt-0.5" />Promozioni non disponibili</p>}
+        
         <div className="flex justify-between items-center border-b border-border/50 pb-2">
-          <span className="text-muted-foreground flex items-center gap-1.5">
-            <Clock className="h-4 w-4 text-primary" /> Orario
+          <span className="text-muted-foreground">
+            <Clock className="h-4 w-4 inline mr-1 mb-0.5" /> Orario
           </span>
           <span className="font-semibold">
             {club.openingTime} - {club.closingTime}
@@ -76,22 +62,22 @@ export function CardClubInfo({club, isClubManagerPage} :  {club :ClubResDto | nu
         </div>
 
         <div className="flex justify-between items-center border-b border-border/50 pb-2">
-          <span className="text-muted-foreground flex items-center gap-1.5">
-            <Clock className="h-4 w-4 text-primary" /> Durata Slot
+          <span className="text-muted-foreground">
+            <Clock className="h-4 w-4 inline mr-1 mb-0.5" /> Durata Slot
           </span>
           <span className="font-semibold">{club.slotDurationMinutes} min</span>
         </div>
 
         <div className="flex justify-between items-center border-b border-border/50 pb-2">
-          <span className="text-muted-foreground flex items-center gap-1.5">
-            <CircleDollarSign className="h-4 w-4 text-primary" /> Prezzo Medio
+          <span className="text-muted-foreground">
+            <CircleDollarSign className="h-4 w-4 inline mr-1 mb-0.5" /> Prezzo Medio
           </span>
-          <span className="font-bold text-primary">€ {club.averagePrice}</span>
+          <span className="font-bold">€ {club.averagePrice}</span>
         </div>
 
         <div className="flex justify-between items-center">
-          <span className="text-muted-foreground flex items-center gap-1.5">
-            <CircleDollarSign className="h-4 w-4 text-primary" /> Noleggio Pala
+          <span className="text-muted-foreground">
+            <CircleDollarSign className="h-4 w-4 inline mr-1 mb-0.5" /> Noleggio Pala
           </span>
           <span className="font-bold">€ {club.racketPrice.toFixed(2)}</span>
         </div>
