@@ -33,10 +33,17 @@ export const CardUserPrenotationDetail: React.FC<CardUserPrenotationDetailProps>
       .filter(player => player.status === BookingPlayerStatus.ACCEPTED).length;
     
       return (
-        <div className="flex flex-col p-2 bg-card border border-border/60 shadow-md gap-5 transition-colors">
+        <div className="flex flex-col p-2  gap-5 transition-colors">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border/40">
                 <div className="flex flex-col gap-1.5 w-full">
-
+                    {booking.cancAt && booking.cancReason && (
+                        <div className="bg-destructive/10 text-destructive border border-destructive/20 px-2 py-1">
+                            <p className="font-semibold">Motivo della cancellazione</p>
+                            <p className="text-sm ">
+                                {booking.cancReason}
+                            </p>
+                        </div>
+                    )}
                     <div className="flex items-center justify-between gap-2">
                         <PromotionBadges promotions={booking.eligiblePromotions} />
                         <BookingStatusBadge status={booking.status} className="ml-auto" />

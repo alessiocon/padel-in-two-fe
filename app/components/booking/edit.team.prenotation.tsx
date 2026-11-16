@@ -211,7 +211,7 @@ export function EditTeamPrenotation({
                 return;
             }
             const createdBooking = res.Data;
-
+            navigation.navigate("/user")
             setBookings((prev) => [...(prev ?? []), createdBooking]);
             setSelectedSlot(null);
             window.alert("Campo prenotato correttamente!");
@@ -228,7 +228,7 @@ export function EditTeamPrenotation({
     const pricing = resolveCourtPrice(selectedCourt, pricingRules, selectedDate, selectedSlot);
 
     return (
-        <div className="p-2 pt-3">
+        <div className="p-2 pt-3 bg-card shadow-sm">
             <div className="mb-4 text-right">
                 <Button type="button" variant="outline" className="bg-destructive/70" onClick={onCancel}>
                     Annulla
@@ -264,7 +264,7 @@ export function EditTeamPrenotation({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {teams.map((team, teamIndex) => (
-                            <div key={teamIndex} className="p-2 rounded-lg bg-muted/30 border border-border/40 space-y-3">
+                            <div key={teamIndex} className="p-2 rounded-lg border-1 border-foreground/20 space-y-3">
                                 <div className="relative">
                                     <span className="absolute left-2.5 top-2.5 text-xs text-muted-foreground">
                                         <Edit3 className="w-3.5 h-3.5" />

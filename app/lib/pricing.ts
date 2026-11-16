@@ -58,7 +58,7 @@ function isTimeInRule(rule: PricingRuleResDto, slot: string): boolean {
   const start = toHourMinute(rule.startTime);
   const end = toHourMinute(rule.endTime);
   if (start === end) return true;
-  return start < end ? time >= start && time < end : time >= start || time < end;
+  return start < end ? time >= start && time <= end : time >= start || time <= end;
 }
 
 /**
@@ -73,7 +73,6 @@ export function findApplicableRule(
 ): PricingRuleResDto | null {
   if (!rules?.length) return null;
   const weekday = new Date(`${date}T00:00:00`).getDay();
-
   return (
     rules
       .filter(

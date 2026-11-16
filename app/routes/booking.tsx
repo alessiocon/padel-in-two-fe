@@ -91,7 +91,7 @@ export default function BookingPage() {
 	};
 
 	return (
-		<main className="min-h-screen bg-background p-4 text-foreground md:p-8">
+		<main className="min-h-screen  p-4 text-foreground md:p-8">
 			<div className="mx-auto w-full max-w-4xl">
 				{isLoading ? (
 					<div className="flex items-center justify-center gap-2 py-16 text-muted-foreground" role="status">

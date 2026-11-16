@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Button, buttonVariants } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
-
+import padelHero from "./../src/padel-hero.png"
 
 export default function HomePage() {
   return (<>
@@ -21,7 +21,7 @@ export default function HomePage() {
         {/* Immagine di sfondo */}
             <div className="absolute inset-0">
                 <img
-                    src="app/src/padel-hero.png"
+                    src={padelHero}
                     alt="Padel"
                     className="h-full w-full object-cover opacity-75"
                 />
@@ -55,8 +55,7 @@ export default function HomePage() {
                     La piattaforma che ti permette di <span className="bg-secondary text-white font-bold">prenotare campi da padel</span>,
                     scoprire club e usufruire di <span className="bg-secondary text-white font-bold">vantaggi esclusivi</span>.
                     <br/>
-                    Gioca dove preferisci, accumula benefici e approfitta delle
-                    <span className="bg-secondary text-white font-bold">promozioni</span> disponibili nei club aderenti.
+                    Gioca dove preferisci, accumula benefici e approfitta delle <span className="bg-secondary text-white font-bold">promozioni</span> disponibili nei club aderenti.
                 </p>
             </section>
 
@@ -131,8 +130,7 @@ export default function HomePage() {
 
                 <p className="mx-auto text-md mt-4 max-w-2xl text-primary-foreground/80">
                     Prenota la tua prossima partita <br/> e inizia a sfruttare tutti i
-                    vantaggi disponibili su{" "}
-                    Padel<span className="text-secondary">In</span>Two.
+                    vantaggi disponibili su Padel<span className="text-secondary">In</span>Two.
                 </p>
 
                 <div className="block  text-end md:text-center mt-4">

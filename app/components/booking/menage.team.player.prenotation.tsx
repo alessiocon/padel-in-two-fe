@@ -30,7 +30,7 @@ export function ManageTeamPlayerPrenotation({
     };
 
     return (
-        <div className="relative p-3 rounded-md bg-card border border-border/50">
+        <div className="relative p-3 rounded-md bg-background border border-border/50">
             <div className="flex justify-between items-center">
                 <p className="text-xs text-muted-foreground font-medium">
                     Giocatore {index + 1}

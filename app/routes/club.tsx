@@ -8,7 +8,7 @@ import { CardClubInfo } from "../components/club/card.club.info";
 import { PriceList } from "../components/club/price.list";
 import { BookingPrenotation } from "../components/booking/prenotation/booking.prenotation";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
-import { buttonVariants } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 import { AuthContext } from "~/store/context";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
@@ -48,12 +48,15 @@ export default function ClubDetailPage() {
 
   let isMemberOfAClub : boolean = Boolean(club?.members.find(m => m.userId === auth?.sub));
   return (<>
-    <div className="min-h-screen text-foreground px-2 md:px-4 lg:px-8">
+    <div className="min-h-screen text-foreground px-2 md:px-4 lg:px-8 mb-10">
       <div className="grid grid-cols-2 gap-2 my-5">
-          <Link to={`/clubs`} 
-              className={`${buttonVariants({ variant: "secondary", size: "sm" })} w-full md:w-auto max-w-[150px] text-center whitespace-nowrap`}>
+          <Button
+              onClick={() => window.history.back()} 
+              variant="secondary"
+              size="sm"
+              className={`w-full md:w-auto max-w-[150px] text-center whitespace-nowrap`}>
               <ArrowLeft className="inline h-4 w-4" /> Indietro
-          </Link>
+          </Button>
           {club && isMemberOfAClub && <>
             <Link to={`/clubs/${club.id}/manage`} 
               className={`${buttonVariants({ variant: "default", size: "sm" })} w-full md:w-auto max-w-[150px] whitespace-nowrap ml-auto`}>

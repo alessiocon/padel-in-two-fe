@@ -165,7 +165,7 @@ export function BookingMatchSection({
       : ["Squadre non al completo", "Mancano dei giocatori, o non tutti hanno accettato il match"]
 
     return (
-      <Card className="w-full max-w-xl mx-auto bg-card text-card-foreground border shadow-sm">
+      <Card className="w-full max-w-xl mx-auto border shadow-sm">
         <CardHeader>
           <CardTitle className="text-center text-lg font-semibold flex items-center justify-center gap-2">
             <Trophy className="w-5 h-5 text-primary" /> Risultato Match
@@ -208,7 +208,7 @@ export function BookingMatchSection({
 
   if (showProposalForm) {
     return (
-      <Card className="w-full max-w-xl mx-auto bg-card text-card-foreground border shadow-sm">
+      <Card className="w-full max-w-xl mx-auto border shadow-sm">
         <CardHeader className="px-0">
           <CardTitle className="text-center text-xs md:text-lg font-semibold flex items-center justify-center gap-2">
             <Trophy className="w-5 h-5 text-primary" /> 
@@ -266,7 +266,7 @@ export function BookingMatchSection({
 
   // --- RENDER: MATCH ESISTENTE (PENDING / ACCEPTED) ---
   return (
-    <Card className="w-full max-w-xl mx-auto bg-card text-card-foreground border shadow-sm p-2">
+    <Card className="w-full max-w-xl mx-auto p-2 gap-1">
       <CardHeader className="px-2 pb-2">
         <div className="ml-auto mb-2">
           <MatchProposeBadge status={match.status}/>
@@ -280,7 +280,7 @@ export function BookingMatchSection({
       <CardContent className="px-2 space-y-4">
 
         {/* Nomi delle Squadre */}
-        <div className="flex justify-between items-center bg-muted/40 p-3 rounded-md text-sm font-semibold">
+        <div className="flex justify-center gap-4 items-center p-3 rounded-md text-sm font-semibold">
           <span className="text-primary">{match.team1Name || "Team 1"}</span>
           <span className="text-xs text-muted-foreground uppercase tracking-widest">vs</span>
           <span className="text-primary">{match.team2Name || "Team 2"}</span>
@@ -291,7 +291,7 @@ export function BookingMatchSection({
           <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Punteggio Set</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             {match.sets?.map((set, idx) => (
-              <div key={idx} className="p-3 border rounded-md bg-muted/20 text-center">
+              <div key={idx} className="p-3 border rounded-md text-center bg-background">
                 <span className="text-xs text-muted-foreground block mb-1">Set {set.setNumber}</span>
                 <span className="text-lg font-bold">
                   {set.team1Games} - {set.team2Games}

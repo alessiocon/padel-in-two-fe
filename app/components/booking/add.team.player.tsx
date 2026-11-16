@@ -24,7 +24,7 @@ export function AddTeamPlayer({
 }: AddTeamPlayerProps) {
 
     return (
-        <div className="p-2.5 rounded-md bg-card border border-border/50 flex flex-col items-start gap-2">
+        <div className="p-2.5 rounded-md bg-background border border-border/50 flex flex-col items-start gap-2">
             <p className="text-xs text-muted-foreground font-medium whitespace-nowrap">Giocatore {index + 1}</p>
             {!canManage ? null : isAuthenticated ? (
                 <div className="grid w-full grid-cols-3 gap-1">

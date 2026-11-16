@@ -12,11 +12,10 @@ export const GroupedTimeSlot: FC<{
   closing: string,
   durationMinutes: number,
   selectedDateStr: string,
-  selectedSlotStr: string | null,
   courts: ClubCourtDto[];
   isLoadingBookings: boolean;
   onSelect: (time: string, availableCourts: ClubCourtDto[]) => void;
-}> = ({ opening, closing, durationMinutes, selectedDateStr, selectedSlotStr, isLoadingBookings, courts, onSelect }) => {
+}> = ({ opening, closing, durationMinutes, selectedDateStr, isLoadingBookings, courts, onSelect }) => {
     const [slots, setSlots] = useState<TimeSlot[]>([]);
     const [now, setNow] = useState(() => new Date());
 
@@ -67,19 +66,16 @@ export const GroupedTimeSlot: FC<{
     }, [opening, closing, durationMinutes, selectedDateStr, courts, now]);
 
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+        <div className="max-h-[170px] md:max-h-none  overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
             {slots.map(slot => {
-                const isSelected = selectedSlotStr === slot.time ;
                 return <Button
                     key={slot.time}
                     disabled={isLoadingBookings || slot.availableCourts.length === 0}
-                    variant={isSelected ? "default" : "outline"}
-                    className={`h-auto py-2 px-3 flex flex-col items-center justify-center gap-1 w-full overflow-hidden${
-                        isSelected ? "ring-2 ring-primary" : "hover:border-primary"
-                        }`}
+                    variant="outline"
+                    className={`h-auto py-2 px-3 flex flex-col items-center justify-center gap-1 w-full overflow-hidden border-foreground hover:border-primary`}
                     onClick={() => onSelect(slot.time, slot.availableCourts)}
                 >
-                    <span className={`text-base font-bold leading-tight ${isSelected ? "text-primary-foreground" : "text-foreground"}`}>{slot.time}</span>
+                    <span className={`text-base font-bold leading-tight text-foreground`}>{slot.time}</span>
                 </Button>
             })}
         </div>

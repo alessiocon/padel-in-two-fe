@@ -33,7 +33,6 @@ export default function SelectCourtDialog({slotState, selectedDate, courts, book
         court.isOccupied = bookedCourtIdsForSlot.includes(court.id);
         return court
     });
-
     return <Dialog  open={open} onOpenChange={() => {setSlot(null); setOpen(false)}}>
         <DialogContent className="sm:max-w-md">
         <DialogHeader>

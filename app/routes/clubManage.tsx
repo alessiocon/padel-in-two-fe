@@ -107,7 +107,8 @@ export default function ClubManagerPage() {
       let res : IApiResponse<BookingDetailResDto> = {Data: null, Error: null, IsSuccess: false};
 
       if(newStatus === BookingStatus.CANCELLED){
-        res = await apiClient.deleteBooking(bookingId, {isStaff: true});
+        const reason = prompt("indica il motivo di cancellazione");
+        res = await apiClient.deleteBooking(bookingId, {isStaff: true, reason: reason ?? "" });
       }else{
         res = await apiClient.restoreBookigStatus(bookingId, { isStaff: true });
       }

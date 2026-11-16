@@ -92,10 +92,10 @@ export function SlotPrenotation({
 
     return (<>
         <div>
-            <Card className="border-primary/20">    
+            <Card className="border-primary/20 gap-2">    
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-2">
                     <div>
-                        <CardTitle className="text-xl flex items-center gap-2">
+                        <CardTitle className="text-lg lg:text-xl flex items-center gap-2">
                         <CalendarIcon className="h-5 w-5 text-primary" /> 
                         Seleziona Data e ora
                         </CardTitle>
@@ -104,24 +104,22 @@ export function SlotPrenotation({
                         </CardDescription>
                     </div>
 
-                    <div className="relative flex items-center">
-                        <input
-                            type="date"
-                            id="date"
-                            value={selectedDate}
-                            min={todayStr}
-                            max={maxDateStr}
-                            onChange={(e) => {
-                                setSelectedDate(e.target.value);
-                                setSelectedSlot(null);
-                                setSelectedCourt(null);
-                            }}
-                            className="w-full sm:w-auto bg-background border-input text-foreground dark:scheme-dark rounded-lg border-2 px-4 py-2.5 text-base font-semibold shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:border-primary/50 cursor-pointer"
-                        />
-                    </div>
+                    <input
+                        type="date"
+                        id="date"
+                        value={selectedDate}
+                        min={todayStr}
+                        max={maxDateStr}
+                        onChange={(e) => {
+                            setSelectedDate(e.target.value);
+                            setSelectedSlot(null);
+                            setSelectedCourt(null);
+                        }}
+                        className="w-full sm:w-auto bg-background text-foreground  border-foreground dark:scheme-dark  border-1 px-2 py-1.5 font-semibold focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:border-primary/50 cursor-pointer"
+                    />
                 </CardHeader>
 
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6 px-2">
                 <div className="space-y-3">
                         <div className="flex items-center justify-between">
                             {!bookings && (
@@ -135,7 +133,6 @@ export function SlotPrenotation({
                             closing={club.closingTime}
                             durationMinutes={club.slotDurationMinutes}
                             selectedDateStr={selectedDate}
-                            selectedSlotStr={selectedSlot}
                             isLoadingBookings={isLoadingBooking && Boolean(bookings === null)}
                             courts={club.courts}
                             onSelect={handleOpenCourtSelection}

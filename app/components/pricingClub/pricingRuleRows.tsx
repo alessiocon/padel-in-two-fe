@@ -12,7 +12,7 @@ export function PriceRuleRows({ rule, courts }: { rule: PricingRuleResDto; court
     const prices = Array.from(new Set(courts.map((court) => court.price ?? 0)));
     const sharedBasePrice = prices.length === 1 ? prices[0] : undefined;
 
-    if (isFixed) return <PriceRow label="Tutti i campi" finalPrice={rule.value} />;
+    if (isFixed) return <PriceRow label="Tutti i campi" finalPrice={rule.value} basePrice={sharedBasePrice} />;
     if (sharedBasePrice === undefined) return <PriceRow label="Tutti i campi" />;
     return <PriceRow label="Tutti i campi" basePrice={sharedBasePrice} finalPrice={applyRule(rule, sharedBasePrice)} />;
   }

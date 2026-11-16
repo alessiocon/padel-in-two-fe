@@ -64,7 +64,7 @@ export default function UserProfile() {
       <div className="w-full max-w-2xl flex flex-col gap-6">
         
         {/* INFORMAZIONI UTENTE */}
-        <section className="bg-card text-card-foreground border border-border p-6 rounded-xl shadow-sm">
+        <section className="text-card-foreground border border-border p-6 rounded-xl shadow-sm">
           <h1 className="text-xl font-bold mb-4 border-b border-border pb-2">
             {auth.firstName || "Nome"} {auth.lastName || "Cognome"}
           </h1>
