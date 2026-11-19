@@ -6,6 +6,8 @@ import { ListBookingUser } from "../components/booking/userPrenotation/list.user
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 import type { PromotionAccountResDto } from "~/client/model/response/promotion.account.res.dto";
 import { PromotionPoints } from "~/components/promotion/promotion.points";
+import { BookingsCalendar } from "~/components/calendar";
+import { BookingStatus } from "~/client/model/common/Enum/booking.status.dto";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -27,7 +29,7 @@ export default function UserProfile() {
         try {
             setIsLoadingBookings(true);
 
-            const res = await apiClient.searchBookingOfUser({});
+            const res = await apiClient.searchBookingOfUser({status: [BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS]});
             if (!res.IsSuccess || res.Data === null) {
             throw new Error("Bookings non caricati");
             }
@@ -86,15 +88,19 @@ export default function UserProfile() {
         </section>
 
         {/* SEZIONE PROMOZIONI */}
-        <PromotionPoints accounts={promotions} isLoading={isLoadingPromotions} />
+        {auth.playerId && <PromotionPoints accounts={promotions} isLoading={isLoadingPromotions} />}
 
         {/* SEZIONE PRENOTAZIONI */}
 
 
-        <ListBookingUser 
+        {/* <ListBookingUser 
           isLoadingBookingsState={[isLoadingBookings, setIsLoadingBookings]}
           bookingsState={[bookings, setBookings]}
-        />
+        /> */}
+
+        {/* CALENDARIO PRENOTAZIONI */}
+        {auth.playerId && <BookingsCalendar />}
+        
 
       </div>
     </div>

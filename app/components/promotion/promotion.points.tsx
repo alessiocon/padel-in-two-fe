@@ -2,6 +2,10 @@ import type { PromotionAccountResDto } from "~/client/model/response/promotion.a
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 import { promotionConfig } from "../budge/promotion.badges";
+import { PromotionType } from "~/client/model/common/Enum/promotion.type";
+import { ArrowRight, Star } from "lucide-react";
+import { Link } from "react-router";
+import { buttonVariants } from "../ui/button";
 
 interface PromotionPointsProps {
     accounts: PromotionAccountResDto[] | null;
@@ -11,7 +15,7 @@ interface PromotionPointsProps {
 
 function PointsStat({ label, value, highlight = false }: { label: string; value: number; highlight?: boolean }) {
     return (
-        <div className="flex flex-col items-center gap-0.5 border border-border/50 bg-card p-2">
+        <div className="flex flex-col items-center gap-0.5 border border-border bg-card p-2">
             <span className="text-[11px] text-muted-foreground">{label}</span>
             <span className={`text-lg font-extrabold ${highlight ? "text-primary" : ""}`}>{value}</span>
         </div>
@@ -36,32 +40,31 @@ function PromotionPointsSkeleton() {
 }
 
 export function PromotionPoints({ accounts, isLoading, className = "" }: PromotionPointsProps) {
-    if (!isLoading && (!accounts || accounts.length === 0)) return null;
 
+    const promotion = accounts?.find(account => account.promotion === PromotionType.ACCUMULATE_POINTS);
     return (
         <Card className={`${className} border rounded-xl py-2 bg-hidden`}>
-            <CardContent className="space-y-3 px-3">
+            <CardContent className="space-y-2 px-3">
                 {isLoading ? (
                     <PromotionPointsSkeleton />
                 ) : (
-                    accounts?.map((account) => {
-                        const config = promotionConfig[account.promotion];
-                        const Icon = config?.icon;
-                        return (
-                            <div key={account.promotion} className="space-y-1 py-2 max-w-[450px] mx-auto">
-                                <p className="text-lg font-semibold text-primary">
-                                    {Icon && <Icon className="h-4 w-4 inline mr-1 mb-0.5" />}
-                                    {config?.label ?? account.promotion}
-                                </p>
-                                <p className="text-sm text-muted-foreground">prenota e gioca per accumulare punti!</p>
-                                <div className="grid grid-cols-3 gap-2">
-                                    <PointsStat label="Totali" value={account.totalPoints} />
-                                    <PointsStat label="Disponibili" value={account.availablePoints} highlight />
-                                    <PointsStat label="Riscattati" value={account.redeemedPoints} />
-                                </div>
-                            </div>
-                        );
-                    })
+                    <div key="Prenota e gioca" className="space-y-1 py-2 mx-auto">
+                        <p className="text-lg font-semibold text-primary">
+                            <Star className="h-4 w-4 inline mr-1 mb-0.5" />  Prenota e gioca
+                        </p>
+                        <p className="text-sm text-muted-foreground">Con 10 punti puoi contattarci e richiedere il tuo premio</p>
+                        <div className="grid grid-cols-3 gap-2 mt-5">
+                            <PointsStat label="Totali" value={promotion?.totalPoints ?? 0} />
+                            <PointsStat label="Disponibili" value={promotion?.availablePoints ?? 0} highlight />
+                            <PointsStat label="Riscattati" value={promotion?.redeemedPoints ?? 0} />
+                        </div>
+                        <div className="text-end">
+                            <Link to="/clubs" className={`${buttonVariants()} text-primary text-sm mt-2`}>
+                                Vedi Club <ArrowRight className="inline-block h-4 w-4" />
+                            </Link>
+                        </div>
+                       
+                    </div>
                 )}
             </CardContent>
         </Card>

@@ -15,7 +15,7 @@ export const promotionConfig: Record<PromotionType, { label: string; description
         icon: Gift,
     },
     [PromotionType.ACCUMULATE_POINTS]: {
-        label: "Accumulo punti",
+        label: "Prenota e gioca",
         description: "Questa prenotazione ti permette di accumulare punti.",
         icon: Star,
     },

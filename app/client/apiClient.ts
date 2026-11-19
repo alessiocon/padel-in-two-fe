@@ -27,6 +27,7 @@ import type { BookingResultProposeDto } from "./model/request/booking.result.dto
 import type { BookingIsAcceptedMatchProposeDto } from "./model/request/booking.accepted.match.propose.dto";
 import type { BookingRemoveMatchProposeDto } from "./model/request/match.propose.remove.dto";
 import type { PromotionAccountResDto } from "./model/response/promotion.account.res.dto";
+import type { CalendarBookingResDto } from "./model/response/calendar.booking.res.dto";
 
 export class apiClient {
   private static getApiBaseUrl(): string {
@@ -131,37 +132,52 @@ private static async request<T = void>(
   }
 
   static async searchBookings(search: SearchBookingQueryDto): Promise<IApiResponse<BookingQuickResDto[]>> {
-    const queryString = new URLSearchParams({
-      ...(search.from && { from: search.from }),
-      ...(search.to && { to: search.to }),
-      ...(search.clubId && { clubId: search.clubId }),
-      ...(search.status && { status: search.status }),
-    }).toString();
+    const params = new URLSearchParams();
+    if (search.from) params.append("from", search.from);
+    if (search.to) params.append("to", search.to);
+    if (search.clubId) params.append("clubId", search.clubId);
+    if (search.status && search.status.length > 0) {
+      search.status.forEach(s => params.append("status", s));
+    }
 
-    return this.request<BookingQuickResDto[]>(`/bookings/?${queryString}`, { method: "GET" });
+    return this.request<BookingQuickResDto[]>(`/bookings/?${params.toString()}`, { method: "GET" });
   }
 
   static async searchBookingForManager(clubId: string, search: SearchBookingQueryDto): Promise<IApiResponse<BookingQuickResDto[]>> {
-    const queryString = new URLSearchParams({
-      ...(search.clubId && {clubId: search.clubId}),
-      ...(search.from && { from: search.from }),
-      ...(search.to && { to: search.to }),
-      ...(search.playerId && { userId: search.playerId }),
-      ...(search.status && { status: search.status }),
-    }).toString();
+    const params = new URLSearchParams();
+    if (search.clubId) params.append("clubId", search.clubId);
+    if (search.from) params.append("from", search.from);
+    if (search.to) params.append("to", search.to);
+    if (search.playerId) params.append("userId", search.playerId);
+    if (search.status && search.status.length > 0) {
+      search.status.forEach(s => params.append("status", s));
+    }
 
-    return this.request<BookingQuickResDto[]>(`/bookings/clubs/${clubId}/manager?${queryString}`, { method: "GET" });
+    return this.request<BookingQuickResDto[]>(`/bookings/clubs/${clubId}/manager?${params.toString()}`, { method: "GET" });
   }
 
   static async searchBookingOfUser(search: SearchBookingQueryDto): Promise<IApiResponse<BookingQuickResDto[]>> {
-    const queryString = new URLSearchParams({
-      ...(search.from && { from: search.from }),
-      ...(search.to && { to: search.to }),
-      ...(search.clubId && { clubId: search.clubId }),
-      ...(search.status && { status: search.status }),
-    }).toString();
+    const params = new URLSearchParams();
+    if (search.from) params.append("from", search.from);
+    if (search.to) params.append("to", search.to);
+    if (search.clubId) params.append("clubId", search.clubId);
+    if (search.status && search.status.length > 0) {
+      search.status.forEach(s => params.append("status", s));
+    }
 
-    return this.request<BookingQuickResDto[]>(`/bookings/user?${queryString}`, { method: "GET" });
+    return this.request<BookingQuickResDto[]>(`/bookings/user?${params.toString()}`, { method: "GET" });
+  }
+
+  static async getCalendarBookings(search: SearchBookingQueryDto): Promise<IApiResponse<CalendarBookingResDto[]>> {
+    const params = new URLSearchParams();
+    if (search.from) params.append("from", search.from);
+    if (search.to) params.append("to", search.to);
+    if (search.clubId) params.append("clubId", search.clubId);
+    if (search.status && search.status.length > 0) {
+      search.status.forEach(s => params.append("status", s));
+    }
+
+    return this.request<CalendarBookingResDto[]>(`/bookings/user/calendar?${params.toString()}`, { method: "GET" });
   }
 
   static async createBooking(input: CreateBookingDto): Promise<IApiResponse<BookingQuickResDto>> {

@@ -26,7 +26,7 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-background text-foreground mt-5">
+    <div className="min-h-screen bg-background text-foreground my-5">
       {/* <div className="my-4  m-auto">
         <h2 className="mb-2 text-center text-xl font-medium">Eventi</h2>
         <CardTournamentPreview/>

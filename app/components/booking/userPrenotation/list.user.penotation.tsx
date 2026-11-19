@@ -8,6 +8,7 @@ import type { IDeleteBookingDialogProps } from "../../dialog/delete.booking.dial
 import DeleteBookingDialog from "../../dialog/delete.booking.dialog";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 import { CardUserPrenotation } from "./card.user.prenotation";
+import { BookingStatus } from "~/client/model/common/Enum/booking.status.dto";
 
 export interface IInfoBookingClubProps {
     bookingsState: [BookingQuickResDto[] | null,React.Dispatch<React.SetStateAction<BookingQuickResDto[] | null>>],
@@ -41,7 +42,7 @@ export function ListBookingUser({
         refreshInFlight.current = true;
         setIsRefreshing(true);
         try {
-            const response = await apiClient.searchBookingOfUser({});
+            const response = await apiClient.searchBookingOfUser({status: [BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS]});
             if (!response.IsSuccess || !response.Data) {
                 window.alert(response.Error?.message || "Impossibile aggiornare le prenotazioni.");
                 return;
@@ -68,8 +69,8 @@ export function ListBookingUser({
                 }
             }}
         >
-            <div className="mb-4 flex justify-between items-center border-b border-border pb-2">
-                <h2 className="text-lg font-bold">Prenotazioni</h2>
+            <div className="mb-4 items-center border-b border-border pb-2">
+                <h2 className="text-lg font-bold">Prenotazioni non concluse</h2>
                 <div className="mt-3 text-right">
                     <Button
                         type="button"
@@ -88,7 +89,7 @@ export function ListBookingUser({
             {isLoadingBookings || bookings == null ? (
                 /* Skeleton List: Simula 3 card prenotazione */
                 <div className="flex flex-col gap-3">
-                {Array.from({ length: 3 }).map((_, index) => (
+                {Array.from({ length: 1 }).map((_, index) => (
                     <div
                     key={`booking-skeleton-${index}`}
                     className="p-4 rounded-lg border border-border/60 bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
@@ -115,7 +116,7 @@ export function ListBookingUser({
                 </p>
                 </div>
             ) : (
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 max-h-[280px] overflow-y-auto">
                 {bookings.map((booking) => (
                     <CardUserPrenotation
                         key={booking.id}
