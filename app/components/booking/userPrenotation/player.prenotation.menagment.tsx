@@ -1,5 +1,5 @@
 import { useContext, useRef, useState } from "react";
-import { LoaderCircle } from "lucide-react";
+import { Car, LoaderCircle } from "lucide-react";
 import { apiClient } from "../../../client/apiClient";
 import { BookingPlayerStatus } from "../../../client/model/common/Enum/booking.player.status";
 import type { CreateBookingPlayerDto } from "../../../client/model/request/create.booking.player.dto";
@@ -12,6 +12,7 @@ import { AddUserForBookingDialog } from "../../dialog/add.user.for.booking.dialo
 import type { BookingPlayerResDto } from "../../../client/model/response/booking.player.res.dto";
 import { BookingStatus } from "../../../client/model/common/Enum/booking.status.dto";
 import { PlayerOthersPrenotation } from "./player.others.prenotation";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
 interface PlayerPrenotationManagementProps {
     bookingState: [BookingDetailResDto, React.Dispatch<React.SetStateAction<BookingDetailResDto[] | null>>];
@@ -103,11 +104,14 @@ export function PlayerPrenotationManagement({ bookingState }: PlayerPrenotationM
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {booking.teams.map((team, teamIdx) => (
-                    <div key={team.id || teamIdx} className="p-3 bg-muted/30 border border-border/40 space-y-2">
-                        <h5 className="font-semibold text-xs text-primary">{team.teamName || `Team ${teamIdx + 1}`}</h5>
-                        <div className="space-y-2">
+                    <Card key={team.id || teamIdx} className="p-2 gap-1">
+                        <CardHeader className="p-2">
+                            <CardTitle>
+                                {team.teamName || `Team ${teamIdx + 1}`}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-0">
                             {[0, 1].map((slotIdx) => {
-
                                 if(booking.status === BookingStatus.IN_PROGRESS) return <PlayerOthersPrenotation key={slotIdx} player={team.players[slotIdx]} />
                                 
                                 const player = team.players[slotIdx];
@@ -147,8 +151,8 @@ export function PlayerPrenotationManagement({ bookingState }: PlayerPrenotationM
                                     />
                                 );
                             })}
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
                 ))}
             </div>
 

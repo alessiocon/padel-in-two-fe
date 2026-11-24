@@ -24,8 +24,8 @@ export function AddTeamPlayer({
 }: AddTeamPlayerProps) {
 
     return (
-        <div className="p-2.5 rounded-md bg-background border border-border/50 flex flex-col items-start gap-2">
-            <p className="text-xs text-muted-foreground font-medium whitespace-nowrap">Giocatore {index + 1}</p>
+        <div className="flex flex-col items-start gap-2">
+            <p className="text-muted-foreground font-medium whitespace-nowrap">Giocatore {index + 1}</p>
             {!canManage ? null : isAuthenticated ? (
                 <div className="grid w-full grid-cols-3 gap-1">
                     <Button
@@ -33,7 +33,6 @@ export function AddTeamPlayer({
                         variant="default"
                         disabled={isLoading || isCaptainPlaced}
                         onClick={() => onAssignMe(index)}
-                        className="h-8 min-w-0 px-1 text-[10px] bg-primary text-primary-foreground hover:bg-primary/90 font-bold"
                     >
                         {isLoading ? <LoaderCircle className="w-3.5 h-3.5 mr-1 animate-spin" /> : <UserCheck className="w-3.5 h-3.5 mr-1" />} Io
                     </Button>
@@ -42,7 +41,6 @@ export function AddTeamPlayer({
                         variant="secondary"
                         disabled={isLoading}
                         onClick={() => onOpenRegisteredDialog(index)}
-                        className="h-8 min-w-0 px-1 text-[10px]"
                     >
                         <Users className="w-3.5 h-3.5 mr-1" /> Utente
                     </Button>
@@ -51,7 +49,7 @@ export function AddTeamPlayer({
                         variant="outline"
                         disabled={isLoading}
                         onClick={() => onOpenGuestDialog(index)}
-                        className="h-8 min-w-0 px-1 text-[10px]"
+                        className="bg-background"
                     >
                         <UserPlus className="w-3.5 h-3.5 mr-1" /> Ospite
                     </Button>

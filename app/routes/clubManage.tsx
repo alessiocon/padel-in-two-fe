@@ -90,7 +90,7 @@ export default function ClubManagerPage() {
     setIsLoadingRequestPrenotations(true);
 
     try {
-      const res = await apiClient.searchBookingForManager(club.id, {status: BookingStatus.PENDING});
+      const res = await apiClient.searchBookingForManager(club.id, {status: [BookingStatus.PENDING]});
       setRequestPrenotations(res.Data || []);
     } catch (error) {
       console.error("Errore nel recupero delle richieste di prenotazione:", error);

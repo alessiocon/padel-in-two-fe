@@ -17,7 +17,7 @@ export default function HomePage() {
   return (<>
 
     <div className="pb-6">
-        <section className="relative min-h-[75vh] overflow-hidden">
+        <section className="relative min-h-[45vh] overflow-hidden">
         {/* Immagine di sfondo */}
             <div className="absolute inset-0">
                 <img
@@ -29,7 +29,7 @@ export default function HomePage() {
             </div>
 
             {/* Contenuto */}
-            <div className="relative z-10 flex min-h-[75vh] flex-col px-6 py-12">
+            <div className="relative z-10 flex min-h-[45vh] max-w-4xl m-auto flex-col px-6 py-12">
                 <div className="mt-auto mb-auto max-w-3xl">
                     <h2 className="text-4xl font-extrabold leading-none text-white md:text-6xl">
                         Gioca a padel e <span className="text-secondary">ricevi premi</span> divertendoti
@@ -45,7 +45,7 @@ export default function HomePage() {
             </div>
         </section>
 
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-4xl mx-auto">
             <section className="container mx-auto px-5 py-13">
                 <h2 className="my-6 text-3xl font-bold">
                     Padel<span className="text-primary">In</span>Two
@@ -106,12 +106,11 @@ export default function HomePage() {
                         <Card className="border-0 py-2 bg-gradient-to-br from-sky-50 to-sky-100 dark:from-sky-950/40 dark:to-sky-900/20">
                             <CardContent className="p-4 py-2">
                                 <h3 className="mb-3 text-xl font-semibold">
-                                    <Trophy className="mb-3 h-10 w-10 text-sky-600 inline mr-2" /> Nuove iniziative                                
+                                    <Users className="mb-3 h-10 w-10 text-sky-600 inline mr-2" />Nuovi Amici!                              
                                 </h3>
 
                                 <p>
-                                    Stiamo lavorando a nuove promozioni e vantaggi per rendere ogni
-                                    partita ancora più conveniente. <Trophy className="mb-1 h-4 w-4 text-sky-600 inline" /> 
+                                    avvia una partita pubblica, imposta il livello consigliato e fai nuove amicizie <Users className="mb-1 h-4 w-4 text-sky-600 inline" /> 
                                 </p>
 
                                 <p className="mt-4 text-sm font-medium">Resta aggiornato sulle novità </p>

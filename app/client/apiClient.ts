@@ -28,6 +28,10 @@ import type { BookingIsAcceptedMatchProposeDto } from "./model/request/booking.a
 import type { BookingRemoveMatchProposeDto } from "./model/request/match.propose.remove.dto";
 import type { PromotionAccountResDto } from "./model/response/promotion.account.res.dto";
 import type { CalendarBookingResDto } from "./model/response/calendar.booking.res.dto";
+import type { PublicBookingResDto } from "./model/response/booking.public.res.dto";
+import type { PublicJoinResultDto } from "./model/response/public.join.result.dto";
+import type { JoinPublicBookingDto } from "./model/request/join.public.booking.req.dto";
+import type { ReviewPublicJoinRequestDto } from "./model/request/review.public.join.req.dto";
 
 export class apiClient {
   private static getApiBaseUrl(): string {
@@ -166,6 +170,40 @@ private static async request<T = void>(
     }
 
     return this.request<BookingQuickResDto[]>(`/bookings/user?${params.toString()}`, { method: "GET" });
+  }
+
+  static async searchPublicBookings(search: SearchBookingQueryDto): Promise<IApiResponse<PublicBookingResDto[]>> {
+    const params = new URLSearchParams();
+      if (search.clubId) params.append("clubId", search.clubId);
+
+    return this.request<PublicBookingResDto[]>(`/bookings/public?${params.toString()}`, { method: "GET" });
+  }
+
+  static async joinPublicBooking(bookingId: string, input: JoinPublicBookingDto): Promise<IApiResponse<PublicJoinResultDto[]>> {
+    
+    return this.request<PublicJoinResultDto[]>(`/bookings/${bookingId}/join`, 
+      { 
+        method: "POST",
+        body: JSON.stringify(input)
+      });
+  }
+
+  static async decidePublicJoinRequest(bookingId: string, requestId: string, input: ReviewPublicJoinRequestDto): Promise<IApiResponse<PublicJoinResultDto>> {
+    
+    return this.request<PublicJoinResultDto>(`/bookings/${bookingId}/join/${requestId}`, 
+      { 
+        method: "PATCH",
+        body: JSON.stringify(input)
+      });
+  }
+
+  static async removePublicJoinRequest(bookingId: string, input: ReviewPublicJoinRequestDto): Promise<IApiResponse<PublicJoinResultDto>> {
+    
+    return this.request<PublicJoinResultDto>(`/bookings/${bookingId}/join/`, 
+      { 
+        method: "DELETE",
+        body: JSON.stringify(input)
+      });
   }
 
   static async getCalendarBookings(search: SearchBookingQueryDto): Promise<IApiResponse<CalendarBookingResDto[]>> {

@@ -30,7 +30,7 @@ export function ManageTeamPlayerPrenotation({
     };
 
     return (
-        <div className="relative p-3 rounded-md bg-background border border-border/50">
+        <div className="relative p-2  bg-background border border-foreground">
             <div className="flex justify-between items-center">
                 <p className="text-xs text-muted-foreground font-medium">
                     Giocatore {index + 1}
@@ -45,9 +45,8 @@ export function ManageTeamPlayerPrenotation({
 
                 <Button
                     size="sm"
-                    variant="ghost"
+                    variant="destructive"
                     onClick={() => void handleRemove()}
-                    className="text-destructive  hover:bg-destructive/10 p-0"
                     aria-label="Rimuovi giocatore"
                 >
                     rimuovi

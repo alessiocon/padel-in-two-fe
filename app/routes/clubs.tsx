@@ -6,8 +6,6 @@ import { apiClient } from "../client/apiClient";
 import type { ClubsResDto } from "../client/model/response/ClubsResDto";
 import { useEffect, useState } from "react";
 import { CardClubSkeleton } from "../component/CardClubPreviewSkeleton";
-import { ClubStatusDto } from "~/client/model/common/Enum/ClubStatusDto";
-import { PromotionType } from "~/client/model/common/Enum/promotion.type";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -26,7 +24,7 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-background text-foreground my-5">
+    <div className="min-h-screen bg-background text-foreground mt-5">
       {/* <div className="my-4  m-auto">
         <h2 className="mb-2 text-center text-xl font-medium">Eventi</h2>
         <CardTournamentPreview/>
@@ -35,7 +33,7 @@ export default function Home() {
 
       <div className="m-auto">
         <div className="mb-4 text-center bg-primary py-4 px-10 text-primary-foreground font-bold">
-          <p>Hai un club e vuoi <span className="text-secondary">unirti</span> a noi <a href="https://www.instagram.com/padelintwo/" className="underline">contattaci!</a></p>
+          <p>Hai un club e vuoi <span className="text-secondary-foreground bg-secondary">unirti</span> a noi <a href="https://www.instagram.com/padelintwo/" className="underline">contattaci!</a></p>
         </div>
           
         {/*TODO: DA IMPLEMENTARE QUANDO CI SARANNO PIù club */}

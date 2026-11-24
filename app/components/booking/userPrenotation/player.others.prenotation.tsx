@@ -11,7 +11,7 @@ export function PlayerOthersPrenotation({ player }: PlayerOthersPrenotationProps
    
 
     return (
-        <div className="relative p-2.5 bg-card border border-border/50 flex items-center justify-between gap-2">
+        <div className="relative p-2.5 bg-background border border-border/50 flex items-center justify-between gap-2">
             <div>
                 <p className="text-xs font-medium">
                     {playerName || (player.username ? `${player.username}` : "Utente")}

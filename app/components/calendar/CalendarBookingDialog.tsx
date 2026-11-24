@@ -42,7 +42,7 @@ export function CalendarBookingDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="p-2 py-8">
         <DialogHeader>
           <DialogTitle>Prenotazioni del {dateStr}</DialogTitle>
           <DialogDescription>
@@ -54,20 +54,15 @@ export function CalendarBookingDialog({
           {bookings.map((booking) => (
             <div
               key={booking.id}
-              className="p-3 border border-border rounded-lg bg-background hover:bg-muted/50 transition-colors"
+              className="p-3 bg-card border border-border"
             >
               <div className="flex items-start justify-between gap-2 mb-2">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="font-semibold text-sm">{booking.clubName}</p>
-                    
-                  </div>
-                </div>
-                <BookingIcon status={booking.status} isWinner={booking.isPlayer ? booking.win : null} className="w-4 h-4" />
+                  <p className="font-semibold text-sm">{booking.clubName}</p>
+                  <BookingIcon status={booking.status} isWinner={booking.isPlayer ? booking.win : null} className="w-4 h-4" />
               </div>
 
               <div className="text-xs  mb-3 space-y-1">
-                <div className="flex justify-between my-2 bg-muted">
+                <div className="flex justify-between my-2">
                   <p>
                     {new Date(booking.startsAt).toLocaleTimeString("it-IT", {
                       hour: "2-digit",
@@ -86,18 +81,16 @@ export function CalendarBookingDialog({
 
                  {booking.isPlayer && booking.status === BookingStatus.END 
                   ? booking.win 
-                    ? <p><Crown className="w-4 h-4 text-primary inline mb-1 mr-1" />Vinta</p>
-                    : <p><BadgeX className="w-4 h-4 text-destructive inline mb-1 mr-1" /> Persa</p>
+                    ? <p className="text-primary"><Crown className="w-4 h-4 inline mb-1 mr-1" />Vinta</p>
+                    : <p className="text-destructive"><BadgeX className="w-4 h-4 inline mb-1 mr-1" /> Persa</p>
                   :null
                 }
-               
                   
                 {booking.status === BookingStatus.END && (
                   <div className="grid grid-rows-3 items-center text-center mt-3">
                       <p className="border-t border-border border-foreground overflow-hidden text-ellipsis whitespace-nowrap">{booking.team1}</p>
                       <p className="py-1">{booking.setTeam1} - {booking.setTeam2}</p>
                       <p className="border-b border-border border-foreground overflow-hidden text-ellipsis whitespace-nowrap">{booking.team2}</p>
-                      
                   </div>
                 )}
               </div>

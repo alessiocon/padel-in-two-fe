@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Check, Search, Users, X } from "lucide-react";
 import { apiClient } from "../../client/apiClient";
@@ -52,26 +53,12 @@ export function AddUserForBookingDialog({ isOpen, onClose, onSelectUser }: ISele
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-2" onClick={onClose}>
-            <div
-                className="bg-background border border-border/40 rounded-xl shadow-xl w-full max-w-md p-4 sm:p-6 relative animate-in fade-in zoom-in-95 duration-200"
-                onClick={(event) => event.stopPropagation()}
-            >
-                <button 
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                    <X className="w-5 h-5" />
-                </button>
-
-                <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                        <Users className="w-6 h-6" />
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-semibold">Seleziona Utente</h3>
-                    </div>
-                </div>
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="p-2 py-7 gap-3">
+                <DialogHeader className="mb-6 block mb-2">
+                    <Users className="w-6 h-6 inline mr-2 mb-1" />
+                    <p className="text-lg font-semibold inline">Seleziona Utente</p>
+                </DialogHeader>
 
                 <div className="space-y-2">
                     <div className="relative">
@@ -81,18 +68,18 @@ export function AddUserForBookingDialog({ isOpen, onClose, onSelectUser }: ISele
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Cerca per nome utente"
-                            className="w-full pl-9 pr-3 py-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="w-full pl-9 pr-3 py-2  border border-foreground bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                         />
                     </div>
 
-                    <div className="max-h-60 overflow-y-auto space-y-2 border border-border/30 rounded-md p-2">
+                    <div className="max-h-70 overflow-y-auto space-y-2">
                         {isLoading ? (
                             <p className="text-center text-xs text-muted-foreground py-4">Ricerca in corso...</p>
                         ) : users.length === 0 ? (
                             <p className="text-center text-xs text-muted-foreground py-4">Nessun utente trovato</p>
                         ) : (
                             users.map((user) => (
-                                <div key={user.id} className="flex items-center gap-3 rounded-lg border border-transparent bg-card p-2 px-3 transition-colors hover:border-border/40 hover:bg-muted/60">
+                                <div key={user.id} className="flex items-center gap-3 border border-foreground bg-card p-2">
                                     <div>
                                         <p className="text-sm font-medium">{user.username}</p>
                                         {user.firstName && <p className="text-xs text-muted-foreground">{user.firstName}{user.lastName ?  " "+user.lastName : ""}</p>}
@@ -116,7 +103,7 @@ export function AddUserForBookingDialog({ isOpen, onClose, onSelectUser }: ISele
                         )}
                     </div>
                 </div>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 }

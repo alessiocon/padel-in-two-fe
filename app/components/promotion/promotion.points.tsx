@@ -15,7 +15,7 @@ interface PromotionPointsProps {
 
 function PointsStat({ label, value, highlight = false }: { label: string; value: number; highlight?: boolean }) {
     return (
-        <div className="flex flex-col items-center gap-0.5 border border-border bg-card p-2">
+        <div className="flex flex-col items-center gap-0.5 border border-border bg-background p-2">
             <span className="text-[11px] text-muted-foreground">{label}</span>
             <span className={`text-lg font-extrabold ${highlight ? "text-primary" : ""}`}>{value}</span>
         </div>
@@ -43,7 +43,7 @@ export function PromotionPoints({ accounts, isLoading, className = "" }: Promoti
 
     const promotion = accounts?.find(account => account.promotion === PromotionType.ACCUMULATE_POINTS);
     return (
-        <Card className={`${className} border rounded-xl py-2 bg-hidden`}>
+        <Card className={`${className} border py-2`}>
             <CardContent className="space-y-2 px-3">
                 {isLoading ? (
                     <PromotionPointsSkeleton />
@@ -55,7 +55,7 @@ export function PromotionPoints({ accounts, isLoading, className = "" }: Promoti
                         <p className="text-sm text-muted-foreground">Con 10 punti puoi contattarci e richiedere il tuo premio</p>
                         <div className="grid grid-cols-3 gap-2 mt-5">
                             <PointsStat label="Totali" value={promotion?.totalPoints ?? 0} />
-                            <PointsStat label="Disponibili" value={promotion?.availablePoints ?? 0} highlight />
+                            <PointsStat label="Disponibili" value={promotion?.availablePoints ?? 0}/>
                             <PointsStat label="Riscattati" value={promotion?.redeemedPoints ?? 0} />
                         </div>
                         <div className="text-end">

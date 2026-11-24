@@ -93,7 +93,7 @@ export function PlayerMePrenotation({ bookingState, player }: PlayerMePrenotatio
     const isAccepted = player.status === BookingPlayerStatus.ACCEPTED;
 
     return (
-        <div className="relative p-2.5 bg-card border border-border/50">
+        <div className="relative p-2.5 bg-background border border-border">
             <p className="text-xs font-medium mb-2"> {player.username} (Tu) </p>
 
             <div className="flex items-center gap-2 justify-end">
@@ -121,11 +121,11 @@ export function PlayerMePrenotation({ bookingState, player }: PlayerMePrenotatio
 
                 {isAccepted && (booking.status !== BookingStatus.IN_PROGRESS && booking.status !== BookingStatus.END ) &&(
                     <Button
-                        size="sm"
-                        variant="outline"
+                        size="xs"
+                        variant="destructive"
                         disabled={isSubmitting}
                         onClick={() => void cancelAcceptedBooking()}
-                        className="h-7 text-[10px] text-rose-600 border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20"
+                        className="text-[10px]"
                     >
                         <XCircle className="mr-1 h-3.5 w-3.5" /> Annulla partecipazione
                     </Button>

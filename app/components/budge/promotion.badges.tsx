@@ -41,7 +41,7 @@ export function PromotionBadges({ promotions, className = "" }: PromotionBadgesP
                             title={label}
                             aria-label={label}
                             onClick={() => setSelected(promotion)}
-                            className="inline-flex border border-primary/20 bg-primary/10 p-1.5 text-primary-foreground transition-colors hover:bg-primary/20"
+                            className="inline-flex bg-primary p-1.5 text-primary-foreground transition-colors hover:bg-primary/20"
                         >
                             <Icon className="h-4 w-4" />
                         </button>

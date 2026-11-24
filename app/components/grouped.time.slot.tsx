@@ -66,13 +66,13 @@ export const GroupedTimeSlot: FC<{
     }, [opening, closing, durationMinutes, selectedDateStr, courts, now]);
 
     return (
-        <div className="max-h-[170px] md:max-h-none  overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+        <div className="max-h-[170px] md:max-h-none overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
             {slots.map(slot => {
                 return <Button
                     key={slot.time}
                     disabled={isLoadingBookings || slot.availableCourts.length === 0}
                     variant="outline"
-                    className={`h-auto py-2 px-3 flex flex-col items-center justify-center gap-1 w-full overflow-hidden border-foreground hover:border-primary`}
+                    className={`h-auto py-2 px-3 flex flex-col items-center justify-center gap-1 w-full overflow-hidden border-foreground hover:border-primary bg-background`}
                     onClick={() => onSelect(slot.time, slot.availableCourts)}
                 >
                     <span className={`text-base font-bold leading-tight text-foreground`}>{slot.time}</span>

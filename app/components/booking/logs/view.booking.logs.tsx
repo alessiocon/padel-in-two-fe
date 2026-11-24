@@ -11,25 +11,22 @@ export function ViewBookingLogs({ logs }: ViewBookingLogsProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="border border-border/40 bg-muted/20">
+        <div className="border border-border/40 bg-card">
             <button
                 type="button"
                 aria-expanded={isOpen}
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full flex items-center justify-between p-3 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
             >
-                <span className="flex items-center gap-2">
-                    <Terminal className="w-4 h-4 text-primary" />
-                    Visualizza Log Attività &amp; Cronologia ({logs.length})
-                </span>
+                Visualizza cronologia attività ({logs.length})
                 {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </button>
 
             {isOpen && (
-                <div className="p-1 border-t border-border/40 bg-background/50 space-y-2 text-xs font-mono text-muted-foreground">
+                <div className="p-1 border-t border-border bg-card/20 space-y-2 text-xs font-mono text-muted-foreground">
                     {logs.length > 0 ? (
                         logs.map((log, index) => (
-                            <div key={`${log.createdAt}-${index}`} className="w-full py-1 border-b border-border/20 last:border-0 scrollbar-auto overflow-auto">
+                            <div key={`${log.createdAt}-${index}`} className="w-full py-1 border-b border-border last:border-0 scrollbar-auto overflow-auto">
                                 <span className="text-[10px] block">{log.createdAt ? dateHelper.formatDate(log.createdAt) : ""}: </span>
                                 <p className="whitespace-pre-line">{log.message || "Evento di sistema"}</p>
                             </div>

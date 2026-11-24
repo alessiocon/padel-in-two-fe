@@ -25,7 +25,7 @@ export function MonthYearPicker({
         type="month"
         value={dateValue}
         onChange={handleChange}
-        className="px-3 py-2 border border-border rounded-lg bg-background text-foreground"
+        className="px-3 py-2 border border-foreground bg-background text-foreground justify-self-end"
       />
   );
 }

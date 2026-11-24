@@ -1,6 +1,7 @@
 export enum BookingPlayerStatus { 
     PENDING = "PENDING", 
-    ACCEPTED= "ACCEPTED", 
-    DECLINED= "DECLINED", 
+    ACCEPTED = "ACCEPTED", 
+    REQUESTED = "REQUESTED",
+    DECLINED = "DECLINED", 
     REMOVED = "REMOVED"
 }

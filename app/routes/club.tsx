@@ -7,6 +7,7 @@ import { apiClient } from "../client/apiClient";
 import { CardClubInfo } from "../components/club/card.club.info";
 import { PriceList } from "../components/club/price.list";
 import { BookingPrenotation } from "../components/booking/prenotation/booking.prenotation";
+import { PublicBookings } from "../components/booking/public";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 import { Button, buttonVariants } from "~/components/ui/button";
 import { AuthContext } from "~/store/context";
@@ -50,13 +51,11 @@ export default function ClubDetailPage() {
   return (<>
     <div className="min-h-screen text-foreground px-2 md:px-4 lg:px-8 mb-10">
       <div className="grid grid-cols-2 gap-2 my-5">
-          <Button
-              onClick={() => window.history.back()} 
-              variant="secondary"
-              size="sm"
-              className={`w-full md:w-auto max-w-[150px] text-center whitespace-nowrap`}>
+          <Link
+            to={"../"}
+              className={`${buttonVariants({ variant: "secondary", size: "sm" })}  w-full md:w-auto max-w-[150px] text-center whitespace-nowrap`}>
               <ArrowLeft className="inline h-4 w-4" /> Indietro
-          </Button>
+          </Link>
           {club && isMemberOfAClub && <>
             <Link to={`/clubs/${club.id}/manage`} 
               className={`${buttonVariants({ variant: "default", size: "sm" })} w-full md:w-auto max-w-[150px] whitespace-nowrap ml-auto`}>
@@ -67,7 +66,7 @@ export default function ClubDetailPage() {
       
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         
-        <aside className="lg:col-span-1 lg:row-span-2 space-y-6">
+        <aside className="lg:col-span-1 lg:row-span-4 space-y-6">
           <CardClubInfo club={club}/>
         </aside>
         <aside className="lg:col-span-3 lg:row-span-1">
@@ -79,6 +78,9 @@ export default function ClubDetailPage() {
           bookingsState={[bookings, setBookings]}
           isLoadingBookingsState={[isLoadingBookings, setIsLoadingBookings]}
         />
+
+        
+        {club && <PublicBookings clubId={club.id} />}
       </div>
     </div>
   </>

@@ -187,12 +187,12 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground w-full flex flex-col justify-center items-center p-4">
-      <div className="w-full max-w-sm flex flex-col items-center">
+    <div className="min-h-screen text-foreground w-full flex flex-col justify-center items-center">
+      <div className="w-full max-w-sm flex flex-col bg-card items-center py-6 px-4">
         
         {/* Selector Switch Tra Login e Registrazione (Visibile solo se non siamo in modalità recupero password) */}
         {authMode !== "forgot-password" && (
-          <div className="flex w-full mb-6 bg-muted p-1 rounded-lg border border-border">
+          <div className="flex w-full mb-6 p-1 bg-background rounded-lg border border-border">
             <button
               type="button"
               onClick={() => setAuthMode("login")}

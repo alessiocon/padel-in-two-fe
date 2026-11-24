@@ -1,3 +1,4 @@
+import type { BookingJoinMode } from "../common/Enum/booking.join.mode";
 import type { BookingStatus } from "../common/Enum/booking.status.dto";
 import type { PromotionType } from "../common/Enum/promotion.type";
 
@@ -14,6 +15,10 @@ export class BookingQuickResDto{
     nPlayer: number;
 
     status: BookingStatus;
+     isPublic: boolean;
+    joinMode: BookingJoinMode;
+    minPlayerLevel: number | null;
+    maxPlayerLevel: number | null;
     description: string;
     startsAt: string;
     endsAt: string;

@@ -24,7 +24,7 @@ export const ButtonCourtSelection: FC<{
           onClose();
         }
       }}
-      className={`p-3 sm:p-4 rounded-lg border transition-all flex flex-col justify-between gap-4 text-left w-full overflow-hidden ${
+      className={`p-3 sm:p-4 bg-card border transition-all flex flex-col justify-between gap-4 text-left w-full overflow-hidden ${
         court.isOccupied
           ? "border-destructive/30 bg-destructive/5 cursor-not-allowed opacity-60 text-muted-foregroun"
           : "border-border bg-background hover:border-primary hover:bg-primary/5 active:scale-[0.98] text-foreground"
@@ -62,7 +62,7 @@ export const ButtonCourtSelection: FC<{
         ) : (
           <Badge
             variant="outline"
-            className="text-[9px] px-1.5 py-0 border-emerald-500/40 bg-emerald-500/10 text-emerald-500 shrink-0"
+            className="text-[9px] px-1.5 py-0 bg-primary/20 text-primary-foreground shrink-0"
           >
             Disponibile
           </Badge>

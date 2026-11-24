@@ -5,6 +5,7 @@ import type { SearchBookingQueryDto } from "~/client/model/request/search.bookin
 import { MonthYearPicker } from "./MonthYearPicker";
 import { CalendarDay } from "./CalendarDay";
 import { CalendarBookingDialog } from "./CalendarBookingDialog";
+import { Card, CardHeader, CardTitle } from "../ui/card";
 
 export function BookingsCalendar() {
   const today = new Date();
@@ -97,17 +98,15 @@ export function BookingsCalendar() {
 
   return (
     <>
-      <section className="border border-border shadow-sm m-0 mt-5 py-5 md:p-6 pb-2 md:mx-0 rounded-xl">
-        <div className="mx-2">
-          <h2 className="text-xl font-bold mb-5">
-            Calendario Prenotazioni
-          </h2>
+      <Card className="mt-5 py-5 md:p-6 pb-2 md:mx-0 gap-0">
+        <CardHeader className="px-2">
+          <CardTitle className="text-lg font-bold mb-2">Calendario Prenotazioni</CardTitle>
           <MonthYearPicker
             month={month}
             year={year}
             onMonthChange={handleMonthChange}
           />
-        </div>
+        </CardHeader>
 
         {isLoading && (
           <div className="text-center py-8 text-muted-foreground">
@@ -123,7 +122,7 @@ export function BookingsCalendar() {
                   {weekDays.map((day) => (
                     <div
                       key={`header-${day}`}
-                      className="text-center text-xs md:text-sm font-semibold text-muted-foreground flex items-end justify-center"
+                      className="text-center text-xs md:text-sm font-semibold flex items-end justify-center mb-2"
                     >
                       {day}
                     </div>
@@ -136,15 +135,10 @@ export function BookingsCalendar() {
                   gridAutoRows: "minmax(100px, 100px)",
                 }}
               >
-                {/* Intestazione giorni della settimana */}
-                
-
-                {/* Griglia giorni */}
                 {calendarDays.map((dayObj, index) => (
                   <CalendarDay
                     key={index}
                     day={dayObj.isCurrentMonth ? dayObj.day : null}
-                    isCurrentMonth={dayObj.isCurrentMonth}
                     bookings={
                       dayObj.isCurrentMonth ? getBookingsForDay(dayObj.day!) : []
                     }
@@ -155,7 +149,7 @@ export function BookingsCalendar() {
             </div>
           </div>
         )}
-      </section>
+      </Card>
 
       <CalendarBookingDialog
         isOpen={popupOpen}
