@@ -39,7 +39,7 @@ export function SlotPrenotation({
     maxDate.setMonth(maxDate.getMonth() + 1);
     const maxDateStr = maxDate.toISOString().split("T")[0];
 
-    const handleOpenCourtSelection = (slot: string, courts: ClubCourtDto[]) => {
+    const handleOpenCourtSelection = (slot: string, courts: ClubCourtDto[], slotDate: string) => {
         if(!bookings) return;
         setSelectedCourt(null);
 
@@ -50,13 +50,15 @@ export function SlotPrenotation({
 
         setSelectCourtDialogProps({
             slotState: [slot, setSelectedSlot],
-            selectedDate,
+            selectedDate: slotDate,
             courts:courtModels,
             bookings: bookings,
             pricingRules: club?.priceRoles,
             onSelectCourt: (court) => {
-            setSelectedCourt(court);
-        }})
+                setSelectedDate(slotDate);
+                setSelectedCourt(court);
+            }
+        })
         setOpenSelectCourtDialog(true);
     };
 
@@ -97,10 +99,10 @@ export function SlotPrenotation({
                     <div>
                         <CardTitle className="text-lg lg:text-xl flex items-center gap-2">
                         <CalendarIcon className="h-5 w-5 text-primary" /> 
-                        Seleziona Data e ora
+                            Seleziona Data e ora
                         </CardTitle>
                         <CardDescription>
-                        Clicca sull'orario desiderato per scegliere il campo
+                            Clicca sull'orario desiderato per scegliere il campo
                         </CardDescription>
                     </div>
 

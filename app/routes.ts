@@ -27,6 +27,7 @@ export default [
       route("/user", "routes/user.tsx"),
       route("/booking/:id", "routes/booking.tsx"),
       route("/clubs/:id/manage", "routes/clubManage.tsx"),
+      route("/clubs/:id/managerbookings", "routes/managerbookings.tsx"),
       route("/tournaments/:id/adminalessio", "routes/adminTournamentManagement.tsx"),
     ]),
 

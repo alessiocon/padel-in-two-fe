@@ -32,6 +32,7 @@ import type { PublicBookingResDto } from "./model/response/booking.public.res.dt
 import type { PublicJoinResultDto } from "./model/response/public.join.result.dto";
 import type { JoinPublicBookingDto } from "./model/request/join.public.booking.req.dto";
 import type { ReviewPublicJoinRequestDto } from "./model/request/review.public.join.req.dto";
+import type { SearchBookingResponseDto as SearchDto } from "./model/common/serach.res.dto";
 
 export class apiClient {
   private static getApiBaseUrl(): string {
@@ -147,17 +148,18 @@ private static async request<T = void>(
     return this.request<BookingQuickResDto[]>(`/bookings/?${params.toString()}`, { method: "GET" });
   }
 
-  static async searchBookingForManager(clubId: string, search: SearchBookingQueryDto): Promise<IApiResponse<BookingQuickResDto[]>> {
+  static async searchBookingForManager(clubId: string, search: SearchBookingQueryDto): Promise<IApiResponse<SearchDto<BookingQuickResDto>>> {
     const params = new URLSearchParams();
     if (search.clubId) params.append("clubId", search.clubId);
     if (search.from) params.append("from", search.from);
     if (search.to) params.append("to", search.to);
     if (search.playerId) params.append("userId", search.playerId);
+    if (search.skip !== undefined) params.append("skip", String(search.skip));
+    if (search.take !== undefined) params.append("take", String(search.take));
     if (search.status && search.status.length > 0) {
       search.status.forEach(s => params.append("status", s));
     }
-
-    return this.request<BookingQuickResDto[]>(`/bookings/clubs/${clubId}/manager?${params.toString()}`, { method: "GET" });
+    return this.request<SearchDto<BookingQuickResDto>>(`/bookings/clubs/${clubId}/manager?${params.toString()}`, { method: "GET" });
   }
 
   static async searchBookingOfUser(search: SearchBookingQueryDto): Promise<IApiResponse<BookingQuickResDto[]>> {

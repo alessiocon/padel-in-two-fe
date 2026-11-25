@@ -2,9 +2,10 @@ import type { Route } from "./+types/clubManage";
 import { useEffect, useState } from "react";
 
 import { 
+  ArrowLeft,
+  ArrowRight,
   Calendar,
   Loader2,
-  ListFilter,
   RefreshCw
 } from "lucide-react";
 
@@ -16,12 +17,13 @@ import { BookingStatus } from "../client/model/common/Enum/booking.status.dto";
 import type { IApiResponse } from "../client/interfaces/IApiResponse";
 import { CardClubInfo } from "~/components/club/card.club.info";
 import { SlotPrenotation } from "~/components/booking/slot.prenotation";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { SendPrenotationByClub } from "~/components/booking/send.prenotation.by.club";
 import type { BookingQuickResDto } from "~/client/model/response/booking.quick.res.dto";
 import { TableNotification } from "~/components/booking/table.notification";
 import type { BookingDetailResDto } from "~/client/model/response/booking.detail.res.dto";
 import { PriceList } from "~/components/club/price.list";
+import { buttonVariants } from "~/components/ui/button";
 
 
 export function meta({}: Route.MetaArgs) {
@@ -76,7 +78,7 @@ export default function ClubManagerPage() {
 
     try {
       const res = await apiClient.searchBookingForManager(club.id, {from: selectedDate, to: selectedDate});
-      setBookings(res.Data || []);
+      setBookings(res.Data?.data || []);
     } catch (error) {
       console.error("Errore nel recupero delle prenotazioni:", error);
       setBookings([]);
@@ -91,7 +93,7 @@ export default function ClubManagerPage() {
 
     try {
       const res = await apiClient.searchBookingForManager(club.id, {status: [BookingStatus.PENDING]});
-      setRequestPrenotations(res.Data || []);
+      setRequestPrenotations(res.Data?.data || []);
     } catch (error) {
       console.error("Errore nel recupero delle richieste di prenotazione:", error);
       setRequestPrenotations([]);
@@ -164,62 +166,57 @@ export default function ClubManagerPage() {
   };
 
   return (<>
-    <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 space-y-6">
-          <Button className="bg-background mx-2" variant="outline" onClick={fetchBookings} disabled={isLoadingBookings}>
-              {isLoadingBookings ? (
-                <><Loader2 className="h-4 w-4 animate-spin text-primary mr-2" /> Aggiornamento...</>
-              ) : (
-                <><RefreshCw className="h-4 w-4 mr-2" /> Aggiorna Pagina</>
-              )}
-          </Button>
+    <div className="bg-background text-foreground space-y-6 px-2 md:px-4 lg:px-8 mb-10">
+          <div className="grid grid-cols-2 gap-2 my-5">
+            <Link to={"./.."}
+              className={`${buttonVariants({ variant: "secondary", size: "sm" })}  w-full md:w-auto max-w-[150px]`}>
+              <ArrowLeft className="inline h-4 w-4" />Indietro
+          </Link>
+            {club && (
+              <Link to={`/clubs/${club.id}/managerbookings`} className={`${buttonVariants({ variant: "default", size: "sm" })}  w-full md:w-auto max-w-[150px] ml-auto`}>
+               prenotazioni <ArrowRight className="inline h-4 w-4" />
+              </Link>
+            )}
+          </div>
           <aside className="lg:col-span-1 space-y-6">
             <CardClubInfo club={club}/>
             <PriceList club={club} />
           </aside>
+
+          <TableNotification
+            bookings={requestPrenotations}
+            isLoading={isLoadingRequestPrenotations}
+            isSubmitting={isSubmitting}
+            title={<>Gestione Richieste Prenotazioni</>}
+            description={`Visualizza e modifica lo stato delle prenotazioni`}
+            emptyMessage="Nessuna richiesta presente presente"
+            onAccept={handleAcceptBooking}
+            onCancel={(bookingId) => handleUpdateStatus(bookingId, BookingStatus.CANCELLED)}
+            onRestore={(bookingId) => handleUpdateStatus(bookingId, BookingStatus.CONFIRMED)}
+          />
+
+          {/* Sezione Griglia Oraria / Prenotazione Manuale */}
+          {!selectedSlot && <SlotPrenotation 
+            club={club}
+            dateState={[selectedDate, setSelectedDate]}
+            slotState={[selectedSlot, setSelectedSlot]}
+            bookingsState={[bookings, setBookings]}
+            isLoadingBooking={isLoadingBookings}
+            setSelectedCourt={setSelectedCourt}
+          />}
+
+          {club && <SendPrenotationByClub 
+              selectedCourtState={[selectedCourt, setSelectedCourt]}
+              bookingsState={[bookings, setBookings]}
+              isLoadingBookingsState={[isLoadingBookings, setIsLoadingBookings]}
+              slotState={[selectedSlot, setSelectedSlot]}
+              clubId={club.id}
+              selectedDate={selectedDate}
+            />
+          }
+
         
-        <TableNotification
-          bookings={requestPrenotations}
-          isLoading={isLoadingRequestPrenotations}
-          isSubmitting={isSubmitting}
-          title={<>Gestione Richieste Prenotazioni</>}
-          description={`Visualizza e modifica lo stato delle prenotazioni`}
-          emptyMessage="Nessuna richiesta presente presente"
-          onAccept={handleAcceptBooking}
-          onCancel={(bookingId) => handleUpdateStatus(bookingId, BookingStatus.CANCELLED)}
-          onRestore={(bookingId) => handleUpdateStatus(bookingId, BookingStatus.CONFIRMED)}
-        />
 
-        {/* Sezione Griglia Oraria / Prenotazione Manuale */}
-        <SlotPrenotation 
-          club={club}
-          dateState={[selectedDate, setSelectedDate]}
-          slotState={[selectedSlot, setSelectedSlot]}
-          bookingsState={[bookings, setBookings]}
-          isLoadingBooking={isLoadingBookings}
-          setSelectedCourt={setSelectedCourt}
-        />
-
-         {club && <SendPrenotationByClub 
-                  selectedCourtState={[selectedCourt, setSelectedCourt]}
-                  bookingsState={[bookings, setBookings]}
-                  isLoadingBookingsState={[isLoadingBookings, setIsLoadingBookings]}
-                  slotState={[selectedSlot, setSelectedSlot]}
-                  clubId={club.id}
-                  selectedDate={selectedDate}
-                />}
-
-        {/* Lista / Tabellone Completo delle Prenotazioni del Giorno */}
-        <TableNotification
-          bookings={bookings}
-          isLoading={isLoadingBookings}
-          isSubmitting={isSubmitting}
-          title={<> <ListFilter className="inline h-5 w-5 text-primary" /> Gestione Prenotazioni del Giorno ({bookings?.length ?? 0})</>}
-          description={`Visualizza e modifica lo stato di qualsiasi prenotazione in data ${selectedDate}`}
-          emptyMessage="Nessuna prenotazione presente per questa giornata."
-          onAccept={handleAcceptBooking}
-          onCancel={(bookingId) => handleUpdateStatus(bookingId, BookingStatus.CANCELLED)}
-          onRestore={(bookingId) => handleUpdateStatus(bookingId, BookingStatus.CONFIRMED)}
-        />
       </div>
   </>);
 }

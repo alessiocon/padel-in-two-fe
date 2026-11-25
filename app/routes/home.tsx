@@ -17,7 +17,7 @@ export default function HomePage() {
   return (<>
 
     <div className="pb-6">
-        <section className="relative min-h-[45vh] overflow-hidden">
+        <section className="relative min-h-[45vh] overflow-hidden absolute left-[50%] translate-x-[-50%] min-w-[100vw]">
         {/* Immagine di sfondo */}
             <div className="absolute inset-0">
                 <img

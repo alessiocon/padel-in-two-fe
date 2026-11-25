@@ -187,7 +187,7 @@ export function EditTeamPrenotation({
             const newBooking: CreateBookingDto = {
                 courtId: selectedCourt.id,
                 clubId,
-                description: "Prenotazione da: " + auth.username,
+                description: `Prenotazione da ${auth.username}`,
                 isPublic: true,
                 joinMode: joinMode,
                 minPlayerLevel: minPlayerLevel,

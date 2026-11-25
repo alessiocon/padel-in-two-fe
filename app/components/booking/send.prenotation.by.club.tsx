@@ -55,7 +55,7 @@ export function SendPrenotationByClub({
         var newBooking: CreateBookingDto = {
             courtId: selectedCourt.id,
             clubId,
-            description: `Prenotazione da: ${auth.username}: ${bookingDescription}`,
+            description: `Prenotazione da ${auth.username}: ${bookingDescription}`,
             startsAt: new Date(`${selectedDate}T${selectedSlot}`).toISOString(),
             slots: 1,
             teams: []
@@ -90,6 +90,11 @@ export function SendPrenotationByClub({
 
     return (
         <div ref={detailsRef} className="lg:col-span-3 space-y-6 p-3 bg-card border border-border/60 shadow-lg space-y-6">
+            <div className="text-right">
+                <Button onClick={() => setSelectedSlot(null)} variant="secondary" disabled={isLoadingBookings} className="ml-auto">Annulla</Button>
+            </div>
+  
+
             <div className="grid grid-cols-[1fr_auto] items-start sm:items-center gap-4 pb-4 border-b border-border/40">
                 <div>
                     <h3 className="text-xl font-bold">

@@ -88,8 +88,8 @@ export function Footer() {
                 </div>
 
                 {/* BOTTOM BAR / COPYRIGHT */}
-                <div className="border-t pt-6 text-center md:text-left text-xs text-muted-foreground">
-                    <p>© {currentYear} PadelInTwo. Tutti i diritti riservati.</p>
+                <div className="border-t pt-6 text-center md:text-left text-xs">
+                    <p className="text-center">© {currentYear} PadelInTwo. Tutti i diritti riservati.</p>
                 </div>
             </div>
         </footer>

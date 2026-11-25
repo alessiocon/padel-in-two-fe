@@ -9,13 +9,14 @@ export class BookingQuickResDto{
 
     courtId: string;
     courtName: string;
+    courtSize: number;
     isCourtIndoor: boolean;
     createdByStaff: boolean;
 
     nPlayer: number;
 
     status: BookingStatus;
-     isPublic: boolean;
+    isPublic: boolean;
     joinMode: BookingJoinMode;
     minPlayerLevel: number | null;
     maxPlayerLevel: number | null;

@@ -122,6 +122,7 @@ export const CardUserPrenotationDetail: React.FC<CardUserPrenotationDetailProps>
       return (
         <div className="flex flex-col   gap-5 transition-colors">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border/40">
+               
                 <div className="flex flex-col gap-1.5 w-full">
                     {booking.cancAt && booking.cancReason && (
                         <div className="bg-destructive/10 text-destructive border border-destructive/20 px-2 py-1">
@@ -170,8 +171,9 @@ export const CardUserPrenotationDetail: React.FC<CardUserPrenotationDetailProps>
                 </div>
             </div>
 
+            
             {/* Team e azioni specifiche per ruolo */}
-            {booking.teams && booking.teams.length > 0 && (
+            {(booking.status !== BookingStatus.RESERVED && booking.status !== BookingStatus.CANCELLED) && booking.teams && booking.teams.length > 0 && (
                 <div className="space-y-3">
                     {isOwner ? (
                         <PlayerPrenotationManagement
@@ -250,14 +252,14 @@ export const CardUserPrenotationDetail: React.FC<CardUserPrenotationDetailProps>
                 </div>
             )}
             
-            <BookingMatchSection 
+            {(booking.status !== BookingStatus.RESERVED && booking.status !== BookingStatus.CANCELLED) && <BookingMatchSection 
                 bookingId={booking.id} 
                 team1Name={booking.teams[0].teamName}
                 team2Name={booking.teams[1].teamName}
                 bookingStatus={booking.status}
                 isStaff={isStaff} 
                 allPlayer={acceptedPlayersCount === booking.courtSize}/>
-
+            }
 
             <ViewBookingLogs logs={booking.logs || []} />
 

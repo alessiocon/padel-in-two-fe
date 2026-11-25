@@ -49,16 +49,16 @@ export default function ClubDetailPage() {
 
   let isMemberOfAClub : boolean = Boolean(club?.members.find(m => m.userId === auth?.sub));
   return (<>
-    <div className="min-h-screen text-foreground px-2 md:px-4 lg:px-8 mb-10">
+    <div className="text-foreground px-2 md:px-4 lg:px-8 mb-10">
       <div className="grid grid-cols-2 gap-2 my-5">
           <Link
-            to={"../"}
-              className={`${buttonVariants({ variant: "secondary", size: "sm" })}  w-full md:w-auto max-w-[150px] text-center whitespace-nowrap`}>
+            to={"./../"}
+              className={`${buttonVariants({ variant: "secondary", size: "sm" })}  w-full md:w-auto max-w-[150px]`}>
               <ArrowLeft className="inline h-4 w-4" /> Indietro
           </Link>
           {club && isMemberOfAClub && <>
             <Link to={`/clubs/${club.id}/manage`} 
-              className={`${buttonVariants({ variant: "default", size: "sm" })} w-full md:w-auto max-w-[150px] whitespace-nowrap ml-auto`}>
+              className={`${buttonVariants({ variant: "default", size: "sm" })} w-full md:w-auto max-w-[150px] ml-auto`}>
               Area manager <ArrowRight className="inline h-4 w-4" />
             </Link>
           </>}

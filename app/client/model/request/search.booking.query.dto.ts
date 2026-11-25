@@ -7,5 +7,7 @@ export class SearchBookingQueryDto {
    createdById?: string;
    playerId?: string;
    member?: string; 
-   status?: BookingStatus[]
+   status?: BookingStatus[];
+   skip?: number;
+   take?: number;
 }

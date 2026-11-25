@@ -52,7 +52,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return <>
     <Header/>
-    <Outlet />
+    <main className="min-h-[100vh] max-w-5xl mx-auto">
+      <Outlet />
+    </main>
     <Footer />
   </>;
 }

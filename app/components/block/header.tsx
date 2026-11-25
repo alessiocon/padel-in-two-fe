@@ -39,7 +39,7 @@ export function Header() {
 
     return (
         <header className="sticky top-0 z-50 w-full bg-primary">
-            <div className="flex h-16 items-center justify-between px-4 max-w-4xl m-auto ">
+            <div className="flex h-16 items-center justify-between px-4 max-w-5xl m-auto ">
                 <Link to="/" className="flex items-center gap-2.5">
                     <div className="h-10 w-10  rounded-lg bg-secondary text-secondary-foreground">
                         <img src={Logo} className="rounded-sm" />
